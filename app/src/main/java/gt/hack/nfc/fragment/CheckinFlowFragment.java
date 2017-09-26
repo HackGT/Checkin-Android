@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
@@ -26,9 +27,11 @@ import gt.hack.nfc.R;
 public class CheckinFlowFragment extends Fragment {
     public static int READER_FLAGS =
             NfcAdapter.FLAG_READER_NFC_A;
-    private String id = "ehsanmasdar@gmail.com";
+    private String id = "easdar@gatech.edu";
+    private boolean alreadyCheckedIn = true;
     private final String packageName = "gt.hack.nfc";
     private AppCompatButton confirmButton;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -39,6 +42,7 @@ public class CheckinFlowFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        final ProgressBar progressBar = getActivity().findViewById(R.id.waitForBadge);
         confirmButton = getActivity().findViewById(R.id.confirmCheckin);
         confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -46,42 +50,50 @@ public class CheckinFlowFragment extends Fragment {
                 getFragmentManager().popBackStack();
             }
         });
-        NfcAdapter nfc = NfcAdapter.getDefaultAdapter(getActivity());
-        if (nfc != null) {
-            nfc.enableReaderMode(getActivity(), new NfcAdapter.ReaderCallback() {
-                @Override
-                public void onTagDiscovered(Tag tag) {
-                    Ndef ndef = Ndef.get(tag);
-                    Log.d("NFC", tag.toString());
-                    try {
-                        ndef.connect();
-                        if (ndef.isWritable()) {
-                            String type = "badge";
-                            NdefRecord extRecord = NdefRecord.createExternal(packageName, type, id.getBytes());
-                            NdefMessage ndefMessage = new NdefMessage(new NdefRecord[] { extRecord });
-                            ndef.writeNdefMessage(ndefMessage);
-                            getActivity().runOnUiThread(new Runnable() {
-                                public void run() {
-                                    ProgressBar progressBar = getActivity().findViewById(R.id.waitForBadge);
-                                    progressBar.setVisibility(View.GONE);
-                                    ImageView check = getActivity().findViewById(R.id.badgeWritten);
-                                    check.setVisibility(View.VISIBLE);
-                                    confirmButton.setVisibility(View.VISIBLE);
-                                }
-                            });
-
-                        }
-                    } catch (IOException | FormatException e) {
-                        e.printStackTrace();
-                    } finally {
+        if (alreadyCheckedIn) {
+            confirmButton.setText("User already Checked-In");
+            confirmButton.setEnabled(false);
+            confirmButton.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.GONE);
+            TextView nfcInstructions = getActivity().findViewById(R.id.nfcInstructions);
+            nfcInstructions.setVisibility(View.GONE);
+        } else {
+            NfcAdapter nfc = NfcAdapter.getDefaultAdapter(getActivity());
+            if (nfc != null) {
+                nfc.enableReaderMode(getActivity(), new NfcAdapter.ReaderCallback() {
+                    @Override
+                    public void onTagDiscovered(Tag tag) {
+                        Ndef ndef = Ndef.get(tag);
+                        Log.d("NFC", tag.toString());
                         try {
-                            ndef.close();
-                        } catch (IOException e) {
+                            ndef.connect();
+                            if (ndef.isWritable()) {
+                                String type = "badge";
+                                NdefRecord extRecord = NdefRecord.createExternal(packageName, type, id.getBytes());
+                                NdefMessage ndefMessage = new NdefMessage(new NdefRecord[] { extRecord });
+                                ndef.writeNdefMessage(ndefMessage);
+                                getActivity().runOnUiThread(new Runnable() {
+                                    public void run() {
+                                        progressBar.setVisibility(View.GONE);
+                                        ImageView check = getActivity().findViewById(R.id.badgeWritten);
+                                        check.setVisibility(View.VISIBLE);
+                                        confirmButton.setVisibility(View.VISIBLE);
+                                    }
+                                });
+
+                            }
+                        } catch (IOException | FormatException e) {
                             e.printStackTrace();
+                        } finally {
+                            try {
+                                ndef.close();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
-                }
-            }, READER_FLAGS, null);
+                }, READER_FLAGS, null);
+            }
         }
     }
 }

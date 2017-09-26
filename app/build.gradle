@@ -28,6 +28,7 @@ dependencies {
     compile 'com.android.support:cardview-v7:26.1.0'
     compile 'com.android.support:design:26.1.0'
     compile 'com.google.android.gms:play-services-vision:11.4.0'
+    compile 'com.squareup.okhttp3:okhttp:3.9.0'
     compile('com.mikepenz:materialdrawer:5.9.5@aar') {
         transitive = true
     }

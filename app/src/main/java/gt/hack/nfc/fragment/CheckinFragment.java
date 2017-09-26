@@ -54,7 +54,8 @@ public class CheckinFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
         return inflater.inflate(R.layout.fragment_checkin, container, false);
     }
@@ -228,12 +229,14 @@ public class CheckinFragment extends Fragment {
         }
 
         /**
-         * Update the position/characteristics of the item within the overlay.
+         * Start tracking the detected item instance within the item overlay.
          */
         @Override
-        public void onUpdate(Detector.Detections<Barcode> detectionResults, Barcode item) {
+        public void onNewItem(int id, Barcode item) {
             detectAndLaunchCheckin(item.rawValue);
         }
+
+
         private void detectAndLaunchCheckin(String value) {
             if (value.contains("user:")) {
                 FragmentManager fragmentManager = getFragmentManager();

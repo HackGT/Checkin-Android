@@ -18,19 +18,16 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 
+import java.io.IOException;
+
+import gt.hack.nfc.util.API;
+
 
 /**
  * A login screen that offers login via email/password.
  */
 public class LoginActivity extends AppCompatActivity {
 
-    /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "ehsanmasdar@gmail.com:hello", "thehackgt@gmail.com:world"
-    };
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
@@ -41,7 +38,6 @@ public class LoginActivity extends AppCompatActivity {
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,16 +46,18 @@ public class LoginActivity extends AppCompatActivity {
         if (p.getBoolean("loggedIn", false)) {
             Intent i = new Intent(LoginActivity.this, MainActivity.class);
             startActivity(i);
-            finish();
+            if (p.getBoolean("loggedIn", false)) {
+                finish();
+            }
         }
 
         setContentView(R.layout.activity_login);
         // Set up the login form.
-        mUsernameView = (AutoCompleteTextView) findViewById(R.id.username);
+        mUsernameView = findViewById(R.id.username);
 
-        mPasswordView = (EditText) findViewById(R.id.password);
+        mPasswordView = findViewById(R.id.password);
 
-        Button mEmailSignInButton = (Button) findViewById(R.id.btn_login);
+        Button mEmailSignInButton = findViewById(R.id.btn_login);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -177,23 +175,13 @@ public class LoginActivity extends AppCompatActivity {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
-
             try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
+                return API.login(mEmail, mPassword,
+                        PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
+            } catch (IOException e) {
+                e.printStackTrace();
                 return false;
             }
-
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
-                }
-            }
-            return true;
         }
 
         @Override
@@ -203,9 +191,6 @@ public class LoginActivity extends AppCompatActivity {
 
             if (success) {
                 Intent i = new Intent(LoginActivity.this, MainActivity.class);
-                SharedPreferences p = PreferenceManager
-                        .getDefaultSharedPreferences(getApplicationContext());
-                p.edit().putBoolean("loggedIn", true).apply();
                 startActivity(i);
                 finish();
             } else {
