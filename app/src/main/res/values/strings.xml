@@ -19,4 +19,7 @@
     <string name="low_storage_error">Code detector dependencies cannot be downloaded due to low device storage</string>
     <string name="no_camera_permission">Camera required for code detection</string>
     <string name="checkin_flow">Check In Flow</string>
+    <string name="search_title">Search users</string>
+    <string name="search_hint">Enter hacker name or email</string>
+    <string name="search_activity_label">Search for Hacker</string>
 </resources>

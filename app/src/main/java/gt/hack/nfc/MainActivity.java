@@ -1,6 +1,7 @@
 package gt.hack.nfc;
 
 import android.app.PendingIntent;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -17,9 +18,13 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.WindowManager;
 
@@ -33,6 +38,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
 import gt.hack.nfc.fragment.CheckinFragment;
+import gt.hack.nfc.fragment.SearchFragment;
 
 
 /**
@@ -57,7 +63,8 @@ public class MainActivity extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        final IProfile profile = new ProfileDrawerItem().withName("Ehsan Asdar").withEmail("ehsanmasdar@gmail.com").withIdentifier(100);
+        final IProfile profile = new ProfileDrawerItem().withName("Ehsan Asdar")
+                .withEmail("ehsanmasdar@gmail.com").withIdentifier(100);
         headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
                 .withTranslucentStatusBar(true)
@@ -65,14 +72,15 @@ public class MainActivity extends AppCompatActivity {
                 .withSavedInstance(savedInstanceState)
                 .build();
 
-        PrimaryDrawerItem checkin = new PrimaryDrawerItem().withName("Check In");
+        PrimaryDrawerItem checkin = new PrimaryDrawerItem().withName("Scan QR Code");
+        PrimaryDrawerItem checkinManual = new PrimaryDrawerItem().withName("Manual User Search");
+
         result = new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(toolbar)
                 .withHasStableIds(true)
                 .withAccountHeader(headerResult)
-                .addDrawerItems(checkin,
-                        new PrimaryDrawerItem().withName("test"))
+                .addDrawerItems(checkin, checkinManual)
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
 
                     @Override
@@ -81,6 +89,10 @@ public class MainActivity extends AppCompatActivity {
                             FragmentManager fragmentManager = getSupportFragmentManager();
                             if (position == 1) {
                                 CheckinFragment fragment = new CheckinFragment();
+                                fragmentManager.beginTransaction()
+                                        .replace(R.id.content_frame, fragment).commit();
+                            } else if (position == 2) {
+                                SearchFragment fragment = new SearchFragment();
                                 fragmentManager.beginTransaction()
                                         .replace(R.id.content_frame, fragment).commit();
                             }
@@ -93,30 +105,6 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             result.setSelection(checkin, true);
         }
-
-        // NFC Foreground dispatch
-//        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-//        mAdapter = NfcAdapter.getDefaultAdapter(this);
-//        pendingIntent = PendingIntent.getActivity(
-//                this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
-//        IntentFilter ndef = new IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED);
-//        try {
-//            ndef.addDataType("*/*");
-//        } catch (IntentFilter.MalformedMimeTypeException e) {
-//            throw new RuntimeException("fail", e);
-//        }
-//        IntentFilter td = new IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED);
-//        intentFiltersArray = new IntentFilter[] {
-//                ndef, td
-//        };
-//
-//        // Setup a tech list for all NfcF tags
-//        techLists = new String[][] { new String[] {
-//                NfcV.class.getName(),
-//                NfcF.class.getName(),
-//                NfcA.class.getName(),
-//                NfcB.class.getName()
-//        } };
     }
 
     @Override

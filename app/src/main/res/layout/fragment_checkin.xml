@@ -12,37 +12,5 @@
         android:layout_height="wrap_content">
 
     </gt.hack.nfc.util.CameraSourcePreview>
-    <!--<LinearLayout-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_alignBottom="@+id/preview">-->
-        <!--<android.support.design.widget.TextInputLayout-->
-            <!--android:id="@+id/firstNameWrapper"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:minWidth="300dp"-->
-            <!--android:layout_toRightOf="@+id/userIcon">-->
-
-            <!--<EditText-->
-                <!--android:id="@+id/backupEmailEntry"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_gravity="center_vertical"-->
-                <!--android:minWidth="300dp"-->
-                <!--android:hint="Email"-->
-                <!--android:text=""-->
-                <!--android:inputType="textEmailAddress" />-->
-        <!--</android.support.design.widget.TextInputLayout>-->
-        <!--<Button-->
-            <!--android:id="@+id/backupSubmit"-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:minWidth="150dp"-->
-            <!--android:background="@color/primaryColor"-->
-            <!--android:textColor="@color/white"-->
-            <!--android:text="Submit"/>-->
-    <!--</LinearLayout>-->
-
-
 
 </RelativeLayout>
