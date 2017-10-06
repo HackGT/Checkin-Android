@@ -1,6 +1,8 @@
 package gt.hack.nfc.fragment;
 
 
+import android.media.AudioManager;
+import android.media.ToneGenerator;
 import android.nfc.FormatException;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
@@ -136,6 +138,8 @@ public class CheckinFlowFragment extends Fragment {
                                                 .findViewById(R.id.badgeWritten);
                                         check.setVisibility(View.VISIBLE);
                                         confirmButton.setVisibility(View.VISIBLE);
+                                        ToneGenerator toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
+                                        toneGen1.startTone(ToneGenerator.TONE_CDMA_ABBR_ALERT,150);
                                     }
                                 });
 

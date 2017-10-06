@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.media.AudioManager;
+import android.media.ToneGenerator;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -252,7 +254,8 @@ public class CheckinFragment extends Fragment {
             if (value.contains("user:") && !foundTag) {
                 foundTag = true;
                 String id = value.split("user:")[1];
-
+                ToneGenerator toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
+                toneGen1.startTone(ToneGenerator.TONE_CDMA_PIP,150);
                 new GetUser(CheckinFragment.this).execute(id);
             }
         }
@@ -290,8 +293,8 @@ public class CheckinFragment extends Fragment {
         @Override
         protected void onPostExecute(UserFragment user) {
             super.onPostExecute(user);
+            this.dialog.dismiss();
             if (user != null) {
-                this.dialog.dismiss();
                 CheckinFlowFragment fragment2 = CheckinFlowFragment.newInstance(user);
                 FragmentManager fragmentManager = getFragmentManager();
                 FragmentTransaction transaction = fragmentManager.beginTransaction();
@@ -303,6 +306,11 @@ public class CheckinFragment extends Fragment {
                 transaction.commit();
             } else {
                 Toast.makeText(getContext(), "User not found!", Toast.LENGTH_LONG).show();
+                ToneGenerator toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
+                toneGen1.startTone(ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK,500);
+//                ToneGenerator.TONE_SUP_ERROR
+//                toneGen1.startTone(ToneGenerator.TONE_CDMA_ABBR_ALERT,150);
+//                toneGen1.startTone(ToneGenerator.TONE_CDMA_ABBR_ALERT,150);
                 foundTag = false;
             }
         }
