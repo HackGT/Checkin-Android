@@ -308,9 +308,6 @@ public class CheckinFragment extends Fragment {
                 Toast.makeText(getContext(), "User not found!", Toast.LENGTH_LONG).show();
                 ToneGenerator toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
                 toneGen1.startTone(ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK,500);
-//                ToneGenerator.TONE_SUP_ERROR
-//                toneGen1.startTone(ToneGenerator.TONE_CDMA_ABBR_ALERT,150);
-//                toneGen1.startTone(ToneGenerator.TONE_CDMA_ABBR_ALERT,150);
                 foundTag = false;
             }
         }
