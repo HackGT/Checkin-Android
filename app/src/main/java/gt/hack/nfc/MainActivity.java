@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
 import android.nfc.NfcManager;
@@ -111,7 +112,11 @@ public class MainActivity extends AppCompatActivity {
                 .build();
         if (savedInstanceState == null) {
             result.setSelection(checkin, true);
+
         }
+
+        // Lock activity to portrait
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
     }
 
     @Override

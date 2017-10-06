@@ -55,6 +55,7 @@ public class SearchFragment extends ListFragment implements SearchView.OnQueryTe
     @Override
     public boolean onQueryTextSubmit(String query) {
         adapter.clear();
+        setListShown(false);
         new HackerLoadTask().execute(query);
         return false;
     }
@@ -94,6 +95,7 @@ public class SearchFragment extends ListFragment implements SearchView.OnQueryTe
         @Override
         protected void onPostExecute(ArrayList<UserFragment> searchResults) {
             super.onPostExecute(searchResults);
+            setListShown(true);
             if (searchResults != null) {
                 adapter.clear();
                 adapter.addAll(searchResults);
