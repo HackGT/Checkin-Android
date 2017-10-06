@@ -48,7 +48,10 @@ public class CheckinFlowFragment extends Fragment {
         args.putString("email", user.email);
         String school = Util.getValueOfQuestion(user.questions, "school");
         args.putString("school", school);
-        args.putString("branch", user.application.type);
+
+        if (user.application != null) {
+            args.putString("branch", user.application.type);
+        }
 
         f.setArguments(args);
 
@@ -86,7 +89,10 @@ public class CheckinFlowFragment extends Fragment {
         }
 
         TextView branchView = getView().findViewById(R.id.hacker_checkin_type);
-        branchView.setText(branch);
+        if (branch != null) {
+            branchView.setText(branch);
+        }
+
 
         confirmButton = getActivity().findViewById(R.id.confirmCheckin);
         confirmButton.setOnClickListener(new View.OnClickListener() {

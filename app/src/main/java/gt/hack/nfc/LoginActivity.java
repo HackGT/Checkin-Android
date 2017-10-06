@@ -165,18 +165,18 @@ public class LoginActivity extends AppCompatActivity {
      */
     public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
 
-        private final String mEmail;
-        private final String mPassword;
+        private final String username;
+        private final String password;
 
-        UserLoginTask(String email, String password) {
-            mEmail = email;
-            mPassword = password;
+        UserLoginTask(String username, String password) {
+            this.username = username;
+            this.password = password;
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-                return API.login(mEmail, mPassword,
+                return API.login(username, password,
                         PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
             } catch (IOException e) {
                 e.printStackTrace();
@@ -190,6 +190,9 @@ public class LoginActivity extends AppCompatActivity {
             showProgress(false);
 
             if (success) {
+                SharedPreferences preferences = PreferenceManager
+                        .getDefaultSharedPreferences(getApplicationContext());
+                preferences.edit().putString("username", username).commit();
                 Intent i = new Intent(LoginActivity.this, MainActivity.class);
                 startActivity(i);
                 finish();

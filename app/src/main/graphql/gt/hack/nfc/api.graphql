@@ -3,6 +3,9 @@ query UserSearch($text: String!, $number: Int!) {
             user {
                 ...UserFragment
             }
+            tags {
+                ...TagFragment
+            }
        }
 }
 query UserGet($id: ID!) {
@@ -10,8 +13,26 @@ query UserGet($id: ID!) {
             user {
                 ...UserFragment
             }
-
+            tags {
+                ...TagFragment
+            }
        }
+}
+mutation SetTag($id: ID!, $tag: String!) {
+   check_in(user: $id, tag: $tag) {
+        user {
+            ...UserFragment
+        }
+        tags {
+            ...TagFragment
+        }
+   }
+}
+fragment TagFragment on TagState {
+    tag {
+        name
+    }
+    checked_in
 }
 fragment UserFragment on User {
   id
@@ -24,4 +45,5 @@ fragment UserFragment on User {
       name
       value
   }
+
 }

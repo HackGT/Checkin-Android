@@ -5,6 +5,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
 import android.nfc.NfcManager;
@@ -16,6 +17,7 @@ import android.nfc.tech.NfcF;
 import android.nfc.tech.NfcV;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
@@ -63,13 +65,18 @@ public class MainActivity extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        final IProfile profile = new ProfileDrawerItem().withName("Ehsan Asdar")
-                .withEmail("ehsanmasdar@gmail.com").withIdentifier(100);
+        SharedPreferences preferences = PreferenceManager
+                .getDefaultSharedPreferences(getApplicationContext());
+        final IProfile profile = new ProfileDrawerItem()
+                .withName(preferences.getString("username", "HackGT User"))
+                .withIdentifier(100)
+                .withIcon(R.color.primaryDarkColor);
         headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
                 .withTranslucentStatusBar(true)
                 .addProfiles(profile)
                 .withSavedInstance(savedInstanceState)
+                .withHeaderBackground(R.color.primaryDarkColor)
                 .build();
 
         PrimaryDrawerItem checkin = new PrimaryDrawerItem().withName("Scan QR Code");
