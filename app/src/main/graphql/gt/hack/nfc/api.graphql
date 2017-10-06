@@ -15,6 +15,9 @@ query UserGet($id: ID!) {
 }
 fragment UserFragment on User {
   id
+  application {
+    type
+  }
   name
   email
   questions(names: ["school", "tshirt-size","dietary-restrictions", "optional-items"]) {

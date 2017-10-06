@@ -61,8 +61,6 @@ public class SearchFragment extends ListFragment implements SearchView.OnQueryTe
 
     @Override
     public boolean onQueryTextChange(String newText) {
-//        adapter.clear();
-//        new HackerLoadTask().execute(newText);
         return false;
     }
 
@@ -97,6 +95,7 @@ public class SearchFragment extends ListFragment implements SearchView.OnQueryTe
         protected void onPostExecute(ArrayList<UserFragment> searchResults) {
             super.onPostExecute(searchResults);
             if (searchResults != null) {
+                adapter.clear();
                 adapter.addAll(searchResults);
                 ((SearchAdapter) getListAdapter()).notifyDataSetChanged();
             }

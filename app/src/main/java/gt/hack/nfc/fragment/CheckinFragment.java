@@ -43,6 +43,7 @@ public class CheckinFragment extends Fragment {
 
     private CameraSource mCameraSource;
     private CameraSourcePreview mPreview;
+    private boolean foundTag;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -122,7 +123,7 @@ public class CheckinFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-
+        foundTag = false;
         startCameraSource();
     }
 
@@ -248,7 +249,8 @@ public class CheckinFragment extends Fragment {
 
 
         private void detectAndLaunchCheckin(String value) {
-            if (value.contains("user:")) {
+            if (value.contains("user:") && !foundTag) {
+                foundTag = true;
                 String id = value.split("user:")[1];
 
                 new GetUser(CheckinFragment.this).execute(id);
@@ -297,9 +299,11 @@ public class CheckinFragment extends Fragment {
                         R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
                 transaction.addToBackStack(null);
                 transaction.replace(R.id.content_frame, fragment2);
+                foundTag = false;
                 transaction.commit();
             } else {
                 Toast.makeText(getContext(), "User not found!", Toast.LENGTH_LONG).show();
+                foundTag = false;
             }
         }
     }

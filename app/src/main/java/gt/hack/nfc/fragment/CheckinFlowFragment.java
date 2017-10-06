@@ -34,6 +34,7 @@ public class CheckinFlowFragment extends Fragment {
     private String name;
     private String email;
     private String school;
+    private String branch;
     private boolean alreadyCheckedIn = false;
     private final String packageName = "gt.hack.nfc";
     private AppCompatButton confirmButton;
@@ -47,6 +48,7 @@ public class CheckinFlowFragment extends Fragment {
         args.putString("email", user.email);
         String school = Util.getValueOfQuestion(user.questions, "school");
         args.putString("school", school);
+        args.putString("branch", user.application.type);
 
         f.setArguments(args);
 
@@ -63,6 +65,7 @@ public class CheckinFlowFragment extends Fragment {
         name = bundle.getString("name");
         email = bundle.getString("email");
         school = bundle.getString("school");
+        branch = bundle.getString("branch");
         return inflater.inflate(R.layout.fragment_checkin_confirm, container, false);
     }
 
@@ -81,6 +84,9 @@ public class CheckinFlowFragment extends Fragment {
         if (school != null) {
             schoolView.setText(school);
         }
+
+        TextView branchView = getView().findViewById(R.id.hacker_checkin_type);
+        branchView.setText(branch);
 
         confirmButton = getActivity().findViewById(R.id.confirmCheckin);
         confirmButton.setOnClickListener(new View.OnClickListener() {
