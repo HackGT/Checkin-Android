@@ -2,11 +2,14 @@ package gt.hack.nfc.fragment;
 
 import android.Manifest;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -14,13 +17,11 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.apollographql.apollo.exception.ApolloException;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.vision.CameraSource;
@@ -32,6 +33,7 @@ import com.google.android.gms.vision.barcode.BarcodeDetector;
 import java.io.IOException;
 
 import gt.hack.nfc.R;
+import gt.hack.nfc.util.API;
 import gt.hack.nfc.util.CameraSourcePreview;
 
 public class CheckinFragment extends Fragment {
@@ -247,14 +249,57 @@ public class CheckinFragment extends Fragment {
 
         private void detectAndLaunchCheckin(String value) {
             if (value.contains("user:")) {
+                String id = value.split("user:")[1];
+
+                new GetUser(CheckinFragment.this).execute(id);
+            }
+        }
+    }
+    class GetUser extends AsyncTask<String,String,UserFragment> {
+
+        private ProgressDialog dialog;
+        private CheckinFragment fragment;
+
+        public GetUser(CheckinFragment fragment) {
+            this.fragment = fragment;
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+            this.dialog = new ProgressDialog(fragment.getActivity());
+            this.dialog.setMessage("Searching for user ...");
+            this.dialog.show();
+        }
+
+        @Override
+        protected UserFragment doInBackground(String... strings) {
+            this.publishProgress("Show dialog");
+            try {
+                return API.getUserId(
+                        PreferenceManager.getDefaultSharedPreferences(getActivity()), strings[0]);
+
+            } catch (ApolloException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(UserFragment user) {
+            super.onPostExecute(user);
+            if (user != null) {
+                this.dialog.dismiss();
+                CheckinFlowFragment fragment2 = CheckinFlowFragment.newInstance(user);
                 FragmentManager fragmentManager = getFragmentManager();
                 FragmentTransaction transaction = fragmentManager.beginTransaction();
-                transaction.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
-
-                CheckinFlowFragment fragment2 = new CheckinFlowFragment();
+                transaction.setCustomAnimations(R.anim.enter,
+                        R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
                 transaction.addToBackStack(null);
                 transaction.replace(R.id.content_frame, fragment2);
                 transaction.commit();
+            } else {
+                Toast.makeText(getContext(), "User not found!", Toast.LENGTH_LONG).show();
             }
         }
     }

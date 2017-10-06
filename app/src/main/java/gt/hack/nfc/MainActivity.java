@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
         PrimaryDrawerItem checkin = new PrimaryDrawerItem().withName("Scan QR Code");
-        PrimaryDrawerItem checkinManual = new PrimaryDrawerItem().withName("Manual User Search");
+        PrimaryDrawerItem checkinManual = new PrimaryDrawerItem().withName("Search for User");
 
         result = new DrawerBuilder()
                 .withActivity(this)

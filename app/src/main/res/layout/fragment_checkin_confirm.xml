@@ -56,38 +56,15 @@
                     android:layout_toRightOf="@+id/userIcon">
 
                     <EditText
-                        android:id="@+id/username"
+                        android:id="@+id/hacker_checkin_name"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:hint="First name"
-                        android:text="Ehsan"
+                        android:hint="Name"
                         android:inputType="none"
                         android:focusable="false"
                         android:focusableInTouchMode="false"/>
                 </android.support.design.widget.TextInputLayout>
-                <android.support.design.widget.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/firstNameWrapper"
-                    android:layout_gravity="center_vertical"
-                    android:layout_toRightOf="@+id/userIcon">
-
-                    <EditText
-                        android:id="@+id/lastName"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_toEndOf="@+id/imageView"
-                        android:layout_toRightOf="@+id/imageView"
-                        android:layout_weight="1"
-                        android:text="Asdar"
-                        android:hint="Last name"
-                        android:inputType="none"
-                        android:focusable="false"
-                        android:focusableInTouchMode="false"/>
-                </android.support.design.widget.TextInputLayout>
-
             </RelativeLayout>
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -109,12 +86,11 @@
                     android:layout_toRightOf="@+id/emailIcon">
 
                     <EditText
-                        android:id="@+id/email"
+                        android:id="@+id/hacker_checkin_email"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:hint="Email"
-                        android:text="easdar@gatech.edu"
                         android:inputType="none"
                         android:focusable="false"
                         android:focusableInTouchMode="false"/>
@@ -141,12 +117,11 @@
                     android:layout_toRightOf="@+id/schoolIcon">
 
                     <EditText
-                        android:id="@+id/school"
+                        android:id="@+id/hacker_checkin_school"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:hint="School"
-                        android:text="Georgia Institute of Technology"
                         android:inputType="none"
                         android:focusable="false"
                         android:focusableInTouchMode="false"/>

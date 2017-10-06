@@ -12,31 +12,31 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import gt.hack.nfc.R;
+import gt.hack.nfc.fragment.UserFragment;
 
-public class SearchAdapter extends ArrayAdapter<Hacker> {
+public class SearchAdapter extends ArrayAdapter<UserFragment> {
     private LayoutInflater inflater;
     private int viewResourceID;
-    private ArrayList<Hacker> items;
 
     public SearchAdapter(@NonNull Context context, @LayoutRes int resource,
-                         @NonNull ArrayList<Hacker> objects) {
+                         @NonNull ArrayList<UserFragment> objects) {
         super(context, resource, objects);
         inflater = LayoutInflater.from(context);
         viewResourceID = resource;
-        items = objects;
+        addAll(objects);
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View v = convertView;
-        Hacker hacker = items.get(position);
+        UserFragment hacker = getItem(position);
         if (v == null) {
             v = inflater.inflate(viewResourceID, parent, false);
-            TextView name = v.findViewById(R.id.hacker_card_name);
-            TextView email = v.findViewById(R.id.hacker_card_email);
-            name.setText(hacker.getName());
-            email.setText(hacker.getEmail());
         }
+        TextView name = v.findViewById(R.id.hacker_card_name);
+        TextView email = v.findViewById(R.id.hacker_card_email);
+        name.setText(hacker.name());
+        email.setText(hacker.email());
         return v;
     }
 }

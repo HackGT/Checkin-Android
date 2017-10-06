@@ -1,0 +1,24 @@
+query UserSearch($text: String!, $number: Int!) {
+       search_user(search: $text, offset: 0, n: $number) {
+            user {
+                ...UserFragment
+            }
+       }
+}
+query UserGet($id: ID!) {
+       user(id: $id) {
+            user {
+                ...UserFragment
+            }
+
+       }
+}
+fragment UserFragment on User {
+  id
+  name
+  email
+  questions(names: ["school", "tshirt-size","dietary-restrictions", "optional-items"]) {
+      name
+      value
+  }
+}

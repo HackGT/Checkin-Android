@@ -3,7 +3,9 @@ package gt.hack.nfc.fragment;
 
 import android.app.SearchManager;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -12,25 +14,26 @@ import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
+
+import com.apollographql.apollo.exception.ApolloException;
 
 import java.util.ArrayList;
 
+
 import gt.hack.nfc.R;
-import gt.hack.nfc.util.Hacker;
+import gt.hack.nfc.util.API;
 import gt.hack.nfc.util.SearchAdapter;
 
 public class SearchFragment extends ListFragment implements SearchView.OnQueryTextListener {
-    private ArrayList<Hacker> hackers;
     private SearchAdapter adapter;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        hackers = new ArrayList<>();
         adapter = new SearchAdapter(getContext(),
-                R.layout.card_hacker, hackers);
+                R.layout.card_hacker, new ArrayList<UserFragment>());
         setListAdapter(adapter);
     }
 
@@ -51,14 +54,15 @@ public class SearchFragment extends ListFragment implements SearchView.OnQueryTe
 
     @Override
     public boolean onQueryTextSubmit(String query) {
-        hackers.clear();
-        hackers.add(new Hacker("Ehsan Asdar", "easdar@gatech.edu", "M", "Georgia Institute of Technology"));
-        adapter.notifyDataSetChanged();
+        adapter.clear();
+        new HackerLoadTask().execute(query);
         return false;
     }
 
     @Override
     public boolean onQueryTextChange(String newText) {
+//        adapter.clear();
+//        new HackerLoadTask().execute(newText);
         return false;
     }
 
@@ -67,12 +71,36 @@ public class SearchFragment extends ListFragment implements SearchView.OnQueryTe
         super.onListItemClick(l, v, position, id);
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.setCustomAnimations(R.anim.enter, R.anim.exit, R.anim.pop_enter, R.anim.pop_exit);
+        transaction.setCustomAnimations(R.anim.enter, R.anim.exit,
+                R.anim.pop_enter, R.anim.pop_exit);
 
-        CheckinFlowFragment fragment2 = new CheckinFlowFragment();
+        CheckinFlowFragment fragment2 = CheckinFlowFragment.newInstance(adapter.getItem(position));
         transaction.addToBackStack(null);
         transaction.replace(R.id.content_frame, fragment2);
         transaction.commit();
+    }
+
+    class HackerLoadTask extends AsyncTask<String, String, ArrayList<UserFragment>> {
+
+        @Override
+        protected ArrayList<UserFragment> doInBackground(String... strings) {
+            try {
+                return API.getUsers(PreferenceManager.getDefaultSharedPreferences(getActivity())
+                        , strings[0]);
+            } catch (ApolloException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<UserFragment> searchResults) {
+            super.onPostExecute(searchResults);
+            if (searchResults != null) {
+                adapter.addAll(searchResults);
+                ((SearchAdapter) getListAdapter()).notifyDataSetChanged();
+            }
+        }
     }
 }
 

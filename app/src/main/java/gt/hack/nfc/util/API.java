@@ -1,19 +1,29 @@
 package gt.hack.nfc.util;
 
 import android.content.SharedPreferences;
+import android.util.Log;
+
+import com.apollographql.apollo.ApolloClient;
+import com.apollographql.apollo.exception.ApolloException;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
+
+import gt.hack.nfc.UserGetQuery;
+import gt.hack.nfc.UserSearchQuery;
+import gt.hack.nfc.fragment.UserFragment;
 import okhttp3.Call;
 import okhttp3.FormBody;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class API {
-    public static final String checkinUrl = "https://checkin.hack.gt";
+    public static final String BASE_URL = "https://checkin.hack.gt";
 
 
     public static boolean login(String username, String password,
@@ -23,7 +33,7 @@ public class API {
                 .add("username", username)
                 .add("password", password)
                 .build();
-        Request request = new Request.Builder().url(checkinUrl + "/api/user/login").post(formBody).build();
+        Request request = new Request.Builder().url(BASE_URL + "/api/user/login").post(formBody).build();
         Call call = client.newCall(request);
         try (Response response = call.execute()) {
             System.out.println(response);
@@ -34,7 +44,7 @@ public class API {
                 for (String cookie : cookieResponses) {
                     // Gross string manipulation
                     if (cookie.contains("auth=")) {
-                        authCookie = cookie.substring(cookie.indexOf("auth=") + 5);
+                        authCookie = cookie.substring(cookie.indexOf("auth="));
                         authCookie = authCookie.substring(0, authCookie.indexOf(";"));
                     }
                 }
@@ -44,4 +54,54 @@ public class API {
         }
         return false;
     }
+    private static ApolloClient getApolloClient (final SharedPreferences preferences) {
+        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(new Interceptor() {
+            @Override
+            public Response intercept(Chain chain) throws IOException {
+                Request original = chain.request();
+                Request.Builder builder = original.newBuilder().method(original.method(),
+                        original.body());
+                builder.header("Cookie", preferences.getString("cookie", ""));
+                System.out.println(chain.request().url());
+                return chain.proceed(builder.build());
+            }
+        })
+                .build();
+        return ApolloClient.builder()
+                .serverUrl(BASE_URL + "/graphql/")
+                .okHttpClient(client).build();
+    }
+
+
+    public static ArrayList<UserFragment> getUsers(final SharedPreferences preferences, String query)
+            throws ApolloException {
+        ApolloClient apolloClient = getApolloClient(preferences);
+        com.apollographql.apollo.api.Response<UserSearchQuery.Data> response =
+                apolloClient.query(new UserSearchQuery(query, 20)).execute();
+        ArrayList<UserFragment> users = new ArrayList<>();
+        if (response.hasErrors()) {
+            Log.e("apollo", response.errors().toString());
+            return null;
+        }
+        for (UserSearchQuery.Search_user user : response.data().search_user()) {
+            users.add(user.user().fragments().userFragment());
+        }
+        return users;
+    }
+
+    public static UserFragment getUserId(final SharedPreferences preferences, String id)
+            throws ApolloException {
+        ApolloClient apolloClient = getApolloClient(preferences);
+        com.apollographql.apollo.api.Response<UserGetQuery.Data> response =
+                apolloClient.query(new UserGetQuery(id)).execute();
+        if (response.hasErrors()) {
+            Log.e("apollo", response.errors().toString());
+            return null;
+        }
+        if (response.data().user() != null && response.data().user().user() != null) {
+             return response.data().user().user().fragments().userFragment();
+        }
+        return null;
+    }
+
 }
