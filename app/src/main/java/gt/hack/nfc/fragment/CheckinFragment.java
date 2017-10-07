@@ -294,7 +294,7 @@ public class CheckinFragment extends Fragment {
         protected void onPostExecute(UserFragment user) {
             super.onPostExecute(user);
             this.dialog.dismiss();
-            if (user != null) {
+            if (user != null && user.attending) {
                 CheckinFlowFragment fragment2 = CheckinFlowFragment.newInstance(user);
                 FragmentManager fragmentManager = getFragmentManager();
                 FragmentTransaction transaction = fragmentManager.beginTransaction();
@@ -305,7 +305,8 @@ public class CheckinFragment extends Fragment {
                 foundTag = false;
                 transaction.commit();
             } else {
-                Toast.makeText(getContext(), "User not found!", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), "User not found! Please proceed to help desk.",
+                        Toast.LENGTH_LONG).show();
                 ToneGenerator toneGen1 = new ToneGenerator(AudioManager.STREAM_MUSIC, 100);
                 toneGen1.startTone(ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK,500);
                 foundTag = false;

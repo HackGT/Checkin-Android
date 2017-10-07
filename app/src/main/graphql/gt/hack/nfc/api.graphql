@@ -1,5 +1,5 @@
 query UserSearch($text: String!, $number: Int!) {
-       search_user(search: $text, offset: 0, n: $number) {
+       search_user(search: $text, offset: 0, n: $number, filter: {attending: true}) {
             user {
                 ...UserFragment
             }
@@ -36,6 +36,9 @@ fragment TagFragment on TagState {
 }
 fragment UserFragment on User {
   id
+  applied
+  accepted
+  attending
   application {
     type
   }
