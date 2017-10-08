@@ -23,4 +23,7 @@
     <string name="search_title">Search users</string>
     <string name="search_hint">Enter hacker name or email</string>
     <string name="search_activity_label">Search for Hacker</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
