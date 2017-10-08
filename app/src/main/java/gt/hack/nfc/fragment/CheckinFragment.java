@@ -114,7 +114,7 @@ public class CheckinFragment extends Fragment {
                 , barcodeDetector)
                 .setFacing(CameraSource.CAMERA_FACING_BACK)
                 .setRequestedPreviewSize(1280, 720)
-                .setRequestedFps(15.0f)
+                .setRequestedFps(60.0f)
                 .setAutoFocusEnabled(true)
                 .build();
     }
