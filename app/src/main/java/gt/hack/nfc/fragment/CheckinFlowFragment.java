@@ -104,7 +104,7 @@ public class CheckinFlowFragment extends Fragment {
             }
         });
         if (alreadyCheckedIn) {
-            confirmButton.setText("User already Checked-In");
+            confirmButton.setText("User already checked in");
             confirmButton.setEnabled(false);
             confirmButton.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.GONE);
@@ -130,6 +130,8 @@ public class CheckinFlowFragment extends Fragment {
                                         new NdefRecord[] { extRecord });
 
                                 ndef.writeNdefMessage(ndefMessage);
+                                // Uncomment to make the tag read-only in production
+                                //ndef.makeReadOnly();
 
                                 getActivity().runOnUiThread(new Runnable() {
                                     public void run() {
