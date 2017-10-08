@@ -32,6 +32,7 @@ import android.view.View;
 import android.view.WindowManager;
 
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.iconics.typeface.IIcon;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -60,6 +61,29 @@ public class MainActivity extends AppCompatActivity {
     private NfcAdapter mAdapter;
     private String[][] techLists;
 
+    private enum DrawerItem {
+        SCAN ("Scan QR Code", GoogleMaterial.Icon.gmd_camera),
+        SEARCH ("Search for User", GoogleMaterial.Icon.gmd_search),
+        LOGOUT ("Log out", GoogleMaterial.Icon.gmd_exit_to_app);
+
+        private String label;
+        private IIcon icon;
+        private PrimaryDrawerItem drawerItem;
+
+        DrawerItem(String label, IIcon icon) {
+            this.label = label;
+            this.icon = icon;
+            this.drawerItem = new PrimaryDrawerItem().withName(label).withIcon(icon);
+        }
+
+        public PrimaryDrawerItem getDrawerItem() {
+            return drawerItem;
+        }
+        public String getLabel() {
+            return label;
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,26 +105,16 @@ public class MainActivity extends AppCompatActivity {
                 .withHeaderBackground(R.drawable.header)
                 .build();
 
-        PrimaryDrawerItem checkin = new PrimaryDrawerItem()
-                .withName("Scan QR Code")
-                .withIcon(GoogleMaterial.Icon.gmd_camera);
-        PrimaryDrawerItem checkinManual = new PrimaryDrawerItem()
-                .withName("Search for User")
-                .withIcon(GoogleMaterial.Icon.gmd_search);
-        PrimaryDrawerItem logout = new PrimaryDrawerItem()
-                .withName("Log out")
-                .withIcon(GoogleMaterial.Icon.gmd_exit_to_app);
-
         result = new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(toolbar)
                 .withHasStableIds(true)
                 .withAccountHeader(headerResult)
                 .addDrawerItems(
-                        checkin,
-                        checkinManual,
+                        DrawerItem.SCAN.getDrawerItem(),
+                        DrawerItem.SEARCH.getDrawerItem(),
                         new DividerDrawerItem(),
-                        logout
+                        DrawerItem.LOGOUT.getDrawerItem()
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
 
@@ -116,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
                                 SearchFragment fragment = new SearchFragment();
                                 fragmentManager.beginTransaction()
                                         .replace(R.id.content_frame, fragment).commit();
-                            } else if (position == 3) {
+                            } else if (position == 4) {
                                 logOut();
                             }
                             setTitle(((PrimaryDrawerItem) drawerItem).getName().toString());
@@ -126,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
                 })
                 .build();
         if (savedInstanceState == null) {
-            result.setSelection(checkin, true);
+            result.setSelection(DrawerItem.SCAN.getDrawerItem(), true);
         }
     }
 
