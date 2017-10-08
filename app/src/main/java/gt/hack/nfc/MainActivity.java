@@ -82,13 +82,14 @@ public class MainActivity extends AppCompatActivity {
 
         PrimaryDrawerItem checkin = new PrimaryDrawerItem().withName("Scan QR Code");
         PrimaryDrawerItem checkinManual = new PrimaryDrawerItem().withName("Search for User");
+        final PrimaryDrawerItem logout = new PrimaryDrawerItem().withName("Log out");
 
         result = new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(toolbar)
                 .withHasStableIds(true)
                 .withAccountHeader(headerResult)
-                .addDrawerItems(checkin, checkinManual)
+                .addDrawerItems(checkin, checkinManual, logout)
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
 
                     @Override
@@ -103,6 +104,8 @@ public class MainActivity extends AppCompatActivity {
                                 SearchFragment fragment = new SearchFragment();
                                 fragmentManager.beginTransaction()
                                         .replace(R.id.content_frame, fragment).commit();
+                            } else if (position == 3) {
+                                logOut();
                             }
                             setTitle(((PrimaryDrawerItem) drawerItem).getName().toString());
                         }
@@ -112,11 +115,17 @@ public class MainActivity extends AppCompatActivity {
                 .build();
         if (savedInstanceState == null) {
             result.setSelection(checkin, true);
-
         }
+    }
 
-        // Lock activity to portrait
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_NOSENSOR);
+    private void logOut() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        // May want to keep around some information in the future
+        // For now, clear everything
+        preferences.edit().clear().commit();
+        Intent i = new Intent(MainActivity.this, LoginActivity.class);
+        startActivity(i);
+        finish();
     }
 
     @Override
