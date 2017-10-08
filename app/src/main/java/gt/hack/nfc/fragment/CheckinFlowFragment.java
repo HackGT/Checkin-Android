@@ -130,6 +130,8 @@ public class CheckinFlowFragment extends Fragment {
                                         new NdefRecord[] { extRecord });
 
                                 ndef.writeNdefMessage(ndefMessage);
+                                // Uncomment to make the tag read-only in production
+                                //ndef.makeReadOnly();
 
                                 getActivity().runOnUiThread(new Runnable() {
                                     public void run() {
