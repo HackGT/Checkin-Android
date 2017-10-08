@@ -31,10 +31,12 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.WindowManager;
 
+import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
@@ -70,26 +72,36 @@ public class MainActivity extends AppCompatActivity {
                 .getDefaultSharedPreferences(getApplicationContext());
         final IProfile profile = new ProfileDrawerItem()
                 .withName(preferences.getString("username", "HackGT User"))
-                .withIdentifier(100)
-                .withIcon(R.color.primaryDarkColor);
+                .withIdentifier(100);
         headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
                 .withTranslucentStatusBar(true)
                 .addProfiles(profile)
                 .withSavedInstance(savedInstanceState)
-                .withHeaderBackground(R.color.primaryDarkColor)
+                .withHeaderBackground(R.drawable.header)
                 .build();
 
-        PrimaryDrawerItem checkin = new PrimaryDrawerItem().withName("Scan QR Code");
-        PrimaryDrawerItem checkinManual = new PrimaryDrawerItem().withName("Search for User");
-        final PrimaryDrawerItem logout = new PrimaryDrawerItem().withName("Log out");
+        PrimaryDrawerItem checkin = new PrimaryDrawerItem()
+                .withName("Scan QR Code")
+                .withIcon(GoogleMaterial.Icon.gmd_camera);
+        PrimaryDrawerItem checkinManual = new PrimaryDrawerItem()
+                .withName("Search for User")
+                .withIcon(GoogleMaterial.Icon.gmd_search);
+        PrimaryDrawerItem logout = new PrimaryDrawerItem()
+                .withName("Log out")
+                .withIcon(GoogleMaterial.Icon.gmd_exit_to_app);
 
         result = new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(toolbar)
                 .withHasStableIds(true)
                 .withAccountHeader(headerResult)
-                .addDrawerItems(checkin, checkinManual, logout)
+                .addDrawerItems(
+                        checkin,
+                        checkinManual,
+                        new DividerDrawerItem(),
+                        logout
+                )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
 
                     @Override
