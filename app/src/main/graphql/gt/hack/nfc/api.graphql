@@ -18,7 +18,17 @@ query UserGet($id: ID!) {
             }
        }
 }
-mutation SetTag($id: ID!, $tag: String!) {
+mutation CheckInTag($id: ID!, $tag: String!) {
+   check_in(user: $id, tag: $tag) {
+        user {
+            ...UserFragment
+        }
+        tags {
+            ...TagFragment
+        }
+   }
+}
+mutation CheckOutTag($id: ID!, $tag: String!) {
    check_in(user: $id, tag: $tag) {
         user {
             ...UserFragment

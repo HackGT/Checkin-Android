@@ -1,8 +1,6 @@
 package gt.hack.nfc.fragment;
 
 
-import android.media.AudioManager;
-import android.media.ToneGenerator;
 import android.nfc.FormatException;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
@@ -10,6 +8,7 @@ import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.Ndef;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -21,13 +20,14 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import org.w3c.dom.Text;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.concurrent.ExecutionException;
 
 import gt.hack.nfc.R;
+import gt.hack.nfc.util.CheckInAsyncTask;
 import gt.hack.nfc.util.Util;
 
 public class CheckinFlowFragment extends Fragment {
@@ -102,7 +102,25 @@ public class CheckinFlowFragment extends Fragment {
         confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getFragmentManager().popBackStack();
+                try {
+                    HashMap<String, TagFragment> tags = new CheckInAsyncTask(
+                            PreferenceManager.getDefaultSharedPreferences(getActivity()),
+                            CheckinFlowFragment.this).execute(id, "hackgt").get();
+                    if (tags != null && tags.get("hackgt").checked_in) {
+                        getFragmentManager().popBackStack();
+                    } else {
+                        Util.makeSnackbar(getActivity().findViewById(R.id.content_frame),
+                                R.string.checkin_error, Snackbar.LENGTH_SHORT).show();
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    Util.makeSnackbar(getActivity().findViewById(R.id.content_frame),
+                            R.string.checkin_error, Snackbar.LENGTH_SHORT).show();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                    Util.makeSnackbar(getActivity().findViewById(R.id.content_frame),
+                            R.string.checkin_error, Snackbar.LENGTH_SHORT).show();
+                }
             }
         });
         if (alreadyCheckedIn) {
@@ -146,7 +164,7 @@ public class CheckinFlowFragment extends Fragment {
                                 });
                                 wroteBadge = true;
                             }
-                            else {
+                            else if (!ndef.isWritable()) {
                                 // Tag already locked or unwritable NFC device like a Buzzcard was tapped
                                 Util.makeSnackbar(getActivity().findViewById(R.id.content_frame), R.string.unwritable_tag, Snackbar.LENGTH_SHORT).show();
                             }

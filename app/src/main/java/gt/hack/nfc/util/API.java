@@ -8,11 +8,15 @@ import com.apollographql.apollo.exception.ApolloException;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
+import gt.hack.nfc.CheckInTagMutation;
+import gt.hack.nfc.CheckOutTagMutation;
 import gt.hack.nfc.UserGetQuery;
 import gt.hack.nfc.UserSearchQuery;
+import gt.hack.nfc.fragment.TagFragment;
 import gt.hack.nfc.fragment.UserFragment;
 import okhttp3.Call;
 import okhttp3.FormBody;
@@ -104,4 +108,41 @@ public class API {
         return null;
     }
 
+    public static HashMap<String, TagFragment>  checkInTag(final SharedPreferences preferences,
+                                  String userid, String tag) throws ApolloException {
+        ApolloClient apolloClient = getApolloClient(preferences);
+        com.apollographql.apollo.api.Response<CheckInTagMutation.Data> response =
+                apolloClient.mutate(new CheckInTagMutation(userid, tag)).execute();
+        if (response.hasErrors()) {
+            Log.e("apollo", response.errors().toString());
+            return null;
+        }
+        HashMap<String, TagFragment> tags = new HashMap<>();
+        if (response.data().check_in() != null && response.data().check_in().tags() != null) {
+            for (CheckInTagMutation.Tag t : response.data().check_in().tags()) {
+               tags.put(t.fragments().tagFragment().tag().name(),t.fragments().tagFragment());
+            }
+            return tags;
+        }
+        return null;
+    }
+
+    public static HashMap<String, TagFragment> checkOutTag(final SharedPreferences preferences,
+                                                           String userid, String tag) throws ApolloException {
+        ApolloClient apolloClient = getApolloClient(preferences);
+        com.apollographql.apollo.api.Response<CheckOutTagMutation.Data> response =
+                apolloClient.mutate(new CheckOutTagMutation(userid, tag)).execute();
+        if (response.hasErrors()) {
+            Log.e("apollo", response.errors().toString());
+            return null;
+        }
+        HashMap<String, TagFragment> tags = new HashMap<>();
+        if (response.data().check_in() != null && response.data().check_in().tags() != null) {
+            for (CheckOutTagMutation.Tag t : response.data().check_in().tags()) {
+                tags.put(t.fragments().tagFragment().tag().name(),t.fragments().tagFragment());
+            }
+            return tags;
+        }
+        return null;
+    }
 }
