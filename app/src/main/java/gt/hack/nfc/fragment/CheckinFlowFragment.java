@@ -38,6 +38,7 @@ public class CheckinFlowFragment extends Fragment {
     private String school;
     private String branch;
     private boolean alreadyCheckedIn = false;
+    private boolean wroteBadge = false;
     private final String packageName = "gt.hack.nfc";
     private AppCompatButton confirmButton;
 
@@ -120,14 +121,14 @@ public class CheckinFlowFragment extends Fragment {
                         Log.d("NFC", tag.toString());
                         try {
                             ndef.connect();
-                            if (ndef.isWritable()) {
+                            if (ndef.isWritable() && !wroteBadge) {
 
                                 String type = "badge";
 
-                                NdefRecord extRecord = NdefRecord.createExternal(packageName,
-                                        type, id.getBytes());
+                                NdefRecord uriRecord = NdefRecord.createUri(
+                                        "https://live.hack.gt/?user=" + id);
                                 NdefMessage ndefMessage = new NdefMessage(
-                                        new NdefRecord[] { extRecord });
+                                        new NdefRecord[] { uriRecord });
 
                                 ndef.writeNdefMessage(ndefMessage);
                                 // Uncomment to make the tag read-only in production
