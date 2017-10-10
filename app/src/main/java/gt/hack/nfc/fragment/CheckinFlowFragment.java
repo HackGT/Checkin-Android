@@ -144,7 +144,7 @@ public class CheckinFlowFragment extends Fragment {
                                         confirmButton.setVisibility(View.VISIBLE);
                                     }
                                 });
-
+                                wroteBadge = true;
                             }
                             else {
                                 // Tag already locked or unwritable NFC device like a Buzzcard was tapped
