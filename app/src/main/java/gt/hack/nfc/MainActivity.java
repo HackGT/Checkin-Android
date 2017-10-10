@@ -45,6 +45,7 @@ import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
 import gt.hack.nfc.fragment.CheckinFragment;
 import gt.hack.nfc.fragment.SearchFragment;
+import gt.hack.nfc.fragment.TapFragment;
 
 
 /**
@@ -62,16 +63,19 @@ public class MainActivity extends AppCompatActivity {
     private String[][] techLists;
 
     private enum DrawerItem {
-        SCAN ("Scan QR Code", GoogleMaterial.Icon.gmd_camera),
-        SEARCH ("Search for User", GoogleMaterial.Icon.gmd_search),
-        LOGOUT ("Log out", GoogleMaterial.Icon.gmd_exit_to_app);
+        SCAN ("Scan QR code", "Scan", GoogleMaterial.Icon.gmd_camera),
+        SEARCH ("Search for user", "Search", GoogleMaterial.Icon.gmd_search),
+        TAP ("Tap to track event", "Track event", GoogleMaterial.Icon.gmd_nfc),
+        LOGOUT ("Log out", "Log out", GoogleMaterial.Icon.gmd_exit_to_app);
 
         private String label;
+        private String title;
         private IIcon icon;
         private PrimaryDrawerItem drawerItem;
 
-        DrawerItem(String label, IIcon icon) {
+        DrawerItem(String label, String title, IIcon icon) {
             this.label = label;
+            this.title = title;
             this.icon = icon;
             this.drawerItem = new PrimaryDrawerItem().withName(label).withIcon(icon);
         }
@@ -81,6 +85,9 @@ public class MainActivity extends AppCompatActivity {
         }
         public String getLabel() {
             return label;
+        }
+        public String getTitle() {
+            return title;
         }
     }
 
@@ -113,6 +120,7 @@ public class MainActivity extends AppCompatActivity {
                 .addDrawerItems(
                         DrawerItem.SCAN.getDrawerItem(),
                         DrawerItem.SEARCH.getDrawerItem(),
+                        DrawerItem.TAP.getDrawerItem(),
                         new DividerDrawerItem(),
                         DrawerItem.LOGOUT.getDrawerItem()
                 )
@@ -121,19 +129,22 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
                         if (drawerItem != null) {
-                            FragmentManager fragmentManager = getSupportFragmentManager();
-                            if (position == 1) {
-                                CheckinFragment fragment = new CheckinFragment();
-                                fragmentManager.beginTransaction()
-                                        .replace(R.id.content_frame, fragment).commit();
-                            } else if (position == 2) {
-                                SearchFragment fragment = new SearchFragment();
-                                fragmentManager.beginTransaction()
-                                        .replace(R.id.content_frame, fragment).commit();
-                            } else if (position == 4) {
+                            String selectedLabel = ((PrimaryDrawerItem) drawerItem).getName().toString();
+                            String newTitle = "";
+                            if (selectedLabel.equals(DrawerItem.SCAN.getLabel())) {
+                                switchToFragment(new CheckinFragment());
+                                newTitle = DrawerItem.SCAN.getTitle();
+                            } else if (selectedLabel.equals(DrawerItem.SEARCH.getLabel())) {
+                                switchToFragment(new SearchFragment());
+                                newTitle = DrawerItem.SEARCH.getTitle();
+                            } else if (selectedLabel.equals(DrawerItem.TAP.getLabel())) {
+                                switchToFragment(new TapFragment());
+                                newTitle = DrawerItem.TAP.getTitle();
+                            } else if (selectedLabel.equals(DrawerItem.LOGOUT.getLabel())) {
                                 logOut();
+                                newTitle = DrawerItem.LOGOUT.getTitle();
                             }
-                            setTitle(((PrimaryDrawerItem) drawerItem).getName().toString());
+                            setTitle(newTitle);
                         }
                         return false;
                     }
@@ -144,6 +155,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void switchToFragment(Fragment fragment) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+    }
     private void logOut() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         // May want to keep around some information in the future

@@ -11,6 +11,7 @@ import android.nfc.Tag;
 import android.nfc.tech.Ndef;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
@@ -105,7 +106,7 @@ public class CheckinFlowFragment extends Fragment {
             }
         });
         if (alreadyCheckedIn) {
-            confirmButton.setText("User already Checked-In");
+            confirmButton.setText("User already checked in");
             confirmButton.setEnabled(false);
             confirmButton.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.GONE);
@@ -144,6 +145,10 @@ public class CheckinFlowFragment extends Fragment {
                                     }
                                 });
 
+                            }
+                            else {
+                                // Tag already locked or unwritable NFC device like a Buzzcard was tapped
+                                Util.makeSnackbar(getActivity().findViewById(R.id.content_frame), R.string.unwritable_tag, Snackbar.LENGTH_SHORT).show();
                             }
                         } catch (IOException | FormatException e) {
                             e.printStackTrace();
