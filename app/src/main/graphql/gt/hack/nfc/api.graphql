@@ -52,6 +52,9 @@ fragment UserFragment on User {
   application {
     type
   }
+  confirmation {
+    type
+  }
   name
   email
   questions(names: ["school", "tshirt-size","dietary-restrictions", "optional-items"]) {

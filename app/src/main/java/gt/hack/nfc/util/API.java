@@ -97,7 +97,7 @@ public class API {
             throws ApolloException {
         ApolloClient apolloClient = getApolloClient(preferences);
         com.apollographql.apollo.api.Response<UserGetQuery.Data> response =
-                apolloClient.query(new UserGetQuery(id)).execute();
+                    apolloClient.query(new UserGetQuery(id)).execute();
         if (response.hasErrors()) {
             Log.e("apollo", response.errors().toString());
             return null;
