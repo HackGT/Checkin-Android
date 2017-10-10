@@ -69,10 +69,10 @@
             },
             {
               "name": "users",
-              "description": "All the users in the database, useful for polling for new user information.\nThis is paginated, n is the number of results, and last_id is the last ID\nseen from the latest page retrieved, if you want the first page leave this out.",
+              "description": "All the users in the database, useful for polling for new user information.\nThis is paginated, n is the number of results, and pagination_token is the last ID\nseen from the latest page retrieved, if you want the first page leave this out.",
               "args": [
                 {
-                  "name": "last_id",
+                  "name": "pagination_token",
                   "description": "",
                   "type": {
                     "kind": "SCALAR",
@@ -127,7 +127,7 @@
               "deprecationReason": null
             },
             {
-              "name": "search_user",
+              "name": "search_user_simple",
               "description": "Search through a user's name and email through regex",
               "args": [
                 {
@@ -712,6 +712,22 @@
                 "kind": "OBJECT",
                 "name": "Team",
                 "ofType": null
+              },
+              "isDeprecated": false,
+              "deprecationReason": null
+            },
+            {
+              "name": "pagination_token",
+              "description": "ID used for pagination",
+              "args": [],
+              "type": {
+                "kind": "NON_NULL",
+                "name": null,
+                "ofType": {
+                  "kind": "SCALAR",
+                  "name": "ID",
+                  "ofType": null
+                }
               },
               "isDeprecated": false,
               "deprecationReason": null

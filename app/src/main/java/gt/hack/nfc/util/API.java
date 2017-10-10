@@ -83,7 +83,7 @@ public class API {
             Log.e("apollo", response.errors().toString());
             return null;
         }
-        for (UserSearchQuery.Search_user user : response.data().search_user()) {
+        for (UserSearchQuery.Search_user_simple user : response.data().search_user_simple()) {
             users.add(user.user().fragments().userFragment());
         }
         return users;

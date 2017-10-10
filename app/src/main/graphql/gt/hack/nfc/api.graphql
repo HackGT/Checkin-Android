@@ -1,5 +1,5 @@
 query UserSearch($text: String!, $number: Int!) {
-       search_user(search: $text, offset: 0, n: $number, filter: {attending: true, accepted: true}) {
+       search_user_simple(search: $text, offset: 0, n: $number, filter: {attending: true, accepted: true}) {
             user {
                 ...UserFragment
             }
