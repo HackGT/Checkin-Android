@@ -37,11 +37,14 @@ import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.model.AbstractDrawerItem;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
+
+import java.util.ArrayList;
 
 import gt.hack.nfc.fragment.CheckinFragment;
 import gt.hack.nfc.fragment.SearchFragment;
@@ -111,6 +114,18 @@ public class MainActivity extends AppCompatActivity {
                 .withSavedInstance(savedInstanceState)
                 .withHeaderBackground(R.drawable.header)
                 .build();
+        String username = preferences.getString("username", null);
+        ArrayList<AbstractDrawerItem> drawerItems = new ArrayList<>();
+        if (username != null && !username.contains("sponsor")) {
+            drawerItems.add(DrawerItem.SCAN.getDrawerItem());
+
+        }
+        if (username.equals("ehsan") || username.equals("petschekr") || username.equals("andrew")) {
+            drawerItems.add(DrawerItem.SEARCH.getDrawerItem());
+        }
+        drawerItems.add(DrawerItem.TAP.getDrawerItem());
+        drawerItems.add(new DividerDrawerItem());
+        drawerItems.add(DrawerItem.LOGOUT.getDrawerItem());
 
         result = new DrawerBuilder()
                 .withActivity(this)
@@ -118,11 +133,7 @@ public class MainActivity extends AppCompatActivity {
                 .withHasStableIds(true)
                 .withAccountHeader(headerResult)
                 .addDrawerItems(
-                        DrawerItem.SCAN.getDrawerItem(),
-                        DrawerItem.SEARCH.getDrawerItem(),
-                        DrawerItem.TAP.getDrawerItem(),
-                        new DividerDrawerItem(),
-                        DrawerItem.LOGOUT.getDrawerItem()
+                        drawerItems.toArray(new AbstractDrawerItem[drawerItems.size()])
                 )
                 .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
 
