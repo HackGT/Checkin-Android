@@ -3,20 +3,25 @@ package gt.hack.nfc;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.AsyncTask;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.text.InputType;
 import android.text.TextUtils;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 
 import java.io.IOException;
 
@@ -38,6 +43,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+    private int logoPresses;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,6 +73,48 @@ public class LoginActivity extends AppCompatActivity {
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+        // Logic for customizing host url
+        final ImageView imageView = findViewById(R.id.logo);
+        imageView.setClickable(true);
+        imageView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                    logoPresses++;
+                    if (logoPresses > 2) {
+                        final SharedPreferences preferences =
+                                PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                        AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
+                        builder.setTitle("Edit URL");
+
+                        final EditText input = new EditText(getApplicationContext());
+                        input.setInputType(InputType.TYPE_TEXT_VARIATION_URI);
+                        input.setText(preferences.getString("url", "https://checkin.hack.gt"));
+                        builder.setView(input);
+
+                        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                String userInput = input.getText().toString();
+                                preferences.edit().putString("url", userInput).commit();
+                                dialog.dismiss();
+                            }
+                        });
+                        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        });
+
+                        builder.show();
+                    }
+                }
+
+                return false;
+            }
+        });
     }
 
 

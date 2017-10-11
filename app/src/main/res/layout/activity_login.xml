@@ -22,6 +22,14 @@
 
 
 
+    <ImageView android:src="@drawable/logo"
+        android:layout_width="wrap_content"
+        android:layout_height="150dp"
+        android:layout_marginBottom="12dp"
+        android:layout_marginTop="48dp"
+        android:layout_gravity="center_horizontal"
+        android:id="@+id/logo"/>
+
     <ScrollView
         android:id="@+id/login_form"
         android:layout_width="match_parent"
@@ -31,15 +39,8 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="56dp"
             android:paddingLeft="24dp"
             android:paddingRight="24dp">
-
-            <ImageView android:src="@drawable/logo"
-                android:layout_width="wrap_content"
-                android:layout_height="150dp"
-                android:layout_marginBottom="12dp"
-                android:layout_gravity="center_horizontal" />
 
             <!-- Username Label -->
             <android.support.design.widget.TextInputLayout

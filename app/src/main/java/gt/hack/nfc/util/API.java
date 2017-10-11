@@ -27,7 +27,6 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class API {
-    public static final String BASE_URL = "https://checkin.hack.gt";
 
 
     public static boolean login(String username, String password,
@@ -37,7 +36,8 @@ public class API {
                 .add("username", username)
                 .add("password", password)
                 .build();
-        Request request = new Request.Builder().url(BASE_URL + "/api/user/login").post(formBody).build();
+        Request request = new Request.Builder().url(preferences.getString("url", "https://checkin.hack.gt")
+                + "/api/user/login").post(formBody).build();
         Call call = client.newCall(request);
         try (Response response = call.execute()) {
             System.out.println(response);
@@ -71,8 +71,9 @@ public class API {
             }
         })
                 .build();
+
         return ApolloClient.builder()
-                .serverUrl(BASE_URL + "/graphql/")
+                .serverUrl(preferences.getString("url", "https://checkin.hack.gt") + "/graphql/")
                 .okHttpClient(client).build();
     }
 
