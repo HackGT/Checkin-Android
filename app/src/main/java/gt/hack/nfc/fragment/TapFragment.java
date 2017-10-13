@@ -32,9 +32,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.StringTokenizer;
+import java.util.concurrent.ExecutionException;
 
 import gt.hack.nfc.R;
 import gt.hack.nfc.util.API;
+import gt.hack.nfc.util.TagAsyncTask;
 import gt.hack.nfc.util.Util;
 
 public class TapFragment extends Fragment {
@@ -74,9 +76,14 @@ public class TapFragment extends Fragment {
 
         ArrayList<String> tags;
         try {
-            tags = API.getTags(PreferenceManager.getDefaultSharedPreferences(getActivity()));
+            tags = new TagAsyncTask(PreferenceManager.getDefaultSharedPreferences(getActivity()), TapFragment.this).execute().get();
         }
-        catch (ApolloException e) {
+        catch (InterruptedException e) {
+            e.printStackTrace();
+            Util.makeSnackbar(getActivity().findViewById(R.id.content_frame), R.string.get_tags_failed, Snackbar.LENGTH_SHORT).show();
+            tags = new ArrayList<>();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
             Util.makeSnackbar(getActivity().findViewById(R.id.content_frame), R.string.get_tags_failed, Snackbar.LENGTH_SHORT).show();
             tags = new ArrayList<>();
         }

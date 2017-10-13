@@ -18,6 +18,11 @@ query UserGet($id: ID!) {
             }
        }
 }
+query TagsGet {
+  tags {
+    name
+  }
+}
 mutation CheckInTag($id: ID!, $tag: String!) {
    check_in(user: $id, tag: $tag) {
         user {

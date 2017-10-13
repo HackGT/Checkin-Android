@@ -14,6 +14,7 @@ import java.util.List;
 
 import gt.hack.nfc.CheckInTagMutation;
 import gt.hack.nfc.CheckOutTagMutation;
+import gt.hack.nfc.TagsGetQuery;
 import gt.hack.nfc.UserGetQuery;
 import gt.hack.nfc.UserSearchQuery;
 import gt.hack.nfc.fragment.TagFragment;
@@ -95,10 +96,17 @@ public class API {
     }
 
     public static ArrayList<String> getTags(final SharedPreferences preferences) throws ApolloException {
-        //ApolloClient apolloClient = getApolloClient(preferences);
-        ArrayList<String> items = new ArrayList<>();
-        items.add("hackgt");
-        return items;
+        ApolloClient apolloClient = getApolloClient(preferences);
+        com.apollographql.apollo.api.Response<TagsGetQuery.Data> response =
+                apolloClient.query(new TagsGetQuery()).execute();
+        if (response.data().tags() != null) {
+            ArrayList<String> items = new ArrayList<>();
+            for (TagsGetQuery.Tag t : response.data().tags()) {
+                items.add(t.name());
+            }
+            return items;
+        }
+        return null;
     }
 
     public static UserFragment getUserId(final SharedPreferences preferences, String id)
