@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
             drawerItems.add(DrawerItem.SCAN.getDrawerItem());
 
         }
-        if (username.equals("ehsan") || username.equals("petschekr") || username.equals("andrew")) {
+        if (username.equals("ehsan") || username.equals("petschekr") || username.equals("andrew") || username.equals("michael")) {
             drawerItems.add(DrawerItem.SEARCH.getDrawerItem());
         }
         drawerItems.add(DrawerItem.TAP.getDrawerItem());
