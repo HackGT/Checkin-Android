@@ -23,6 +23,7 @@
     <string name="invalid_nfc_tag">Corrupted or blank tag tapped. Please try again.</string>
     <string name="invalid_tag">Please enter a valid tag</string>
     <string name="server_or_network_error">Invalid response from server</string>
+    <string name="invalid_badge_id">The badge you just scanned does not contain a valid user ID to check in. This could be due to outdated data, a connection to the wrong checkin2 server, or possibly a forged NFC badge.</string>
     <string name="checkin_flow">Check In Flow</string>
     <string name="search_title">Search users</string>
     <string name="search_hint">Enter hacker name or email</string>

@@ -1,5 +1,7 @@
 package gt.hack.nfc.fragment;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.nfc.FormatException;
@@ -8,6 +10,7 @@ import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.Ndef;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -27,6 +30,7 @@ import com.apollographql.apollo.exception.ApolloException;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import gt.hack.nfc.R;
 import gt.hack.nfc.util.API;
@@ -124,15 +128,43 @@ public class TapFragment extends Fragment {
                             return;
                         }
                         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                        HashMap<String, TagFragment> APIresult_temp;
                         if (checkInOrOut.isChecked()) {
-                            API.checkInTag(preferences, id, tagSelect.getText().toString().trim());
+                            APIresult_temp = API.checkInTag(preferences, id, tagSelect.getText().toString().trim());
                         }
                         else {
-                            API.checkOutTag(preferences, id, tagSelect.getText().toString().trim());
+                            APIresult_temp = API.checkOutTag(preferences, id, tagSelect.getText().toString().trim());
                         }
+                        // Java is really stupid
+                        // The API result has to be marked final to be accessed in the inner class below
+                        final HashMap<String, TagFragment> APIresult = APIresult_temp;
+
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
+                                if (APIresult == null) {
+                                    // User doesn't actually exist according to the checkin2 backend
+                                    // Could be due to forgery, wrong DB being used, old data
+                                    AlertDialog.Builder builder;
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                        builder = new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Dialog_Alert);
+                                    }
+                                    else {
+                                        builder = new AlertDialog.Builder(getContext());
+                                    }
+                                    builder.setTitle("Invalid user on badge")
+                                            .setMessage(R.string.invalid_badge_id)
+                                            .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialogInterface, int i) {
+
+                                                }
+                                            })
+                                            .setIcon(android.R.drawable.ic_dialog_alert)
+                                            .show();
+                                    return;
+                                }
+
                                 final Handler handler = new Handler();
                                 waitingForBadge.setVisibility(View.GONE);
                                 badgeTapped.setVisibility(View.VISIBLE);
