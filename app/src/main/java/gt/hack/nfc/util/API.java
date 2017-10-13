@@ -105,16 +105,36 @@ public class API {
             throws ApolloException {
         ApolloClient apolloClient = getApolloClient(preferences);
         com.apollographql.apollo.api.Response<UserGetQuery.Data> response =
-                    apolloClient.query(new UserGetQuery(id)).execute();
+                apolloClient.query(new UserGetQuery(id)).execute();
         if (response.hasErrors()) {
             Log.e("apollo", response.errors().toString());
             return null;
         }
         if (response.data().user() != null && response.data().user().user() != null) {
-             return response.data().user().user().fragments().userFragment();
+            return response.data().user().user().fragments().userFragment();
         }
         return null;
     }
+
+    public static HashMap<String, TagFragment> getTagsForUser(final SharedPreferences preferences, String id)
+            throws ApolloException {
+        ApolloClient apolloClient = getApolloClient(preferences);
+        com.apollographql.apollo.api.Response<UserGetQuery.Data> response =
+                apolloClient.query(new UserGetQuery(id)).execute();
+        if (response.hasErrors()) {
+            Log.e("apollo", response.errors().toString());
+            return null;
+        }
+        HashMap<String, TagFragment> tags = new HashMap<>();
+        if (response.data().user() != null && response.data().user().tags() != null) {
+            for (UserGetQuery.Tag t : response.data().user().tags()) {
+                tags.put(t.fragments().tagFragment().tag().name(),t.fragments().tagFragment());
+            }
+            return tags;
+        }
+        return null;
+    }
+
 
     public static HashMap<String, TagFragment>  checkInTag(final SharedPreferences preferences,
                                   String userid, String tag) throws ApolloException {

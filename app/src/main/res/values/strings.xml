@@ -36,4 +36,6 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="checkin_error">Error checking user in. Please try again.</string>
     <string name="get_tags_failed">Failed to get tags</string>
+    <string name="user_already_checked_in">User already checked in for this tag</string>
+    <string name="user_already_checked_out">User already checked out for this tag</string>
 </resources>

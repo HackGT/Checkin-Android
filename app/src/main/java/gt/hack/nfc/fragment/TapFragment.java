@@ -31,6 +31,7 @@ import com.apollographql.apollo.exception.ApolloException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.StringTokenizer;
 
 import gt.hack.nfc.R;
 import gt.hack.nfc.util.API;
@@ -129,6 +130,8 @@ public class TapFragment extends Fragment {
                         }
                         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
                         HashMap<String, TagFragment> APIresult_temp;
+
+                        final HashMap<String, TagFragment> currentState = API.getTagsForUser(preferences, id);
                         if (checkInOrOut.isChecked()) {
                             APIresult_temp = API.checkInTag(preferences, id, tagSelect.getText().toString().trim());
                         }
@@ -154,6 +157,46 @@ public class TapFragment extends Fragment {
                                     }
                                     builder.setTitle("Invalid user on badge")
                                             .setMessage(R.string.invalid_badge_id)
+                                            .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialogInterface, int i) {
+
+                                                }
+                                            })
+                                            .setIcon(android.R.drawable.ic_dialog_alert)
+                                            .show();
+                                    return;
+                                } else if (currentState.get(tagSelect.getText().toString().trim()) == null ||
+                                        (currentState.get(tagSelect.getText().toString().trim()).checked_in && APIresult.get(tagSelect.getText().toString().trim()).checked_in)) {
+                                    AlertDialog.Builder builder;
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                        builder = new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Dialog_Alert);
+                                    }
+                                    else {
+                                        builder = new AlertDialog.Builder(getContext());
+                                    }
+                                    builder.setTitle("User already checked in!")
+                                            .setMessage(R.string.user_already_checked_in)
+                                            .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialogInterface, int i) {
+
+                                                }
+                                            })
+                                            .setIcon(android.R.drawable.ic_dialog_alert)
+                                            .show();
+                                    return;
+                                } else if (currentState.get(tagSelect.getText().toString().trim()) == null ||
+                                        (!currentState.get(tagSelect.getText().toString().trim()).checked_in && !APIresult.get(tagSelect.getText().toString().trim()).checked_in)) {
+                                    AlertDialog.Builder builder;
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                        builder = new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Dialog_Alert);
+                                    }
+                                    else {
+                                        builder = new AlertDialog.Builder(getContext());
+                                    }
+                                    builder.setTitle("User already checked out!")
+                                            .setMessage(R.string.user_already_checked_out)
                                             .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                                                 @Override
                                                 public void onClick(DialogInterface dialogInterface, int i) {
