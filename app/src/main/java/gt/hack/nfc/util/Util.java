@@ -1,11 +1,14 @@
 package gt.hack.nfc.util;
 
 
+import android.app.Activity;
+import android.content.Context;
 import android.support.design.widget.BaseTransientBottomBar;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
 import android.view.accessibility.AccessibilityManager;
+import android.view.inputmethod.InputMethodManager;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -38,5 +41,10 @@ public class Util {
         }
 
         return snackbar;
+    }
+
+    public static void hideSoftKeyboard(View view, Context context) {
+        InputMethodManager inputMethodManager =(InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 }

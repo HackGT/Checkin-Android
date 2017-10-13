@@ -1,13 +1,84 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<?xml version="1.0" encoding="utf-8"?>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="gt.hack.nfc.fragment.TapFragment">
+    android:weightSum="1"
+    android:paddingBottom="6dp"
+    android:paddingLeft="8dp"
+    android:paddingRight="8dp"
+    android:paddingTop="6dp"
+    android:clickable="true"
+    android:focusableInTouchMode="true" >
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <android.support.v7.widget.CardView
+        android:id="@+id/card_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_gravity="center"
+        android:layout_weight="0.22"
+        app:cardCornerRadius="4dp"
+        app:cardElevation="1dp">
 
-</FrameLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+            <TextView
+                android:id="@+id/text_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:padding="8dp"
+                android:text="Tap badge to track event"
+                android:textSize="24sp"
+                android:textAlignment="center"/>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:theme="@style/HackGT">
+                <AutoCompleteTextView
+                    android:id="@+id/checkin_tag"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:hint="Tag"
+                    android:theme="@style/HackGT"
+                    android:inputType="textNoSuggestions"/>
+            </android.support.design.widget.TextInputLayout>
+
+            <Switch
+                android:id="@+id/check_in_out_select"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/switch_check_in"
+                android:checked="true"
+                android:textSize="18sp"
+                android:theme="@style/HackGT"
+                android:paddingTop="20dp"
+                android:paddingLeft="6dp"/>
+
+            <ProgressBar
+                android:id="@+id/wait_for_badge_tap"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:layout_gravity="end"
+                android:paddingTop="20dp"
+                android:paddingBottom="60dp"/>
+            <ImageView
+                android:id="@+id/badge_tapped"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:tint="@color/success"
+                android:visibility="gone"
+                android:gravity="center_horizontal"
+                android:layout_gravity="end"
+                android:paddingTop="16dp"
+                android:src="@drawable/check" />
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
+</LinearLayout>

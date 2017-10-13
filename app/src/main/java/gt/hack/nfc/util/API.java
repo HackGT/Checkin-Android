@@ -94,6 +94,13 @@ public class API {
         return users;
     }
 
+    public static ArrayList<String> getTags(final SharedPreferences preferences) throws ApolloException {
+        //ApolloClient apolloClient = getApolloClient(preferences);
+        ArrayList<String> items = new ArrayList<>();
+        items.add("hackgt");
+        return items;
+    }
+
     public static UserFragment getUserId(final SharedPreferences preferences, String id)
             throws ApolloException {
         ApolloClient apolloClient = getApolloClient(preferences);
@@ -138,8 +145,8 @@ public class API {
             return null;
         }
         HashMap<String, TagFragment> tags = new HashMap<>();
-        if (response.data().check_in() != null && response.data().check_in().tags() != null) {
-            for (CheckOutTagMutation.Tag t : response.data().check_in().tags()) {
+        if (response.data().check_out() != null && response.data().check_out().tags() != null) {
+            for (CheckOutTagMutation.Tag t : response.data().check_out().tags()) {
                 tags.put(t.fragments().tagFragment().tag().name(),t.fragments().tagFragment());
             }
             return tags;

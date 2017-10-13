@@ -1,53 +1,41 @@
 package gt.hack.nfc.fragment;
 
-import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.nfc.FormatException;
+import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
+import android.nfc.NfcAdapter;
+import android.nfc.Tag;
+import android.nfc.tech.Ndef;
 import android.os.Bundle;
+import android.os.Handler;
+import android.preference.PreferenceManager;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.CompoundButton;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.Switch;
+
+import com.apollographql.apollo.exception.ApolloException;
+
+import java.io.IOException;
+import java.util.ArrayList;
 
 import gt.hack.nfc.R;
+import gt.hack.nfc.util.API;
+import gt.hack.nfc.util.Util;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link TapFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link TapFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class TapFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    private OnFragmentInteractionListener mListener;
-
-    public TapFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment TapFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static TapFragment newInstance(String param1, String param2) {
+    public static TapFragment newInstance() {
         TapFragment fragment = new TapFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -55,55 +43,129 @@ public class TapFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+        super.onCreateView(inflater, container, savedInstanceState);
         return inflater.inflate(R.layout.fragment_tap, container, false);
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
+    private AutoCompleteTextView tagSelect;
+    private Switch checkInOrOut;
+    private ProgressBar waitingForBadge;
+    private ImageView badgeTapped;
+    public static final int READER_FLAGS = NfcAdapter.FLAG_READER_NFC_A;
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+    public void onResume() {
+        super.onResume();
+
+        tagSelect = getActivity().findViewById(R.id.checkin_tag);
+        checkInOrOut = getActivity().findViewById(R.id.check_in_out_select);
+        waitingForBadge = getActivity().findViewById(R.id.wait_for_badge_tap);
+        badgeTapped = getActivity().findViewById(R.id.badge_tapped);
+
+        ArrayList<String> tags;
+        try {
+            tags = API.getTags(PreferenceManager.getDefaultSharedPreferences(getActivity()));
+        }
+        catch (ApolloException e) {
+            Util.makeSnackbar(getActivity().findViewById(R.id.content_frame), R.string.get_tags_failed, Snackbar.LENGTH_SHORT).show();
+            tags = new ArrayList<>();
+        }
+        ArrayAdapter<String> autoCompleteAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, tags);
+        tagSelect.setThreshold(0);
+        tagSelect.setAdapter(autoCompleteAdapter);
+        tagSelect.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if (!hasFocus) {
+                    Util.hideSoftKeyboard(view, getContext());
+                }
+            }
+        });
+
+        checkInOrOut.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                compoundButton.setText(isChecked ? R.string.switch_check_in : R.string.switch_check_out);
+            }
+        });
+
+        // Wait for NFC read
+        NfcAdapter nfc = NfcAdapter.getDefaultAdapter(getActivity());
+        if (nfc != null) {
+            nfc.enableReaderMode(getActivity(), new NfcAdapter.ReaderCallback() {
+                @Override
+                public void onTagDiscovered(Tag tag) {
+                    Ndef ndef = Ndef.get(tag);
+                    try {
+                        ndef.connect();
+                        NdefMessage message = ndef.getNdefMessage();
+                        NdefRecord[] records = message.getRecords();
+                        if (records.length == 0) {
+                            NfcInvalidTag();
+                            return;
+                        }
+                        Uri encodedURL = records[0].toUri();
+                        if (!encodedURL.getHost().equals("live.hack.gt")) {
+                            NfcInvalidTag();
+                            return;
+                        }
+                        String id = encodedURL.getQueryParameter("user");
+                        if (id.length() != 36) {
+                            NfcInvalidTag();
+                            return;
+                        }
+                        if (tagSelect.getText().toString().trim().length() == 0) {
+                            Util.makeSnackbar(getActivity().findViewById(R.id.content_frame), R.string.invalid_tag, Snackbar.LENGTH_SHORT).show();
+                            return;
+                        }
+                        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                        if (checkInOrOut.isChecked()) {
+                            API.checkInTag(preferences, id, tagSelect.getText().toString().trim());
+                        }
+                        else {
+                            API.checkOutTag(preferences, id, tagSelect.getText().toString().trim());
+                        }
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                final Handler handler = new Handler();
+                                waitingForBadge.setVisibility(View.GONE);
+                                badgeTapped.setVisibility(View.VISIBLE);
+                                handler.postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        waitingForBadge.setVisibility(View.VISIBLE);
+                                        badgeTapped.setVisibility(View.GONE);
+                                    }
+                                }, 1000);
+                            }
+                        });
+                    }
+                    catch (IOException | FormatException e) {
+                        e.printStackTrace();
+                    }
+                    catch (ApolloException e) {
+                        Util.makeSnackbar(getActivity().findViewById(R.id.content_frame), R.string.server_or_network_error, Snackbar.LENGTH_SHORT).show();
+                        e.printStackTrace();
+                    }
+                    finally {
+                        try {
+                            ndef.close();
+                        }
+                        catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }, READER_FLAGS, null);
         }
     }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+    private void NfcInvalidTag() {
+        Util.makeSnackbar(getActivity().findViewById(R.id.content_frame), R.string.invalid_nfc_tag, Snackbar.LENGTH_SHORT).show();
     }
 }

@@ -159,8 +159,14 @@ public class CheckinFlowFragment extends Fragment {
                                         new NdefRecord[] { uriRecord });
 
                                 ndef.writeNdefMessage(ndefMessage);
-                                // Uncomment to make the tag read-only in production
-                                //ndef.makeReadOnly();
+                                // Whether to make the tag read-only in production
+                                final boolean shouldMakeReadOnly = false;
+                                if (ndef.canMakeReadOnly() && shouldMakeReadOnly) {
+                                    ndef.makeReadOnly();
+                                }
+                                else {
+                                    Util.makeSnackbar(getActivity().findViewById(R.id.content_frame), R.string.unlockable_tag, Snackbar.LENGTH_SHORT).show();
+                                }
 
                                 getActivity().runOnUiThread(new Runnable() {
                                     public void run() {

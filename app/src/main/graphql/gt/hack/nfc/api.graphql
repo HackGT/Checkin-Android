@@ -29,7 +29,7 @@ mutation CheckInTag($id: ID!, $tag: String!) {
    }
 }
 mutation CheckOutTag($id: ID!, $tag: String!) {
-   check_in(user: $id, tag: $tag) {
+   check_out(user: $id, tag: $tag) {
         user {
             ...UserFragment
         }

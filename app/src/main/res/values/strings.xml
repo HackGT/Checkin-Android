@@ -19,13 +19,20 @@
     <string name="low_storage_error">Code detector dependencies cannot be downloaded due to low device storage</string>
     <string name="no_camera_permission">Camera required for code detection</string>
     <string name="unwritable_tag">NFC tag has been locked or is otherwise unwritable</string>
+    <string name="unlockable_tag">NFC tag was successfully written but does not support locking</string>
+    <string name="invalid_nfc_tag">Corrupted or blank tag tapped. Please try again.</string>
+    <string name="invalid_tag">Please enter a valid tag</string>
+    <string name="server_or_network_error">Invalid response from server</string>
     <string name="checkin_flow">Check In Flow</string>
     <string name="search_title">Search users</string>
     <string name="search_hint">Enter hacker name or email</string>
     <string name="search_activity_label">Search for Hacker</string>
     <string name="tag_checkin">Checking Hacker In...</string>
+    <string name="switch_check_in">Check in user</string>
+    <string name="switch_check_out">Check out user</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="checkin_error">Error checking user in. Please try again.</string>
+    <string name="get_tags_failed">Failed to get tags</string>
 </resources>
