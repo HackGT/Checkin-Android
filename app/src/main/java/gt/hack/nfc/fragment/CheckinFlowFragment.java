@@ -159,9 +159,7 @@ public class CheckinFlowFragment extends Fragment {
                                         new NdefRecord[] { uriRecord });
 
                                 ndef.writeNdefMessage(ndefMessage);
-                                // Whether to make the tag read-only in production
-                                final boolean shouldMakeReadOnly = false;
-                                if (ndef.canMakeReadOnly() && shouldMakeReadOnly) {
+                                if (ndef.canMakeReadOnly() && Util.nfcLockEnabled) {
                                     ndef.makeReadOnly();
                                 }
                                 else {

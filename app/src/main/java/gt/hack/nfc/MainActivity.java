@@ -1,7 +1,6 @@
 package gt.hack.nfc;
 
 import android.app.PendingIntent;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -9,16 +8,13 @@ import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.InputType;
-import android.view.MotionEvent;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.ImageView;
+import android.widget.CompoundButton;
 
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.typeface.IIcon;
@@ -26,10 +22,13 @@ import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.interfaces.OnCheckedChangeListener;
 import com.mikepenz.materialdrawer.model.AbstractDrawerItem;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
+import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
+import com.mikepenz.materialdrawer.model.SwitchDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
@@ -38,6 +37,7 @@ import java.util.ArrayList;
 import gt.hack.nfc.fragment.CheckinFragment;
 import gt.hack.nfc.fragment.SearchFragment;
 import gt.hack.nfc.fragment.TapFragment;
+import gt.hack.nfc.util.Util;
 
 
 /**
@@ -102,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
                 .addProfiles(profile)
                 .withSavedInstance(savedInstanceState)
                 .withHeaderBackground(R.drawable.header)
+                .withSelectionListEnabledForSingleProfile(false)
                 .build();
         String username = preferences.getString("username", null);
         ArrayList<AbstractDrawerItem> drawerItems = new ArrayList<>();
@@ -109,12 +110,26 @@ public class MainActivity extends AppCompatActivity {
             drawerItems.add(DrawerItem.SCAN.getDrawerItem());
 
         }
-        if (username.equals("ehsan") || username.equals("petschekr") || username.equals("andrew") || username.equals("michael")) {
+        if (username.equals("ehsan") || username.equals("petschekr") || username.equals("andrew") || username.equals("michael") || username.equals("kexin")) {
             drawerItems.add(DrawerItem.SEARCH.getDrawerItem());
         }
         drawerItems.add(DrawerItem.TAP.getDrawerItem());
         drawerItems.add(new DividerDrawerItem());
+        drawerItems.add(new SwitchDrawerItem().withChecked(Util.nfcLockEnabled).withName("NFC locking enabled").withOnCheckedChangeListener(new OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(IDrawerItem drawerItem, CompoundButton buttonView, boolean isChecked) {
+                Util.nfcLockEnabled = isChecked;
+                if (isChecked) {
+                    Util.makeSnackbar(findViewById(R.id.content_frame), R.string.nfc_locking_enabled, Snackbar.LENGTH_SHORT).show();
+                }
+                else {
+                    Util.makeSnackbar(findViewById(R.id.content_frame), R.string.nfc_locking_disabled, Snackbar.LENGTH_SHORT).show();
+                }
+            }
+        }).withSelectable(false));
+        drawerItems.add(new DividerDrawerItem());
         drawerItems.add(DrawerItem.LOGOUT.getDrawerItem());
+        drawerItems.add(new SecondaryDrawerItem().withName("Version v" + Util.version).withSelectable(false));
 
         result = new DrawerBuilder()
                 .withActivity(this)
@@ -128,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                        if (drawerItem != null) {
+                        if (drawerItem != null && drawerItem instanceof PrimaryDrawerItem) {
                             String selectedLabel = ((PrimaryDrawerItem) drawerItem).getName().toString();
                             String newTitle = "";
                             if (selectedLabel.equals(DrawerItem.SCAN.getLabel())) {

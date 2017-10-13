@@ -16,6 +16,10 @@ import java.util.List;
 import gt.hack.nfc.fragment.UserFragment;
 
 public class Util {
+    public static final String version = "1.0.1";
+    // Whether to make the tag read-only by default in production
+    public static boolean nfcLockEnabled = false;
+
     public static String getValueOfQuestion(List<UserFragment.Question> questions, String name) {
         for (UserFragment.Question q : questions) {
             if (q.name().equals(name)) {
