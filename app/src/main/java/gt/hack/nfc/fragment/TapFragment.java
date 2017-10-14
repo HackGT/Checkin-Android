@@ -10,6 +10,7 @@ import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.Ndef;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -27,10 +28,12 @@ import android.widget.ProgressBar;
 import android.widget.Switch;
 
 import com.apollographql.apollo.exception.ApolloException;
+import com.google.android.gms.common.api.Api;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.StringTokenizer;
 import java.util.concurrent.ExecutionException;
 
@@ -126,7 +129,7 @@ public class TapFragment extends Fragment {
                             NfcInvalidTag();
                             return;
                         }
-                        String id = encodedURL.getQueryParameter("user");
+                        final String id = encodedURL.getQueryParameter("user");
                         if (id.length() != 36) {
                             NfcInvalidTag();
                             return;
@@ -135,84 +138,34 @@ public class TapFragment extends Fragment {
                             Util.makeSnackbar(getActivity().findViewById(R.id.content_frame), R.string.invalid_tag, Snackbar.LENGTH_SHORT).show();
                             return;
                         }
-                        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-                        HashMap<String, TagFragment> APIresult_temp;
+                        final String selectedTag = tagSelect.getText().toString().trim();
+                        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
-                        final HashMap<String, TagFragment> currentState = API.getTagsForUser(preferences, id);
-                        if (checkInOrOut.isChecked()) {
-                            APIresult_temp = API.checkInTag(preferences, id, tagSelect.getText().toString().trim());
-                        }
-                        else {
-                            APIresult_temp = API.checkOutTag(preferences, id, tagSelect.getText().toString().trim());
-                        }
-                        // Java is really stupid
-                        // The API result has to be marked final to be accessed in the inner class below
-                        final HashMap<String, TagFragment> APIresult = APIresult_temp;
 
-                        getActivity().runOnUiThread(new Runnable() {
+                        API.AsyncGraphQlTask<HashMap<String, TagFragment>> getCurrentState = new API.AsyncGraphQlTask<>(
+                                getActivity().getApplicationContext(),
+                                new API.Consumer<List<HashMap<String, TagFragment>>>() {
+
                             @Override
-                            public void run() {
+                            public void run(List<HashMap<String, TagFragment>> data) {
+                                HashMap<String, TagFragment> currentState = data.get(0);
+                                HashMap<String, TagFragment> APIresult = data.get(1);
+
                                 if (APIresult == null) {
                                     // User doesn't actually exist according to the checkin2 backend
                                     // Could be due to forgery, wrong DB being used, old data
-                                    AlertDialog.Builder builder;
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                        builder = new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Dialog_Alert);
-                                    }
-                                    else {
-                                        builder = new AlertDialog.Builder(getContext());
-                                    }
-                                    builder.setTitle("Invalid user on badge")
-                                            .setMessage(R.string.invalid_badge_id)
-                                            .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialogInterface, int i) {
-
-                                                }
-                                            })
-                                            .setIcon(android.R.drawable.ic_dialog_alert)
-                                            .show();
-                                    return;
-                                } else if (currentState.get(tagSelect.getText().toString().trim()) == null ||
-                                        (currentState.get(tagSelect.getText().toString().trim()).checked_in && APIresult.get(tagSelect.getText().toString().trim()).checked_in)) {
-                                    AlertDialog.Builder builder;
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                        builder = new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Dialog_Alert);
-                                    }
-                                    else {
-                                        builder = new AlertDialog.Builder(getContext());
-                                    }
-                                    builder.setTitle("User already checked in!")
-                                            .setMessage(R.string.user_already_checked_in)
-                                            .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialogInterface, int i) {
-
-                                                }
-                                            })
-                                            .setIcon(android.R.drawable.ic_dialog_alert)
-                                            .show();
-                                    return;
-                                } else if (currentState.get(tagSelect.getText().toString().trim()) == null ||
-                                        (!currentState.get(tagSelect.getText().toString().trim()).checked_in && !APIresult.get(tagSelect.getText().toString().trim()).checked_in)) {
-                                    AlertDialog.Builder builder;
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                                        builder = new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Dialog_Alert);
-                                    }
-                                    else {
-                                        builder = new AlertDialog.Builder(getContext());
-                                    }
-                                    builder.setTitle("User already checked out!")
-                                            .setMessage(R.string.user_already_checked_out)
-                                            .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialogInterface, int i) {
-
-                                                }
-                                            })
-                                            .setIcon(android.R.drawable.ic_dialog_alert)
-                                            .show();
-                                    return;
+                                    showAlert("Invalid user on badge", R.string.invalid_badge_id);
+                                } else if (currentState.get(selectedTag).checked_in
+                                        && APIresult.get(selectedTag).checked_in)
+                                {
+                                    // if we are already checked in and we want to check us in show a warning
+                                    showAlert("User already checked in!", R.string.user_already_checked_in);
+                                } else if ((!currentState.get(selectedTag).checked_in
+                                        || currentState.get(selectedTag) == null)
+                                        && !APIresult.get(selectedTag).checked_in)
+                                {
+                                    // if we were already checked out and we wanted to check out
+                                    showAlert("User already checked out!", R.string.user_already_checked_out);
                                 }
 
                                 final Handler handler = new Handler();
@@ -227,12 +180,27 @@ public class TapFragment extends Fragment {
                                 }, 1000);
                             }
                         });
+
+                        getCurrentState.execute(new API.Supplier<HashMap<String, TagFragment>>() {
+
+                            @Override
+                            public HashMap<String, TagFragment> get() throws ApolloException {
+                                return API.getTagsForUser(preferences, id);
+                            }
+                        }, new API.Supplier<HashMap<String, TagFragment>>() {
+
+                            @Override
+                            public HashMap<String, TagFragment> get() throws ApolloException {
+                                if (checkInOrOut.isChecked()) {
+                                    return API.checkInTag(preferences, id, selectedTag);
+                                }
+                                else {
+                                    return API.checkOutTag(preferences, id, selectedTag);
+                                }
+                            }
+                        });
                     }
                     catch (IOException | FormatException e) {
-                        e.printStackTrace();
-                    }
-                    catch (ApolloException e) {
-                        Util.makeSnackbar(getActivity().findViewById(R.id.content_frame), R.string.server_or_network_error, Snackbar.LENGTH_SHORT).show();
                         e.printStackTrace();
                     }
                     finally {
@@ -247,7 +215,27 @@ public class TapFragment extends Fragment {
             }, READER_FLAGS, null);
         }
     }
+
     private void NfcInvalidTag() {
         Util.makeSnackbar(getActivity().findViewById(R.id.content_frame), R.string.invalid_nfc_tag, Snackbar.LENGTH_SHORT).show();
+    }
+
+    private void showAlert(String title, int message) {
+        AlertDialog.Builder builder;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder = new AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Dialog_Alert);
+        }
+        else {
+            builder = new AlertDialog.Builder(getContext());
+        }
+        builder.setTitle(title)
+                .setMessage(message)
+                .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
     }
 }

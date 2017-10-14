@@ -1,7 +1,10 @@
 package gt.hack.nfc.util;
 
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.apollographql.apollo.ApolloClient;
 import com.apollographql.apollo.exception.ApolloException;
@@ -180,5 +183,44 @@ public class API {
             return tags;
         }
         return null;
+    }
+    
+    public interface Supplier<T> {
+        T get() throws ApolloException;
+    }
+
+    public interface Consumer<T> {
+        void run(T data);
+    }
+
+    public static class AsyncGraphQlTask<O> extends AsyncTask<Supplier<O>, Void, List<O>> {
+        private Context context;
+        private Consumer<List<O>> callback;
+
+        public AsyncGraphQlTask(Context context, Consumer<List<O>> callback) {
+            this.context = context;
+            this.callback = callback;
+        }
+
+        @Override
+        protected List<O> doInBackground(Supplier<O>... params) {
+            ArrayList<O> outputs = new ArrayList<>();
+            for (Supplier<O> supplier : params) {
+                try {
+                    outputs.add(supplier.get());
+                }
+                catch (Exception err) {
+                    err.printStackTrace();
+                    Toast.makeText(context, err.getMessage(), Toast.LENGTH_LONG).show();
+                    outputs.add(null);
+                }
+            }
+            return outputs;
+        }
+
+        @Override
+        protected void onPostExecute(List<O> data) {
+            this.callback.run(data);
+        }
     }
 }
