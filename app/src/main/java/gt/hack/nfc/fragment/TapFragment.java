@@ -146,54 +146,99 @@ public class TapFragment extends Fragment {
                             NfcInvalidTag();
                             return;
                         }
-                        if (tagSelect.getText().toString().trim().length() == 0) {
-                            Util.makeSnackbar(getActivity().findViewById(R.id.content_frame), R.string.invalid_tag, Snackbar.LENGTH_SHORT).show();
-                            return;
-                        }
                         final String selectedTag = tagSelect.getText().toString().trim();
                         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
-
-                        API.AsyncGraphQlTask<HashMap<String, TagFragment>> getCurrentState = new API.AsyncGraphQlTask<>(
+                        API.AsyncGraphQlTask<UserFragment> getUserInfo = new API.AsyncGraphQlTask<>(
                                 getActivity().getApplicationContext(),
-                                new API.Consumer<List<HashMap<String, TagFragment>>>() {
+                                new API.Consumer<List<UserFragment>>() {
 
                             @Override
-                            public void run(List<HashMap<String, TagFragment>> data) {
-                                HashMap<String, TagFragment> currentState = data.get(0);
-                                HashMap<String, TagFragment> APIresult = data.get(1);
+                            public void run(final List<UserFragment> users) {
+                                API.AsyncGraphQlTask<HashMap<String, TagFragment>> getCurrentState = new API.AsyncGraphQlTask<>(
+                                        getActivity().getApplicationContext(),
+                                        new API.Consumer<List<HashMap<String, TagFragment>>>() {
 
-                                if (APIresult == null || APIresult.get(selectedTag) == null) {
-                                    // User doesn't actually exist according to the checkin2 backend
-                                    // Could be due to forgery, wrong DB being used, old data
-                                    showAlert("Invalid user on badge", R.string.invalid_badge_id);
-                                } else if (currentState.get(selectedTag) != null
-                                        && currentState.get(selectedTag).checked_in
-                                        && APIresult.get(selectedTag).checked_in)
-                                {
-                                    // if we are already checked in and we want to check us in show a warning
-                                    showAlert("User already checked in!", R.string.user_already_checked_in);
-                                } else if ((currentState.get(selectedTag) == null ||
-                                        !currentState.get(selectedTag).checked_in)
-                                        && !APIresult.get(selectedTag).checked_in)
-                                {
-                                    // if we were already checked out and we wanted to check out
-                                    showAlert("User already checked out!", R.string.user_already_checked_out);
-                                }
+                                            @Override
+                                            public void run(List<HashMap<String, TagFragment>> tags) {
+                                                HashMap<String, TagFragment> currentState = tags.get(0);
+                                                HashMap<String, TagFragment> APIresult = tags.get(1);
+                                                UserFragment userInfo = users.get(0);
 
-                                final Handler handler = new Handler();
-                                waitingForBadge.setVisibility(View.GONE);
-                                badgeTapped.setVisibility(View.VISIBLE);
-                                userName.setText(currentState.get(selectedTag).);
+                                                if (userInfo != null) {
+                                                    userName.setText(userInfo.name);
 
-                                handler.postDelayed(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        waitingForBadge.setVisibility(View.VISIBLE);
-                                        badgeTapped.setVisibility(View.GONE);
-                                        processingBadge.set(false);
-                                    }
-                                }, 1000);
+                                                    if (userInfo.application != null) {
+                                                        userBranch.setText(userInfo.application.type);
+                                                    }
+
+                                                    for (UserFragment.Question question : userInfo.questions) {
+                                                        if (question.name.equals("tshirt-size")) {
+                                                            userShirtSize.setText(question.value);
+                                                        } else if (question.name.equals("dietary-restrictions")) {
+                                                            userDietaryRestrictions.setText(question.value);
+                                                        }
+                                                    }
+                                                }
+
+                                                if (tagSelect.length() == 0) {
+                                                    Util.makeSnackbar(getActivity().findViewById(R.id.content_frame), R.string.invalid_tag, Snackbar.LENGTH_SHORT).show();
+                                                } else if (APIresult == null || APIresult.get(selectedTag) == null || userInfo == null) {
+                                                    // User doesn't actually exist according to the checkin2 backend
+                                                    // Could be due to forgery, wrong DB being used, old data
+                                                    showAlert("Invalid user on badge", R.string.invalid_badge_id);
+                                                } else if (currentState.get(selectedTag) != null
+                                                        && currentState.get(selectedTag).checked_in
+                                                        && APIresult.get(selectedTag).checked_in)
+                                                {
+                                                    // if we are already checked in and we want to check us in show a warning
+                                                    showAlert("User already checked in!", R.string.user_already_checked_in);
+                                                } else if ((currentState.get(selectedTag) == null ||
+                                                        !currentState.get(selectedTag).checked_in)
+                                                        && !APIresult.get(selectedTag).checked_in) {
+                                                    // if we were already checked out and we wanted to check out
+                                                    showAlert("User already checked out!", R.string.user_already_checked_out);
+                                                }
+
+                                                if (APIresult == null) {
+                                                    processingBadge.set(false);
+                                                    return;
+                                                }
+
+                                                final Handler handler = new Handler();
+                                                waitingForBadge.setVisibility(View.GONE);
+                                                badgeTapped.setVisibility(View.VISIBLE);
+
+                                                handler.postDelayed(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        waitingForBadge.setVisibility(View.VISIBLE);
+                                                        badgeTapped.setVisibility(View.GONE);
+                                                        processingBadge.set(false);
+                                                    }
+                                                }, 1000);
+                                            }
+                                        });
+
+                                getCurrentState.execute(
+                                        new API.Supplier<HashMap<String, TagFragment>>() {
+                                            @Override
+                                            public HashMap<String, TagFragment> get() throws ApolloException {
+                                                return API.getTagsForUser(preferences, id);
+                                            }
+                                        },
+                                        new API.Supplier<HashMap<String, TagFragment>>() {
+                                            @Override
+                                            public HashMap<String, TagFragment> get() throws ApolloException {
+                                                if (checkInOrOut.isChecked()) {
+                                                    return API.checkInTag(preferences, id, selectedTag);
+                                                }
+                                                else {
+                                                    return API.checkOutTag(preferences, id, selectedTag);
+                                                }
+                                            }
+                                        }
+                                );
                             }
                         });
 
@@ -202,25 +247,13 @@ public class TapFragment extends Fragment {
                             return;
                         }
                         processingBadge.set(true);
-                        getCurrentState.execute(
-                            new API.Supplier<HashMap<String, TagFragment>>() {
-                                @Override
-                                public HashMap<String, TagFragment> get() throws ApolloException {
-                                    return API.getTagsForUser(preferences, id);
-                                }
-                            },
-                            new API.Supplier<HashMap<String, TagFragment>>() {
-                                @Override
-                                public HashMap<String, TagFragment> get() throws ApolloException {
-                                    if (checkInOrOut.isChecked()) {
-                                        return API.checkInTag(preferences, id, selectedTag);
-                                    }
-                                    else {
-                                        return API.checkOutTag(preferences, id, selectedTag);
-                                    }
-                                }
+                        getUserInfo.execute(new API.Supplier<UserFragment>() {
+
+                            @Override
+                            public UserFragment get() throws ApolloException {
+                                return API.getUserById(preferences, id);
                             }
-                        );
+                        });
                     }
                     catch (IOException | FormatException e) {
                         e.printStackTrace();

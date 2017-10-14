@@ -48,6 +48,7 @@ fragment TagFragment on TagState {
         name
     }
     checked_in
+    checked_in_date
 }
 fragment UserFragment on User {
   id
@@ -65,6 +66,7 @@ fragment UserFragment on User {
   questions(names: ["school", "tshirt-size","dietary-restrictions", "optional-items"]) {
       name
       value
+      values
   }
 
 }
