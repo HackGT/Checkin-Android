@@ -281,7 +281,7 @@ public class CheckinFragment extends Fragment {
         protected UserFragment doInBackground(String... strings) {
             this.publishProgress("Show dialog");
             try {
-                return API.getUserId(
+                return API.getUserById(
                         PreferenceManager.getDefaultSharedPreferences(getActivity()), strings[0]);
 
             } catch (ApolloException e) {

@@ -112,7 +112,7 @@ public class API {
         return null;
     }
 
-    public static UserFragment getUserId(final SharedPreferences preferences, String id)
+    public static UserFragment getUserById(final SharedPreferences preferences, String id)
             throws ApolloException {
         ApolloClient apolloClient = getApolloClient(preferences);
         com.apollographql.apollo.api.Response<UserGetQuery.Data> response =

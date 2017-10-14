@@ -27,6 +27,7 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Switch;
+import android.widget.TextView;
 
 import com.apollographql.apollo.exception.ApolloException;
 import com.google.android.gms.common.api.Api;
@@ -68,6 +69,10 @@ public class TapFragment extends Fragment {
     private Switch checkInOrOut;
     private ProgressBar waitingForBadge;
     private ImageView badgeTapped;
+    private TextView userName;
+    private TextView userBranch;
+    private TextView userShirtSize;
+    private TextView userDietaryRestrictions;
     public static final int READER_FLAGS = NfcAdapter.FLAG_READER_NFC_A;
 
     @Override
@@ -78,6 +83,10 @@ public class TapFragment extends Fragment {
         checkInOrOut = getActivity().findViewById(R.id.check_in_out_select);
         waitingForBadge = getActivity().findViewById(R.id.wait_for_badge_tap);
         badgeTapped = getActivity().findViewById(R.id.badge_tapped);
+        userName = getActivity().findViewById(R.id.track_name);
+        userBranch = getActivity().findViewById(R.id.track_type);
+        userShirtSize = getActivity().findViewById(R.id.track_tshirt_size);
+        userDietaryRestrictions = getActivity().findViewById(R.id.track_dietary_restrictions);
 
         ArrayList<String> tags;
         try {
@@ -175,6 +184,8 @@ public class TapFragment extends Fragment {
                                 final Handler handler = new Handler();
                                 waitingForBadge.setVisibility(View.GONE);
                                 badgeTapped.setVisibility(View.VISIBLE);
+                                userName.setText(currentState.get(selectedTag).);
+
                                 handler.postDelayed(new Runnable() {
                                     @Override
                                     public void run() {
@@ -191,23 +202,25 @@ public class TapFragment extends Fragment {
                             return;
                         }
                         processingBadge.set(true);
-                        getCurrentState.execute(new API.Supplier<HashMap<String, TagFragment>>() {
-                            @Override
-                            public HashMap<String, TagFragment> get() throws ApolloException {
-                                return API.getTagsForUser(preferences, id);
-                            }
-                        }, new API.Supplier<HashMap<String, TagFragment>>() {
-
-                            @Override
-                            public HashMap<String, TagFragment> get() throws ApolloException {
-                                if (checkInOrOut.isChecked()) {
-                                    return API.checkInTag(preferences, id, selectedTag);
+                        getCurrentState.execute(
+                            new API.Supplier<HashMap<String, TagFragment>>() {
+                                @Override
+                                public HashMap<String, TagFragment> get() throws ApolloException {
+                                    return API.getTagsForUser(preferences, id);
                                 }
-                                else {
-                                    return API.checkOutTag(preferences, id, selectedTag);
+                            },
+                            new API.Supplier<HashMap<String, TagFragment>>() {
+                                @Override
+                                public HashMap<String, TagFragment> get() throws ApolloException {
+                                    if (checkInOrOut.isChecked()) {
+                                        return API.checkInTag(preferences, id, selectedTag);
+                                    }
+                                    else {
+                                        return API.checkOutTag(preferences, id, selectedTag);
+                                    }
                                 }
                             }
-                        });
+                        );
                     }
                     catch (IOException | FormatException e) {
                         e.printStackTrace();
