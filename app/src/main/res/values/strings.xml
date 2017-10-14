@@ -21,7 +21,7 @@
     <string name="unwritable_tag">NFC tag has been locked or is otherwise unwritable</string>
     <string name="unlockable_tag">NFC tag was successfully written but does not support locking</string>
     <string name="invalid_nfc_tag">Corrupted or blank tag tapped. Please try again.</string>
-    <string name="invalid_tag">Please enter a valid tag</string>
+    <string name="invalid_tag">Please type a valid tag</string>
     <string name="server_or_network_error">Invalid response from server</string>
     <string name="invalid_badge_id">The badge you just scanned does not contain a valid user ID to check in. This could be due to outdated data, a connection to the wrong checkin2 server, or possibly a forged NFC badge.</string>
     <string name="nfc_locking_enabled">Enabled permanent NFC badge locking</string>

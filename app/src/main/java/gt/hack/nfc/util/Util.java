@@ -16,7 +16,7 @@ import java.util.List;
 import gt.hack.nfc.fragment.UserFragment;
 
 public class Util {
-    public static final String version = "1.0.2";
+    public static final String version = "1.0.4";
     // Whether to make the tag read-only by default in production
     public static boolean nfcLockEnabled = true;
 

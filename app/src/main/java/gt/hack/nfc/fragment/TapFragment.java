@@ -17,6 +17,7 @@ import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import gt.hack.nfc.R;
 import gt.hack.nfc.util.API;
@@ -110,7 +112,8 @@ public class TapFragment extends Fragment {
         });
 
         // Wait for NFC read
-        NfcAdapter nfc = NfcAdapter.getDefaultAdapter(getActivity());
+        final AtomicBoolean processingBadge = new AtomicBoolean(false);
+        final NfcAdapter nfc = NfcAdapter.getDefaultAdapter(getActivity());
         if (nfc != null) {
             nfc.enableReaderMode(getActivity(), new NfcAdapter.ReaderCallback() {
                 @Override
@@ -151,17 +154,18 @@ public class TapFragment extends Fragment {
                                 HashMap<String, TagFragment> currentState = data.get(0);
                                 HashMap<String, TagFragment> APIresult = data.get(1);
 
-                                if (APIresult == null) {
+                                if (APIresult == null || APIresult.get(selectedTag) == null) {
                                     // User doesn't actually exist according to the checkin2 backend
                                     // Could be due to forgery, wrong DB being used, old data
                                     showAlert("Invalid user on badge", R.string.invalid_badge_id);
-                                } else if (currentState.get(selectedTag).checked_in
+                                } else if (currentState.get(selectedTag) != null
+                                        && currentState.get(selectedTag).checked_in
                                         && APIresult.get(selectedTag).checked_in)
                                 {
                                     // if we are already checked in and we want to check us in show a warning
                                     showAlert("User already checked in!", R.string.user_already_checked_in);
-                                } else if ((!currentState.get(selectedTag).checked_in
-                                        || currentState.get(selectedTag) == null)
+                                } else if ((currentState.get(selectedTag) == null ||
+                                        !currentState.get(selectedTag).checked_in)
                                         && !APIresult.get(selectedTag).checked_in)
                                 {
                                     // if we were already checked out and we wanted to check out
@@ -176,13 +180,18 @@ public class TapFragment extends Fragment {
                                     public void run() {
                                         waitingForBadge.setVisibility(View.VISIBLE);
                                         badgeTapped.setVisibility(View.GONE);
+                                        processingBadge.set(false);
                                     }
                                 }, 1000);
                             }
                         });
 
+                        if (processingBadge.get()) {
+                            Log.d("NFC", "Skipped processing badge due to in-progress request");
+                            return;
+                        }
+                        processingBadge.set(true);
                         getCurrentState.execute(new API.Supplier<HashMap<String, TagFragment>>() {
-
                             @Override
                             public HashMap<String, TagFragment> get() throws ApolloException {
                                 return API.getTagsForUser(preferences, id);
