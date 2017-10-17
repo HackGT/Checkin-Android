@@ -11,6 +11,7 @@
     <color name="background">#E0E0E0</color>
     <color name="success">#00E676</color>
     <color name="white">#fff</color>
+    <color name="lightRed">#fc4e4e</color>
 
     <!-- OVERWRITE THESE COLORS FOR A LIGHT THEME -->
     <!-- MaterialDrawer DEFAULT colors -->
