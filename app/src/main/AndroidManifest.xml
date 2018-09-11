@@ -34,8 +34,8 @@
                 android:resource="@xml/searchable" />
             <intent-filter>
                 <action android:name="android.nfc.action.TECH_DISCOVERED"/>
-                <meta-data android:name="android.nfc.action.TECH_DISCOVERED"
-                    android:resource="@xml/nfc" />
+                <!--<meta-data android:name="android.nfc.action.TECH_DISCOVERED"-->
+                    <!--android:resource="@xml/nfc" />-->
             </intent-filter>
 
             <intent-filter>
