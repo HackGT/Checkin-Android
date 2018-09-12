@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">HackGT: New Heights</string>
+    <string name="app_name">HackGT 5</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
@@ -30,7 +30,7 @@
     <string name="search_title">Search users</string>
     <string name="search_hint">Enter hacker name or email</string>
     <string name="search_activity_label">Search for Hacker</string>
-    <string name="tag_checkin">Checking Hacker In...</string>
+    <string name="tag_checkin">Checking Hacker In&#8230;</string>
     <string name="switch_check_in">Check in user</string>
     <string name="switch_check_out">Check out user</string>
 
