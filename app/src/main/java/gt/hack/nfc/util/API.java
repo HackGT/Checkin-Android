@@ -40,7 +40,7 @@ public class API {
                 .add("username", username)
                 .add("password", password)
                 .build();
-        Request request = new Request.Builder().url(preferences.getString("url", "https://checkin.hack.gt")
+        Request request = new Request.Builder().url(preferences.getString("url", "https://checkin.dev.hack.gt")
                 + "/api/user/login").post(formBody).build();
         Call call = client.newCall(request);
         try (Response response = call.execute()) {
@@ -77,7 +77,7 @@ public class API {
                 .build();
 
         return ApolloClient.builder()
-                .serverUrl(preferences.getString("url", "https://checkin.hack.gt") + "/graphql/")
+                .serverUrl(preferences.getString("url", "https://checkin.dev.hack.gt") + "/graphql/")
                 .okHttpClient(client).build();
     }
 
