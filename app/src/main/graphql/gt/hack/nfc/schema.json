@@ -13,11 +13,11 @@
       {
         "kind": "OBJECT",
         "name": "Query",
-        "description": null,
+        "description": "The root query type, use to query data",
         "fields": [
           {
             "name": "tags",
-            "description": null,
+            "description": "Get a list of unique tags currently available to set.",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -41,11 +41,11 @@
           },
           {
             "name": "user",
-            "description": null,
+            "description": "Retrieve user through a user ID or through the token passed to\nQuery. Leave id empty if you'd like to view the currently logged in\nuser.",
             "args": [
               {
                 "name": "id",
-                "description": null,
+                "description": "",
                 "type": {
                   "kind": "NON_NULL",
                   "name": null,
@@ -68,11 +68,11 @@
           },
           {
             "name": "users",
-            "description": null,
+            "description": "All the users in the database, useful for polling for new user information.\nThis is paginated, n is the number of results, and pagination_token is the last ID\nseen from the latest page retrieved, if you want the first page leave this out.",
             "args": [
               {
                 "name": "pagination_token",
-                "description": null,
+                "description": "",
                 "type": {
                   "kind": "SCALAR",
                   "name": "ID",
@@ -82,7 +82,7 @@
               },
               {
                 "name": "n",
-                "description": null,
+                "description": "",
                 "type": {
                   "kind": "NON_NULL",
                   "name": null,
@@ -96,7 +96,7 @@
               },
               {
                 "name": "filter",
-                "description": null,
+                "description": "",
                 "type": {
                   "kind": "INPUT_OBJECT",
                   "name": "UserFilter",
@@ -127,11 +127,11 @@
           },
           {
             "name": "search_user_simple",
-            "description": null,
+            "description": "Search through a user's name and email through regex",
             "args": [
               {
                 "name": "search",
-                "description": null,
+                "description": "",
                 "type": {
                   "kind": "NON_NULL",
                   "name": null,
@@ -145,7 +145,7 @@
               },
               {
                 "name": "use_regex",
-                "description": null,
+                "description": "",
                 "type": {
                   "kind": "SCALAR",
                   "name": "Boolean",
@@ -155,7 +155,7 @@
               },
               {
                 "name": "offset",
-                "description": null,
+                "description": "",
                 "type": {
                   "kind": "NON_NULL",
                   "name": null,
@@ -169,7 +169,7 @@
               },
               {
                 "name": "n",
-                "description": null,
+                "description": "",
                 "type": {
                   "kind": "NON_NULL",
                   "name": null,
@@ -183,7 +183,7 @@
               },
               {
                 "name": "filter",
-                "description": null,
+                "description": "",
                 "type": {
                   "kind": "INPUT_OBJECT",
                   "name": "UserFilter",
@@ -214,7 +214,7 @@
           },
           {
             "name": "application_branches",
-            "description": null,
+            "description": "All possible application question branches",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -238,7 +238,7 @@
           },
           {
             "name": "confirmation_branches",
-            "description": null,
+            "description": "All possible confirmation question branches",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -262,7 +262,7 @@
           },
           {
             "name": "question_branches",
-            "description": null,
+            "description": "All possible question branches from all types!",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -286,11 +286,11 @@
           },
           {
             "name": "question_names",
-            "description": null,
+            "description": "All possible question names, or names of question in a branch",
             "args": [
               {
                 "name": "branch",
-                "description": null,
+                "description": "",
                 "type": {
                   "kind": "SCALAR",
                   "name": "String",
@@ -324,11 +324,11 @@
       {
         "kind": "OBJECT",
         "name": "Tag",
-        "description": null,
+        "description": "Information about checkin tags",
         "fields": [
           {
             "name": "name",
-            "description": null,
+            "description": "The unique name of the tag (not human label)",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -371,11 +371,11 @@
       {
         "kind": "OBJECT",
         "name": "UserAndTags",
-        "description": null,
+        "description": "",
         "fields": [
           {
             "name": "tags",
-            "description": null,
+            "description": "Tags associated with a user",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -399,7 +399,7 @@
           },
           {
             "name": "user",
-            "description": null,
+            "description": "Registration info about the user",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -422,11 +422,11 @@
       {
         "kind": "OBJECT",
         "name": "TagState",
-        "description": null,
+        "description": "",
         "fields": [
           {
             "name": "tag",
-            "description": null,
+            "description": "",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -442,7 +442,7 @@
           },
           {
             "name": "checked_in",
-            "description": null,
+            "description": "",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -458,7 +458,7 @@
           },
           {
             "name": "checked_in_date",
-            "description": null,
+            "description": "Date when the attendee was checked in",
             "args": [],
             "type": {
               "kind": "SCALAR",
@@ -470,7 +470,7 @@
           },
           {
             "name": "checked_in_by",
-            "description": null,
+            "description": "The username of the admin that checked the attendee in",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -503,11 +503,11 @@
       {
         "kind": "OBJECT",
         "name": "User",
-        "description": null,
+        "description": "Registration info about the user",
         "fields": [
           {
             "name": "id",
-            "description": null,
+            "description": "User ID, valid across the entire system",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -523,7 +523,7 @@
           },
           {
             "name": "name",
-            "description": null,
+            "description": "User's full name",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -539,7 +539,7 @@
           },
           {
             "name": "email",
-            "description": null,
+            "description": "User's email",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -555,7 +555,7 @@
           },
           {
             "name": "email_verified",
-            "description": null,
+            "description": "If the user's email is a verified email",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -571,7 +571,7 @@
           },
           {
             "name": "applied",
-            "description": null,
+            "description": "If the user has applied to the event",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -587,7 +587,7 @@
           },
           {
             "name": "accepted",
-            "description": null,
+            "description": "If the user has been accepted to the event",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -603,7 +603,7 @@
           },
           {
             "name": "accepted_and_notified",
-            "description": null,
+            "description": "If the user has been accepted and notified of his or her acceptance",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -619,7 +619,7 @@
           },
           {
             "name": "confirmed",
-            "description": null,
+            "description": "If the user has submitted a confirmation",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -635,7 +635,7 @@
           },
           {
             "name": "confirmationBranch",
-            "description": null,
+            "description": "A users assigned confirmation branch",
             "args": [],
             "type": {
               "kind": "SCALAR",
@@ -647,7 +647,7 @@
           },
           {
             "name": "application",
-            "description": null,
+            "description": "A users application phase answers\nnull if user has not filled out this phase",
             "args": [],
             "type": {
               "kind": "OBJECT",
@@ -659,7 +659,7 @@
           },
           {
             "name": "confirmation",
-            "description": null,
+            "description": "A users confirmation phase answers\nnull if user has not filled out this phase",
             "args": [],
             "type": {
               "kind": "OBJECT",
@@ -671,11 +671,11 @@
           },
           {
             "name": "question",
-            "description": null,
+            "description": "Get the answer to one of the questions asked of this user.\nIf branch is not given, find this question name in any branch.",
             "args": [
               {
                 "name": "name",
-                "description": null,
+                "description": "",
                 "type": {
                   "kind": "NON_NULL",
                   "name": null,
@@ -698,11 +698,11 @@
           },
           {
             "name": "questions",
-            "description": null,
+            "description": "Get the answer to multiple questions asked of this user, userful\nwhen the set of questions you want to receive is set by the user.",
             "args": [
               {
                 "name": "names",
-                "description": null,
+                "description": "",
                 "type": {
                   "kind": "NON_NULL",
                   "name": null,
@@ -745,7 +745,7 @@
           },
           {
             "name": "team",
-            "description": null,
+            "description": "What team, if any, is the user a part of?",
             "args": [],
             "type": {
               "kind": "OBJECT",
@@ -757,7 +757,7 @@
           },
           {
             "name": "pagination_token",
-            "description": null,
+            "description": "ID used for pagination",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -780,11 +780,11 @@
       {
         "kind": "OBJECT",
         "name": "Branch",
-        "description": null,
+        "description": "A filled out form (application / confirmation form)",
         "fields": [
           {
             "name": "type",
-            "description": null,
+            "description": "What type of application did the user fill out (mentor, participant, etc.)\nwhen going through the form?",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -800,7 +800,7 @@
           },
           {
             "name": "data",
-            "description": null,
+            "description": "A key-value list of questions and answers from the confirmation application",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -824,7 +824,7 @@
           },
           {
             "name": "start_time",
-            "description": null,
+            "description": "Start of application as some RFC's date string",
             "args": [],
             "type": {
               "kind": "SCALAR",
@@ -836,7 +836,7 @@
           },
           {
             "name": "submit_time",
-            "description": null,
+            "description": "Submit time of application as some RFC's date string",
             "args": [],
             "type": {
               "kind": "SCALAR",
@@ -855,11 +855,11 @@
       {
         "kind": "OBJECT",
         "name": "FormItem",
-        "description": null,
+        "description": "Entries to various forms (application, confirmation, etc.)",
         "fields": [
           {
             "name": "name",
-            "description": null,
+            "description": "Name of the question / form item",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -875,7 +875,7 @@
           },
           {
             "name": "type",
-            "description": null,
+            "description": "Type of form item (textbox, checkbox, phone no.)",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -891,7 +891,7 @@
           },
           {
             "name": "value",
-            "description": null,
+            "description": "Value (if just one string)",
             "args": [],
             "type": {
               "kind": "SCALAR",
@@ -903,7 +903,7 @@
           },
           {
             "name": "values",
-            "description": null,
+            "description": "Values (if many selections are applicable, like checkbox)",
             "args": [],
             "type": {
               "kind": "LIST",
@@ -923,7 +923,7 @@
           },
           {
             "name": "file",
-            "description": null,
+            "description": "File if type contains a file",
             "args": [],
             "type": {
               "kind": "OBJECT",
@@ -942,11 +942,11 @@
       {
         "kind": "OBJECT",
         "name": "File",
-        "description": null,
+        "description": "Uploaded file",
         "fields": [
           {
             "name": "original_name",
-            "description": null,
+            "description": "The original name of the uploaded file",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -962,7 +962,7 @@
           },
           {
             "name": "encoding",
-            "description": null,
+            "description": "The file's encoding",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -978,7 +978,7 @@
           },
           {
             "name": "mimetype",
-            "description": null,
+            "description": "The file's mimetype",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -994,7 +994,7 @@
           },
           {
             "name": "path",
-            "description": null,
+            "description": "The path to the file in S3",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -1010,7 +1010,7 @@
           },
           {
             "name": "size",
-            "description": null,
+            "description": "The size of the file in bytes",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -1043,11 +1043,11 @@
       {
         "kind": "OBJECT",
         "name": "Team",
-        "description": null,
+        "description": "Application teams",
         "fields": [
           {
             "name": "id",
-            "description": null,
+            "description": "ID of the Team",
             "args": [],
             "type": {
               "kind": "NON_NULL",
@@ -1070,12 +1070,12 @@
       {
         "kind": "INPUT_OBJECT",
         "name": "UserFilter",
-        "description": null,
+        "description": "Filter users by this criterea.\nA value means to filter by that value, no value\nmeans that filter will be ignored.",
         "fields": null,
         "inputFields": [
           {
             "name": "applied",
-            "description": null,
+            "description": "If the user has applied to the event",
             "type": {
               "kind": "SCALAR",
               "name": "Boolean",
@@ -1085,7 +1085,7 @@
           },
           {
             "name": "accepted",
-            "description": null,
+            "description": "If the user has been accepted to the event",
             "type": {
               "kind": "SCALAR",
               "name": "Boolean",
@@ -1095,7 +1095,7 @@
           },
           {
             "name": "confirmed",
-            "description": null,
+            "description": "If the user has indicated that he or she is attending",
             "type": {
               "kind": "SCALAR",
               "name": "Boolean",
@@ -1105,7 +1105,7 @@
           },
           {
             "name": "application_branch",
-            "description": null,
+            "description": "The type of application a user filled out (e.g. Mentor, Participant)",
             "type": {
               "kind": "SCALAR",
               "name": "String",
@@ -1115,7 +1115,7 @@
           },
           {
             "name": "confirmation_branch",
-            "description": null,
+            "description": "The type of confirmation a user filled out (e.g. Needs Reimbursement)",
             "type": {
               "kind": "SCALAR",
               "name": "String",
@@ -1131,15 +1131,15 @@
       {
         "kind": "OBJECT",
         "name": "Mutation",
-        "description": null,
+        "description": "The root mutation type, use it to change things",
         "fields": [
           {
             "name": "check_in",
-            "description": null,
+            "description": "Check-in a user by specifying the tag name",
             "args": [
               {
                 "name": "user",
-                "description": null,
+                "description": "",
                 "type": {
                   "kind": "NON_NULL",
                   "name": null,
@@ -1153,7 +1153,7 @@
               },
               {
                 "name": "tag",
-                "description": null,
+                "description": "",
                 "type": {
                   "kind": "NON_NULL",
                   "name": null,
@@ -1176,11 +1176,11 @@
           },
           {
             "name": "check_out",
-            "description": null,
+            "description": "Check-out a user by specifying the tag name",
             "args": [
               {
                 "name": "user",
-                "description": null,
+                "description": "",
                 "type": {
                   "kind": "NON_NULL",
                   "name": null,
@@ -1194,7 +1194,7 @@
               },
               {
                 "name": "tag",
-                "description": null,
+                "description": "",
                 "type": {
                   "kind": "NON_NULL",
                   "name": null,
@@ -1217,11 +1217,11 @@
           },
           {
             "name": "add_tag",
-            "description": null,
+            "description": "Add tag to all users",
             "args": [
               {
                 "name": "tag",
-                "description": null,
+                "description": "",
                 "type": {
                   "kind": "NON_NULL",
                   "name": null,
@@ -1251,11 +1251,11 @@
       {
         "kind": "OBJECT",
         "name": "Subscription",
-        "description": null,
+        "description": "The root subscription type, all subscribes go through here",
         "fields": [
           {
             "name": "tag_change",
-            "description": null,
+            "description": "",
             "args": [],
             "type": {
               "kind": "NON_NULL",

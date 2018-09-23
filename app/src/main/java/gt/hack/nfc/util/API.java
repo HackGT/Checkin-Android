@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
+
 import com.apollographql.apollo.ApolloClient;
 import com.apollographql.apollo.exception.ApolloException;
 
@@ -40,7 +41,7 @@ public class API {
                 .add("username", username)
                 .add("password", password)
                 .build();
-        Request request = new Request.Builder().url(preferences.getString("url", "https://checkin.dev.hack.gt")
+        Request request = new Request.Builder().url(preferences.getString("url", Util.DEFAULT_SERVER)
                 + "/api/user/login").post(formBody).build();
         Call call = client.newCall(request);
         try (Response response = call.execute()) {
@@ -77,7 +78,7 @@ public class API {
                 .build();
 
         return ApolloClient.builder()
-                .serverUrl(preferences.getString("url", "https://checkin.dev.hack.gt") + "/graphql/")
+                .serverUrl(preferences.getString("url", Util.DEFAULT_SERVER) + "/graphql/")
                 .okHttpClient(client).build();
     }
 
@@ -101,7 +102,7 @@ public class API {
     public static ArrayList<String> getTags(final SharedPreferences preferences) throws ApolloException {
         ApolloClient apolloClient = getApolloClient(preferences);
         com.apollographql.apollo.api.Response<TagsGetQuery.Data> response =
-                apolloClient.query(new TagsGetQuery()).execute();
+                apolloClient.query(new TagsGetQuery());
         if (response.data().tags() != null) {
             ArrayList<String> items = new ArrayList<>();
             for (TagsGetQuery.Tag t : response.data().tags()) {

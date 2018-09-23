@@ -1,6 +1,7 @@
 package gt.hack.nfc;
 
-import android.app.PendingIntent;
+import
+        android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;

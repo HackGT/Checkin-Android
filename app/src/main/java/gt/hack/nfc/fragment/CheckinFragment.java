@@ -294,7 +294,7 @@ public class CheckinFragment extends Fragment {
         protected void onPostExecute(UserFragment user) {
             super.onPostExecute(user);
             this.dialog.dismiss();
-            if (user != null && user.accepted && user.attending) {
+            if (user != null && user.accepted && user.confirmed) {
                 CheckinFlowFragment fragment2 = CheckinFlowFragment.newInstance(user);
                 FragmentManager fragmentManager = getFragmentManager();
                 FragmentTransaction transaction = fragmentManager.beginTransaction();

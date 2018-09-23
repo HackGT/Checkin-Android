@@ -17,6 +17,7 @@ import gt.hack.nfc.fragment.UserFragment;
 
 public class Util {
     public static final String version = "2.0.0";
+    public static final String DEFAULT_SERVER = "https://checkin.dev.hack.gt";
     // Whether to make the tag read-only by default in production
     public static boolean nfcLockEnabled = true;
 
@@ -33,9 +34,11 @@ public class Util {
         Snackbar snackbar = Snackbar.make(view, resId, duration);
         // Hack to show snackbar animation even when an accessibility service like Nova or Microsoft Launcher is enabled;
         try {
-            Field mAccessibilityManagerField = BaseTransientBottomBar.class.getDeclaredField("mAccessibilityManager");
+            Field mAccessibilityManagerField = BaseTransientBottomBar.
+                    class.getDeclaredField("mAccessibilityManager");
             mAccessibilityManagerField.setAccessible(true);
-            AccessibilityManager accessibilityManager = (AccessibilityManager) mAccessibilityManagerField.get(snackbar);
+            AccessibilityManager accessibilityManager =
+                    (AccessibilityManager) mAccessibilityManagerField.get(snackbar);
             Field mIsEnabledField = AccessibilityManager.class.getDeclaredField("mIsEnabled");
             mIsEnabledField.setAccessible(true);
             mIsEnabledField.setBoolean(accessibilityManager, false);
@@ -48,7 +51,8 @@ public class Util {
     }
 
     public static void hideSoftKeyboard(View view, Context context) {
-        InputMethodManager inputMethodManager =(InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        InputMethodManager inputMethodManager = (InputMethodManager)
+                context.getSystemService(Activity.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 }
