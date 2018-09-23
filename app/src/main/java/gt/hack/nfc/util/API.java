@@ -7,8 +7,11 @@ import android.util.Log;
 import android.widget.Toast;
 
 
+import com.apollographql.apollo.ApolloCall;
 import com.apollographql.apollo.ApolloClient;
 import com.apollographql.apollo.exception.ApolloException;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -86,17 +89,33 @@ public class API {
     public static ArrayList<UserFragment> getUsers(final SharedPreferences preferences, String query)
             throws ApolloException {
         ApolloClient apolloClient = getApolloClient(preferences);
-        com.apollographql.apollo.api.Response<UserSearchQuery.Data> response =
-                apolloClient.query(new UserSearchQuery(query, 20)).execute();
-        ArrayList<UserFragment> users = new ArrayList<>();
-        if (response.hasErrors()) {
-            Log.e("apollo", response.errors().toString());
-            return null;
-        }
-        for (UserSearchQuery.Search_user_simple user : response.data().search_user_simple()) {
-            users.add(user.user().fragments().userFragment());
-        }
-        return users;
+//        com.apollographql.apollo.api.Response<UserSearchQuery.Data> response =
+//                apolloClient.query(new UserSearchQuery(query, 20)).execute();
+        final UserSearchQuery userSearchQuery = UserSearchQuery.builder()
+                .number(20).text(query).build();
+
+        apolloClient.query(userSearchQuery).enqueue(new ApolloCall.Callback<UserSearchQuery.Data>() {
+            @Override
+            public void onResponse(@NotNull com.apollographql.apollo.api.Response<UserSearchQuery.Data> response) {
+                Log.i("CHECKIN-ANDROID", "inside onResponse");
+                Log.i("CHECKIN-ANDROID", "response is " + response);
+                ArrayList<UserFragment> users = new ArrayList<>();
+                for (UserSearchQuery.Search_user_simple user : response.data().search_user_simple()) {
+                    users.add(user.user().fragments().userFragment());
+                }
+                for (UserSearchQuery.Search_user_simple user : response.data().search_user_simple()) {
+                    users.add(user.user().fragments().userFragment());
+                    return users;
+                }
+            }
+
+            @Override
+            public void onFailure(@NotNull ApolloException e) {
+                Log.i("CHECKIN-ANDROID", "It didn't work, classic");
+            }
+        });
+
+
     }
 
     public static ArrayList<String> getTags(final SharedPreferences preferences) throws ApolloException {
@@ -185,7 +204,7 @@ public class API {
         }
         return null;
     }
-    
+
     public interface Supplier<T> {
         T get() throws ApolloException;
     }
