@@ -16,6 +16,7 @@ import android.view.View
 import android.widget.ListView
 
 import com.apollographql.apollo.exception.ApolloException
+import kotlin.coroutines.experimental.*;
 
 import java.util.ArrayList
 
@@ -23,6 +24,8 @@ import java.util.ArrayList
 import gt.hack.nfc.R
 import gt.hack.nfc.util.API
 import gt.hack.nfc.util.SearchAdapter
+import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.runBlocking
 
 class SearchFragment : ListFragment(), SearchView.OnQueryTextListener {
     private var adapter: SearchAdapter? = null
@@ -75,7 +78,7 @@ class SearchFragment : ListFragment(), SearchView.OnQueryTextListener {
 
         override fun doInBackground(vararg strings: String): ArrayList<UserFragment>? {
             try {
-                return API.getUsers(PreferenceManager.getDefaultSharedPreferences(activity), strings[0])
+                return runBlocking { API.getUsers(PreferenceManager.getDefaultSharedPreferences(activity), strings[0]) }
             } catch (e: ApolloException) {
                 e.printStackTrace()
             }

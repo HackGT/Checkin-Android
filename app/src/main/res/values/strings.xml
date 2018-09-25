@@ -40,4 +40,6 @@
     <string name="get_tags_failed">Failed to get tags</string>
     <string name="user_already_checked_in">User already checked in for this tag</string>
     <string name="user_already_checked_out">User already checked out for this tag</string>
+
+    <string name="tags_api_made_past">Made it past the tags API call</string>
 </resources>

@@ -225,7 +225,7 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-                return API.login(username, password,
+                return API.INSTANCE.login(username, password,
                         PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
             } catch (IOException e) {
                 e.printStackTrace();
