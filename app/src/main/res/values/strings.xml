@@ -33,6 +33,9 @@
     <string name="tag_checkin">Checking Hacker In&#8230;</string>
     <string name="switch_check_in">Check in user</string>
     <string name="switch_check_out">Check out user</string>
+    <string name="permanent_badge_locking_option_disabled">Not locking tag because the permanent locking option is disabled</string>
+    <string name="permanent_badge_locking_option_disabled_debug_build">Didn\'t permanently lock badge because this is a debug build</string>
+
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
