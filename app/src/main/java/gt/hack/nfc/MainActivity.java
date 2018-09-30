@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
         }).withSelectable(false));
         drawerItems.add(new DividerDrawerItem());
         drawerItems.add(DrawerItem.LOGOUT.getDrawerItem());
-        drawerItems.add(new SecondaryDrawerItem().withName("Version v" + getApplicationContext().getString(R.string.app_version)).withSelectable(false));
+        drawerItems.add(new SecondaryDrawerItem().withName("Version " + getApplicationContext().getString(R.string.app_version)).withSelectable(false));
 
         result = new DrawerBuilder()
                 .withActivity(this)
