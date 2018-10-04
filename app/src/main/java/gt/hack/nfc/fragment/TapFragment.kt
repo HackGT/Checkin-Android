@@ -100,6 +100,7 @@ class TapFragment : Fragment() {
       }
 
       val nfc = NfcAdapter.getDefaultAdapter(activity)
+
       nfc.enableReaderMode(activity, { tag: Tag ->
         // get the latest read tag
         val ndef = Ndef.get(tag)
@@ -188,6 +189,8 @@ class TapFragment : Fragment() {
       Log.i(TAG, "prevTagState: " + prevTagState)
       Log.i(TAG, "newTagState: " + newTagState)
 
+      val validOperation = prevTagState != newTagState
+
       activity?.runOnUiThread {
         userName.text = userInfo.name
         if (userInfo.application != null) {
@@ -196,6 +199,16 @@ class TapFragment : Fragment() {
         userShirtSize.text = userShirtSizeVal
         userDietaryRestrictions.text = userDietaryRestrictionsVal
 
+        if (validOperation) {
+          waitingForBadge.setVisibility(View.GONE)
+          badgeTapped.setVisibility(View.VISIBLE)
+        }
+        //tagSelect.setBackgroundColor(Color.TRANSPARENT)
+
+        Handler().postDelayed({
+          waitingForBadge.setVisibility(View.VISIBLE)
+          badgeTapped.setVisibility(View.GONE)
+        }, 1000)
 
       }
     } else { // checkInData is null, ie invalid user
