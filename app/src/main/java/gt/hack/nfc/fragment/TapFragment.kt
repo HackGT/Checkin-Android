@@ -6,6 +6,8 @@ import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.DialogInterface.OnClickListener
 import android.graphics.Color
+import android.media.AudioManager
+import android.media.ToneGenerator
 import android.net.Uri
 import android.nfc.NdefRecord
 import android.nfc.tech.Ndef
@@ -33,7 +35,7 @@ import kotlinx.android.synthetic.main.fragment_tap.*
 import kotlinx.android.synthetic.main.fragment_tap.view.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main.view.*
-import kotlinx.coroutines.experimental.runBlocking
+import kotlinx.coroutines.experimental.*
 import java.lang.RuntimeException
 import kotlin.collections.ArrayList
 import kotlin.coroutines.experimental.buildIterator
@@ -43,6 +45,7 @@ class TapFragment : Fragment() {
 
   val READER_FLAGS = NfcAdapter.FLAG_READER_NFC_A
   val TAG = "CHECKIN/TAP_FRAGMENT"
+  var waitingForTag = true;
 
   companion object {
     fun newInstance(): TapFragment {
@@ -102,60 +105,77 @@ class TapFragment : Fragment() {
       val nfc = NfcAdapter.getDefaultAdapter(activity)
 
       nfc.enableReaderMode(activity, { tag: Tag ->
-        // get the latest read tag
-        val ndef = Ndef.get(tag)
-        val record: NdefRecord? = try {
-          ndef.connect()
-          val message = ndef.ndefMessage
-          message.records[0]
-        } catch (e: Throwable) {
-          Log.i(TAG,"" + e.printStackTrace())
-          null
-        } finally {
-          try {
-            ndef.close()
+        if (waitingForTag) {
+          waitingForTag = false
+          // get the latest read tag
+          val ndef = Ndef.get(tag)
+          val record: NdefRecord? = try {
+            ndef.connect()
+            val message = ndef.ndefMessage
+            message.records[0]
           } catch (e: Throwable) {
-            e.printStackTrace()
+            Log.i(TAG, "" + e.printStackTrace())
+            null
+          } finally {
+            try {
+              ndef.close()
+            } catch (e: Throwable) {
+              e.printStackTrace()
+            }
           }
+
+          val id: Uri? = record?.toUri()
+          Log.i(TAG, id.toString())
+          if (id?.host == "live.hack.gt" && uuidRegex.containsMatchIn(id.getQueryParameter("user").orEmpty())) {
+            val uuid = id.getQueryParameter("user").orEmpty()
+            Log.i(TAG, "this valid id is " + uuid)
+
+            val tagName = tagSelect.text.trim().toString()
+            val doCheckIn = check_in_out_select.isChecked
+            // check in/out the user
+            // TODO: we should run these concurrently to save time
+//          val job2 = launch {
+//            try {
+//              val userInfo = async { API.getUserById(preferences, uuid) }
+//              Log.i(TAG, "async tags" + userInfo.await())
+//            } catch (exception: Exception) {
+//              Log.e(TAG, "Problem in coroutine")
+//            }
+//          }
+//          Log.i(TAG, "past job2")
+            val userInfo = runBlocking { API.getUserById(preferences, uuid) }
+            val currentTags = runBlocking { API.getTagsForUser(preferences, uuid) }
+            val newTags = when (doCheckIn) {
+              true -> runBlocking { API.checkInTag(preferences, uuid, tagName) }
+              else -> runBlocking { API.checkOutTag(preferences, uuid, tagName) }
+            }
+
+            val checkInData = CheckInData(userInfo, currentTags, newTags!!)
+
+            Log.i(TAG, "hi")
+            drawCheckInFinish(checkInData, tagName)
+
+            Log.i(TAG, checkInData.userInfo.toString())
+            Log.i(TAG, checkInData.currentTags.toString())
+            Log.i(TAG, checkInData.newTags.toString())
+          } else {
+            //TODO: distinguish between 2 cases where badge is blank vs. badge data is there but wrong format (forged or corrupt - consider showing whether the badge is
+            //  permanently locked
+            Log.i(TAG, "this tag's data is formatted incorrectly: " + id)
+            val toneGen1 = ToneGenerator(AudioManager.STREAM_MUSIC, 100)
+            toneGen1.startTone(ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK, 500)
+            activity?.runOnUiThread {
+              showAlert("Invalid user on badge", R.string.invalid_badge_id)
+            }
+            waitingForTag = true;
+          }
+
         }
 
-        val id: Uri? = record?.toUri()
-        Log.i(TAG, id.toString())
-        if (id?.host == "live.hack.gt"  && uuidRegex.containsMatchIn(id.getQueryParameter("user").orEmpty())) {
-          val uuid = id.getQueryParameter("user").orEmpty()
-          Log.i(TAG, "this valid id is " + uuid)
-
-          val tagName = tagSelect.text.trim().toString()
-          val doCheckIn = check_in_out_select.isChecked
-          // check in/out the user
-          // TODO: extract this to a function
-          val userInfo = runBlocking { API.getUserById(preferences, uuid) }
-          val currentTags = runBlocking { API.getTagsForUser(preferences, uuid) }
-          val newTags = when (doCheckIn) {
-            true -> runBlocking { API.checkInTag(preferences, uuid, tagName) }
-            else -> runBlocking { API.checkOutTag(preferences, uuid, tagName) }
-          }
-
-          val checkInData = CheckInData(userInfo, currentTags, newTags!!)
-
-          Log.i(TAG, "hi")
-          drawCheckInFinish(checkInData, tagName)
-
-          Log.i(TAG, checkInData.userInfo.toString())
-          Log.i(TAG, checkInData.currentTags.toString())
-          Log.i(TAG, checkInData.newTags.toString())
-        } else {
-          Log.i(TAG, "this tag's data is formatted incorrectly: " + id)
-          activity?.runOnUiThread {
-            showAlert("Invalid user on badge", R.string.invalid_badge_id)
-          }        }
-
-
-
-      }, READER_FLAGS, null)
+      } , READER_FLAGS, null)
 
     }
-    Util.makeSnackbar(activity?.findViewById(R.id.content_frame), R.string.tags_api_made_past, Snackbar.LENGTH_SHORT).show()
+
   }
 
   fun drawCheckInFinish(checkInData: CheckInData, tagName: String) {
@@ -170,6 +190,7 @@ class TapFragment : Fragment() {
     val userInfo = checkInData.userInfo
     var userShirtSizeVal: String? = ""
     var userDietaryRestrictionsVal: String? = ""
+    var delayTime: Long = 1000;
 
 
     if (userInfo != null) {
@@ -183,39 +204,73 @@ class TapFragment : Fragment() {
       }
 
       Log.i(TAG, ""+ checkInData.currentTags)
-      val prevTagState: Boolean = checkInData.currentTags!!.get(tagName)!!.checked_in
-      val newTagState: Boolean = checkInData.newTags.get(tagName)!!.checked_in
+      var prevTagState: Boolean? = null
+      var newTagState: Boolean? = null
+      var unseenTag = false;
+      if (checkInData.currentTags!!.get(tagName) != null) {
+        prevTagState = checkInData.currentTags.get(tagName)!!.checked_in
+        newTagState = checkInData.newTags.get(tagName)!!.checked_in
+      } else {
+        unseenTag = true
+      }
+
 
       Log.i(TAG, "prevTagState: " + prevTagState)
       Log.i(TAG, "newTagState: " + newTagState)
 
-      val validOperation = prevTagState != newTagState
+      val validOperation = prevTagState != newTagState || (unseenTag && !check_in_out_select.isChecked)
 
       activity?.runOnUiThread {
+
         userName.text = userInfo.name
+
         if (userInfo.application != null) {
           userBranch.text = userInfo.application.type
         }
+
         userShirtSize.text = userShirtSizeVal
         userDietaryRestrictions.text = userDietaryRestrictionsVal
 
+        waitingForBadge.setVisibility(View.GONE)
+
         if (validOperation) {
-          waitingForBadge.setVisibility(View.GONE)
           badgeTapped.setVisibility(View.VISIBLE)
+        } else {
+          waitingForBadge.setVisibility(View.GONE)
+          invalid_tap_msg.visibility = View.VISIBLE
+          invalid_tap.visibility = View.VISIBLE
+
+
+          if (prevTagState != null && prevTagState) { // indicates checkin/out state
+            invalid_tap_msg.text = getString(R.string.user_already_checked_in)
+          } else { //TODO: add additional message for "Can't check user out if they aren't checked in"
+            invalid_tap_msg.text = getString(R.string.user_already_checked_out)
+          }
+          delayTime = 5000
         }
         //tagSelect.setBackgroundColor(Color.TRANSPARENT)
 
-        Handler().postDelayed({
-          waitingForBadge.setVisibility(View.VISIBLE)
-          badgeTapped.setVisibility(View.GONE)
-        }, 1000)
+
 
       }
     } else { // checkInData is null, ie invalid user
       activity?.runOnUiThread {
-        showAlert("User not found", R.string.invalid_badge_id)
+        invalid_tap_msg.text = getString(R.string.invalid_badge_id)
+        invalid_tap.visibility = View.VISIBLE
       }
+      delayTime = 5000
     }
+
+    activity?.runOnUiThread {
+      Handler().postDelayed({
+        waitingForBadge.setVisibility(View.VISIBLE)
+        badgeTapped.setVisibility(View.GONE)
+        invalid_tap.visibility = View.GONE
+        invalid_tap_msg.visibility = View.GONE
+        waitingForTag = true
+      }, delayTime)
+    }
+
   }
 
 //  fun drawCheckInFinish(checkInData: CheckInData, tagName: String): Future[Unit] = {
