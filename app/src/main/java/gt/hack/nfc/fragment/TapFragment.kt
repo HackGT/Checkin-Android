@@ -36,6 +36,7 @@ import kotlinx.android.synthetic.main.activity_main.view.*
 import kotlinx.coroutines.experimental.runBlocking
 import java.lang.RuntimeException
 import kotlin.collections.ArrayList
+import kotlin.coroutines.experimental.buildIterator
 
 
 class TapFragment : Fragment() {
@@ -125,25 +126,28 @@ class TapFragment : Fragment() {
 
           val tagName = tagSelect.text.trim().toString()
           val doCheckIn = check_in_out_select.isChecked
-            // check in/out the user
-            // TODO: extract this to a function
-            val userInfo = runBlocking { API.getUserById(preferences, uuid) }
-            val currentTags = runBlocking { API.getTagsForUser(preferences, uuid) }
-            val newTags = when (doCheckIn) {
-              true -> runBlocking { API.checkInTag(preferences, uuid, tagName) }
-              else -> runBlocking { API.checkOutTag(preferences, uuid, tagName) }
-            }
+          // check in/out the user
+          // TODO: extract this to a function
+          val userInfo = runBlocking { API.getUserById(preferences, uuid) }
+          val currentTags = runBlocking { API.getTagsForUser(preferences, uuid) }
+          val newTags = when (doCheckIn) {
+            true -> runBlocking { API.checkInTag(preferences, uuid, tagName) }
+            else -> runBlocking { API.checkOutTag(preferences, uuid, tagName) }
+          }
 
-            val checkInData = CheckInData(userInfo, currentTags, newTags!!)
+          val checkInData = CheckInData(userInfo, currentTags, newTags!!)
 
+          Log.i(TAG, "hi")
+          drawCheckInFinish(checkInData, tagName)
 
           Log.i(TAG, checkInData.userInfo.toString())
           Log.i(TAG, checkInData.currentTags.toString())
           Log.i(TAG, checkInData.newTags.toString())
         } else {
           Log.i(TAG, "this tag's data is formatted incorrectly: " + id)
-          //invalidTagMessage(), probs a toast
-        }
+          activity?.runOnUiThread {
+            showAlert("Invalid user on badge", R.string.invalid_badge_id)
+          }        }
 
 
 
@@ -153,142 +157,55 @@ class TapFragment : Fragment() {
     Util.makeSnackbar(activity?.findViewById(R.id.content_frame), R.string.tags_api_made_past, Snackbar.LENGTH_SHORT).show()
   }
 
-  override fun onResume() {
-    super.onResume()
-    Log.i(TAG, "Inside onResume")
-//
-//      activity?.runOnUiThread(Runnable {
-//          tagSelect.setText(prevTag)
-//          tagSelect.setEnabled(true)
-//      })
-//
-//      val autocomplete = ArrayAdapter<String>(getContext(), android.R.layout.simple_expandable_list_item_1, allTags)
-//
-//      activity?.runOnUiThread(Runnable {
-//          tagSelect.setThreshold(0)
-//          tagSelect.setAdapter(autocomplete)
-//          tagSelect.setOnFocusChangeListener { v, hasFocus -> if (!hasFocus) {
-//                Util.hideSoftKeyboard(view, getContext())
-//            }
-//          }
-//      })
-//
-//
-//      Util.makeSnackbar(activity?.findViewById(R.id.content_frame), R.string.get_tags_failed, Snackbar.LENGTH_SHORT).show()
-//
+  fun drawCheckInFinish(checkInData: CheckInData, tagName: String) {
+    val waitingForBadge = wait_for_badge_tap
+    val badgeTapped = badge_tapped
+    val userName = track_name
+    val userBranch = track_type
+    val userShirtSize = track_tshirt_size
+    val userDietaryRestrictions = track_dietary_restrictions
+    val tagSelect = checkin_tag
 
-    //
-    // Handle Checkin Settings
-    //
-    // only one setting so far, set to either checkin or checkout:
-//    val checkInOrOut = activity?.check_in_out_select
-//    checkInOrOut?.setOnCheckedChangeListener { compoundButton, isChecked -> when(isChecked) {
-//      true -> compoundButton.setText(R.string.switch_check_in)
-//      false -> compoundButton.setText(R.string.switch_check_out)
-//    } }
+    val userInfo = checkInData.userInfo
+    var userShirtSizeVal: String? = ""
+    var userDietaryRestrictionsVal: String? = ""
 
-    //
-    // Read NFC Tags
-    //
-    // loop and read tags
-//    val nfc = NfcAdapter.getDefaultAdapter(getActivity)
-//    nfc.enableReaderMode(getActivity, (tag: Tag) => {
-//      // get the latest read tag
-//      val ndef = Ndef.get(tag)
-//      val record = try {
-//        ndef.connect()
-//        val message = ndef.getNdefMessage
-//        // first record is garaunteed to be there:
-//        // https://developer.android.com/reference/android/nfc/NdefMessage.html#getRecords()
-//        Some(message.getRecords()(0))
-//      }
-//      catch {
-//        case e: Any =>
-//          e.printStackTrace()
-//          None
-//      }
-//      finally try ndef.close() catch {
-//        case e: Any => e.printStackTrace()
-//      }
-//
-//      val id = record
-//        .flatMap(text => Option(text.toUri))
-//        .filter(uri => uri.getHost == "live.hack.gt")
-//        .flatMap(uri => Option(uri.getQueryParameter("user")))
-//        .filter(user => uuidRegex.findFirstIn(user).isDefined)
-//
-//      val checkInTag = tagSelect.getText.toString.trim
-//      val doCheckIn = checkInOrOut.isChecked
-//
-//      val finished = id match {
-//        case Some(userId) => checkInUser(userId, doCheckIn, checkInTag)
-//        case None =>
-//          invalidTagMessage()
-//          Future.successful(())
-//      }
-//
-//      // show some messages in case of an error
-//      finished onComplete {
-//        case Success(()) => ()
-//        case Failure(e) =>
-//          e.printStackTrace()
-//          Toast.makeText(getActivity, e.getMessage, Toast.LENGTH_LONG).show()
-//      }
-//      // wait for us to be done (and don't scan anything else while we're at it!)
-//      Await.ready(finished, 10000 millis)
-//    }, READER_FLAGS, null)
+
+    if (userInfo != null) {
+
+      userInfo.questions.forEach { question: UserFragment.Question? ->
+        if (question?.name.equals("tshirt-size")) {
+          userShirtSizeVal = question?.value
+        } else if (question?.name.equals("dietary-restrictions")) {
+          userDietaryRestrictionsVal = question?.value
+        }
+      }
+
+      Log.i(TAG, ""+ checkInData.currentTags)
+      val prevTagState: Boolean = checkInData.currentTags!!.get(tagName)!!.checked_in
+      val newTagState: Boolean = checkInData.newTags.get(tagName)!!.checked_in
+
+      Log.i(TAG, "prevTagState: " + prevTagState)
+      Log.i(TAG, "newTagState: " + newTagState)
+
+      activity?.runOnUiThread {
+        userName.text = userInfo.name
+        if (userInfo.application != null) {
+          userBranch.text = userInfo.application.type
+        }
+        userShirtSize.text = userShirtSizeVal
+        userDietaryRestrictions.text = userDietaryRestrictionsVal
+
+
+      }
+    } else { // checkInData is null, ie invalid user
+      activity?.runOnUiThread {
+        showAlert("User not found", R.string.invalid_badge_id)
+      }
+    }
   }
 
-//  fun checkInUser(id: String, checkIn: Boolean, tag: String): Future[Unit] = {
-//    // get username & pass
-//    val preferences = PreferenceManager.getDefaultSharedPreferences(getActivity)
-//
-//    // Make all our API calls out of band
-//    val doCheckIn = Future {
-//      val userInfo = API.getUserById(preferences, id))
-//      val currentTags = Option(API.getTagsForUser(preferences, id))
-//      val newTags = Option(checkIn match {
-//        case true => API.checkInTag(preferences, id, tag)
-//        case false => API.checkOutTag(preferences, id, tag)
-//      })
-//      CheckInData(userInfo, currentTags, newTags)
-//    }
-//
-//    // set fields when complete
-//    doCheckIn
-//      .flatMap(data => runOnUi(() => drawCheckInFinish(data, tag)))
-//      .flatMap(identity)
-//  }
-
 //  fun drawCheckInFinish(checkInData: CheckInData, tagName: String): Future[Unit] = {
-//    val waitingForBadge: ProgressBar = getActivity.findViewById(R.id.wait_for_badge_tap)
-//    val badgeTapped: ImageView = getActivity.findViewById(R.id.badge_tapped)
-//    val userName: TextView = getActivity.findViewById(R.id.track_name)
-//    val userBranch: TextView = getActivity.findViewById(R.id.track_type)
-//    val userShirtSize: TextView = getActivity.findViewById(R.id.track_tshirt_size)
-//    val userDietaryRestrictions: TextView = getActivity.findViewById(R.id.track_dietary_restrictions)
-//    val tagSelect: AutoCompleteTextView = getActivity.findViewById(R.id.checkin_tag)
-//    val complete = Promise[Unit]()
-//
-//    // Handle displaying user data or make an error message
-//    checkInData.userInfo match {
-//      case Some(userInfo) =>
-//        userName.setText(userInfo.name)
-//
-//        if (userInfo.application != null) {
-//          userBranch.setText(userInfo.application.`type`)
-//        }
-//
-//        userInfo.questions.forEach(question => {
-//          if (question.name.equals("tshirt-size")) {
-//            userShirtSize.setText(question.value)
-//          } else if (question.name.equals("dietary-restrictions")) {
-//            userDietaryRestrictions.setText(question.value)
-//          }
-//        })
-//
-//      case None => showAlert("Invalid user on badge", R.string.invalid_badge_id)
-//    }
 //
 //    val prevTagState = checkInData.currentTags.flatMap(tags => Option(tags.get(tagName)))
 //    val currTagState = checkInData.newTags.flatMap(tags => Option(tags.get(tagName)))
