@@ -36,7 +36,7 @@ class TapFragment : Fragment() {
 
   val READER_FLAGS = NfcAdapter.FLAG_READER_NFC_A
   val TAG = "CHECKIN/TAP_FRAGMENT"
-  var waitingForTag = true;
+  var waitingForTag = true
 
   companion object {
     fun newInstance(): TapFragment {
@@ -46,7 +46,6 @@ class TapFragment : Fragment() {
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
     return inflater.inflate(R.layout.fragment_tap, container, false)
-    //return super.onCreateView(inflater, container, savedInstanceState)
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -58,8 +57,8 @@ class TapFragment : Fragment() {
     tagSelect.setText("Updating tags list...")
     tagSelect.isEnabled = false
 
-    val preferences = PreferenceManager.getDefaultSharedPreferences(getActivity())
-    var error = false;
+    val preferences = PreferenceManager.getDefaultSharedPreferences(activity)
+    var error = false
     val allTags = runBlocking {
       try {
         API.getTags(preferences)
@@ -73,7 +72,7 @@ class TapFragment : Fragment() {
     if (error) {
       tagSelect.setText("No internet, couldn't fetch tags")
     } else {
-      tagSelect.setText(prevTag)
+      tagSelect.text = prevTag
       tagSelect.isEnabled = true
 
       val autocomplete = ArrayAdapter(context, android.R.layout.simple_expandable_list_item_1, allTags as ArrayList<String>)
@@ -150,15 +149,23 @@ class TapFragment : Fragment() {
             Log.i(TAG, checkInData.currentTags.toString())
             Log.i(TAG, checkInData.newTags.toString())
           } else {
-            //TODO: distinguish between 2 cases where badge is blank vs. badge data is there but wrong format (forged or corrupt - consider showing whether the badge is
-            //  permanently locked
-            Log.i(TAG, "this tag's data is formatted incorrectly: " + id)
+            if (id == null) {
+              Log.i(TAG, "this tag's data is null: " + id)
+              activity?.runOnUiThread {
+                showAlert("Invalid user on badge", R.string.badge_data_null)
+              }
+            } else {
+              Log.i(TAG, "this tag's data is formatted incorrectly: " + id)
+              activity?.runOnUiThread {
+                showAlert("Invalid user on badge", R.string.invalid_badge_id)
+              }
+
+            }
+
             val toneGen1 = ToneGenerator(AudioManager.STREAM_MUSIC, 100)
             toneGen1.startTone(ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK, 500)
-            activity?.runOnUiThread {
-              showAlert("Invalid user on badge", R.string.invalid_badge_id)
-            }
-            waitingForTag = true;
+
+            waitingForTag = true
           }
 
         }
@@ -181,7 +188,7 @@ class TapFragment : Fragment() {
     val userInfo = checkInData.userInfo
     var userShirtSizeVal: String? = ""
     var userDietaryRestrictionsVal: String? = ""
-    var delayTime: Long = 1000;
+    var delayTime: Long = 1000
 
 
     if (userInfo != null) {
@@ -197,7 +204,7 @@ class TapFragment : Fragment() {
       Log.i(TAG, ""+ checkInData.currentTags)
       var prevTagState: Boolean? = null
       var newTagState: Boolean? = null
-      var unseenTag = false;
+      var unseenTag = false
       if (checkInData.currentTags!!.get(tagName) != null) {
         prevTagState = checkInData.currentTags.get(tagName)!!.checked_in
         newTagState = checkInData.newTags.get(tagName)!!.checked_in
@@ -209,7 +216,7 @@ class TapFragment : Fragment() {
       Log.i(TAG, "prevTagState: " + prevTagState)
       Log.i(TAG, "newTagState: " + newTagState)
 
-      val validOperation = prevTagState != newTagState || (unseenTag && !check_in_out_select.isChecked)
+      val validOperation = prevTagState != newTagState && !unseenTag && !check_in_out_select.isChecked
 
       activity?.runOnUiThread {
 
@@ -222,26 +229,28 @@ class TapFragment : Fragment() {
         userShirtSize.text = userShirtSizeVal
         userDietaryRestrictions.text = userDietaryRestrictionsVal
 
-        waitingForBadge.setVisibility(View.GONE)
+        waitingForBadge.visibility = View.GONE
 
         if (validOperation) {
-          badgeTapped.setVisibility(View.VISIBLE)
+          badgeTapped.visibility = View.VISIBLE
         } else {
-          waitingForBadge.setVisibility(View.GONE)
+          val toneGen1 = ToneGenerator(AudioManager.STREAM_MUSIC, 100)
+          toneGen1.startTone(ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK, 500)
+
+          waitingForBadge.visibility = View.GONE
           invalid_tap_msg.visibility = View.VISIBLE
           invalid_tap.visibility = View.VISIBLE
 
 
           if (prevTagState != null && prevTagState) { // indicates checkin/out state
             invalid_tap_msg.text = getString(R.string.user_already_checked_in)
-          } else { //TODO: add additional message for "Can't check user out if they aren't checked in"
+          } else if (newTagState == null && !check_in_out_select.isChecked) {
+            invalid_tap_msg.text = getString(R.string.cannot_checkout_not_checked_in)
+          } else {
             invalid_tap_msg.text = getString(R.string.user_already_checked_out)
           }
           delayTime = 5000
         }
-        //tagSelect.setBackgroundColor(Color.TRANSPARENT)
-
-
 
       }
     } else { // checkInData is null, ie invalid user
@@ -254,8 +263,8 @@ class TapFragment : Fragment() {
 
     activity?.runOnUiThread {
       Handler().postDelayed({
-        waitingForBadge.setVisibility(View.VISIBLE)
-        badgeTapped.setVisibility(View.GONE)
+        waitingForBadge.visibility = View.VISIBLE
+        badgeTapped.visibility = View.GONE
         invalid_tap.visibility = View.GONE
         invalid_tap_msg.visibility = View.GONE
         waitingForTag = true
@@ -264,58 +273,12 @@ class TapFragment : Fragment() {
 
   }
 
-//  fun drawCheckInFinish(checkInData: CheckInData, tagName: String): Future[Unit] = {
-//
-//    val prevTagState = checkInData.currentTags.flatMap(tags => Option(tags.get(tagName)))
-//    val currTagState = checkInData.newTags.flatMap(tags => Option(tags.get(tagName)))
-//
-//    // Handle already checked in / checked out messages
-//    (prevTagState, currTagState) match {
-//      case (prevTag, Some(currTag)) if prevTag.exists(t => t.checked_in) == currTag.checked_in =>
-//        currTag.checked_in match {
-//          case true => showAlert("User already checked in!", R.string.user_already_checked_in)
-//          case false => showAlert("User already checked out!", R.string.user_already_checked_out)
-//        }
-//
-//      case _ => ()
-//    }
-//
-//    // Finish up, show the check mark or invalid tag
-//    currTagState match {
-//      case Some(_) =>
-//        // we successfully scanned the tag!
-//        // set the scanning image to a check mark
-//        val handler = new Handler()
-//        waitingForBadge.setVisibility(View.GONE)
-//        badgeTapped.setVisibility(View.VISIBLE)
-//        tagSelect.setBackgroundColor(Color.TRANSPARENT)
-//        // pause one second (debounce)
-//        delay(() => {
-//          waitingForBadge.setVisibility(View.VISIBLE)
-//          badgeTapped.setVisibility(View.GONE)
-//        }, 1000)
-//
-//      case None =>
-//        tagSelect.setBackgroundColor(R.color.lightRed)
-//        Util.makeSnackbar(getActivity.findViewById(R.id.content_frame), R.string.invalid_tag, Snackbar.LENGTH_SHORT).show()
-//        Future.successful(())
-//    }
-//  }
-
-  fun invalidTagMessage() {
-    Util.makeSnackbar(
-        activity?.content_frame,
-        R.string.invalid_nfc_tag,
-        Snackbar.LENGTH_SHORT
-    ).show()
-  }
-
   fun showAlert(title: String, message: Int) {
     val builder: AlertDialog.Builder
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-      builder = AlertDialog.Builder(getContext(), android.R.style.Theme_Material_Dialog_Alert)
+      builder = AlertDialog.Builder(context, android.R.style.Theme_Material_Dialog_Alert)
     } else {
-      builder = AlertDialog.Builder(getContext())
+      builder = AlertDialog.Builder(context)
     }
 
 
@@ -328,24 +291,3 @@ class TapFragment : Fragment() {
 
   data class CheckInData(val userInfo: UserFragment?, val currentTags: HashMap<String, TagFragment>?, val newTags: HashMap<String, TagFragment>)
 }
-
-//
-// Important Utilities!
-//
-//  fun runOnUi[F](fn: () => F): Future[F] = {
-//    val complete = Promise[F]()
-//    getActivity.runOnUiThread(() => {
-//      complete success fn()
-//    })
-//    complete.future
-//  }
-//
-//  fun delay[F](fn: () => F, millis: Int): Future[F] = {
-//    val complete = Promise[F]()
-//    val handler = new Handler()
-//    handler.postDelayed(() => {
-//      complete success fn()
-//    }, millis)
-//    complete.future
-//  }
-//}
