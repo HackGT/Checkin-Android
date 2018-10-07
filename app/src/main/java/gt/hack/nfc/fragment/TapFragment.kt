@@ -3,9 +3,7 @@ package gt.hack.nfc.fragment
 import java.util.*
 
 import android.app.AlertDialog
-import android.content.DialogInterface
 import android.content.DialogInterface.OnClickListener
-import android.graphics.Color
 import android.media.AudioManager
 import android.media.ToneGenerator
 import android.net.Uri
@@ -13,13 +11,11 @@ import android.nfc.NdefRecord
 import android.nfc.tech.Ndef
 import android.nfc.NfcAdapter
 import android.nfc.Tag
-import android.nfc.tech.NfcA
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 
 import android.preference.PreferenceManager
-import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.util.Log
 import android.view.LayoutInflater
@@ -32,13 +28,8 @@ import gt.hack.nfc.util.API
 import gt.hack.nfc.util.Util
 
 import kotlinx.android.synthetic.main.fragment_tap.*
-import kotlinx.android.synthetic.main.fragment_tap.view.*
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.activity_main.view.*
 import kotlinx.coroutines.experimental.*
-import java.lang.RuntimeException
 import kotlin.collections.ArrayList
-import kotlin.coroutines.experimental.buildIterator
 
 
 class TapFragment : Fragment() {
