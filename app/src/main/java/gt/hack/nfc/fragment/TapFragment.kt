@@ -216,7 +216,8 @@ class TapFragment : Fragment() {
       Log.i(TAG, "prevTagState: " + prevTagState)
       Log.i(TAG, "newTagState: " + newTagState)
 
-      val validOperation = prevTagState != newTagState && !unseenTag && !check_in_out_select.isChecked
+      val validOperation = (prevTagState != newTagState && !unseenTag)
+                            || (newTagState == null && check_in_out_select.isChecked)
 
       activity?.runOnUiThread {
 
@@ -232,44 +233,48 @@ class TapFragment : Fragment() {
         waitingForBadge.visibility = View.GONE
 
         if (validOperation) {
-          badgeTapped.visibility = View.VISIBLE
+          displayMessageAndReset(true, "", 1000)
         } else {
-          val toneGen1 = ToneGenerator(AudioManager.STREAM_MUSIC, 100)
-          toneGen1.startTone(ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK, 500)
-
-          waitingForBadge.visibility = View.GONE
-          invalid_tap_msg.visibility = View.VISIBLE
-          invalid_tap.visibility = View.VISIBLE
-
-
           if (prevTagState != null && prevTagState) { // indicates checkin/out state
-            invalid_tap_msg.text = getString(R.string.user_already_checked_in)
+           displayMessageAndReset(false, getString(R.string.user_already_checked_in), 5000)
           } else if (newTagState == null && !check_in_out_select.isChecked) {
-            invalid_tap_msg.text = getString(R.string.cannot_checkout_not_checked_in)
+            displayMessageAndReset(false, getString(R.string.cannot_checkout_not_checked_in), 5000)
           } else {
-            invalid_tap_msg.text = getString(R.string.user_already_checked_out)
+            displayMessageAndReset(false, getString(R.string.user_already_checked_out), 5000)
           }
-          delayTime = 5000
         }
 
       }
     } else { // checkInData is null, ie invalid user
-      activity?.runOnUiThread {
-        invalid_tap_msg.text = getString(R.string.invalid_badge_id)
-        invalid_tap.visibility = View.VISIBLE
+        displayMessageAndReset(false, getString(R.string.invalid_badge_id),5000)
       }
-      delayTime = 5000
     }
 
-    activity?.runOnUiThread {
+  fun displayMessageAndReset(validTag: Boolean, message: String, duration: Long ) {
+    val waitingForBadge = wait_for_badge_tap
+    val badgeTapped = badge_tapped
+
+      waitingForBadge.visibility = View.GONE
+
+      if (validTag) {
+        badgeTapped.visibility = View.VISIBLE
+      } else {
+        val toneGen1 = ToneGenerator(AudioManager.STREAM_MUSIC, 100)
+        toneGen1.startTone(ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK, 500)
+
+        invalid_tap_msg.text = message
+        invalid_tap.visibility = View.VISIBLE
+        invalid_tap_msg.visibility = View.VISIBLE
+      }
+
       Handler().postDelayed({
         waitingForBadge.visibility = View.VISIBLE
         badgeTapped.visibility = View.GONE
         invalid_tap.visibility = View.GONE
         invalid_tap_msg.visibility = View.GONE
         waitingForTag = true
-      }, delayTime)
-    }
+      }, duration)
+
 
   }
 
