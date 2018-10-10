@@ -1,10 +1,7 @@
 package gt.hack.nfc.util
 
-import android.content.Context
 import android.content.SharedPreferences
-import android.os.AsyncTask
 import android.util.Log
-import android.widget.Toast
 
 
 import com.apollographql.apollo.ApolloCall
@@ -23,26 +20,20 @@ import gt.hack.nfc.UserGetQuery
 import gt.hack.nfc.UserSearchQuery
 import gt.hack.nfc.fragment.TagFragment
 import gt.hack.nfc.fragment.UserFragment
-import okhttp3.Call
 import okhttp3.FormBody
-import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.RequestBody
-import okhttp3.Response
 import kotlin.coroutines.experimental.suspendCoroutine
 
 object API {
-
-
     @Throws(IOException::class)
     fun login(username: String, password: String,
               preferences: SharedPreferences): Boolean {
         val client = OkHttpClient()
         val formBody = FormBody.Builder()
-                .add("username", username)
-                .add("password", password)
-                .build()
+            .add("username", username)
+            .add("password", password)
+            .build()
         val request = Request.Builder().url(preferences.getString("url", Util.DEFAULT_SERVER)!! + "/api/user/login").post(formBody).build()
         val call = client.newCall(request)
         call.execute().use { response ->
@@ -69,21 +60,21 @@ object API {
         val client = OkHttpClient.Builder().addInterceptor { chain ->
             val original = chain.request()
             val builder = original.newBuilder().method(original.method(),
-                    original.body())
+                original.body())
             builder.header("Cookie", preferences.getString("cookie", "")!!)
             println(chain.request().url())
             chain.proceed(builder.build())
         }
-                .build()
+            .build()
 
         return ApolloClient.builder()
-                .serverUrl(preferences.getString("url", Util.DEFAULT_SERVER)!! + "/graphql/")
-                .okHttpClient(client).build()
+            .serverUrl(preferences.getString("url", Util.DEFAULT_SERVER)!! + "/graphql/")
+            .okHttpClient(client).build()
     }
 
 
     suspend fun <T> ApolloCall<T>.execute() = suspendCoroutine<com.apollographql.apollo.api.Response<T>> { cont ->
-        enqueue(object: ApolloCall.Callback<T>() {
+        enqueue(object : ApolloCall.Callback<T>() {
             override fun onResponse(response: com.apollographql.apollo.api.Response<T>) {
                 cont.resume(response)
             }
@@ -97,7 +88,7 @@ object API {
     @Throws(ApolloException::class)
     suspend fun getUsers(preferences: SharedPreferences, query: String): ArrayList<UserFragment> {
         val apolloClient = getApolloClient(preferences)
-        val response = apolloClient.query(UserSearchQuery(query, 20)).execute();
+        val response = apolloClient.query(UserSearchQuery(query, 20)).execute()
 
         val users = ArrayList<UserFragment>()
         for (user in response.data()!!.search_user_simple()) {
@@ -153,7 +144,7 @@ object API {
 
     @Throws(ApolloException::class)
     suspend fun checkInTag(preferences: SharedPreferences,
-                   userid: String, tag: String): HashMap<String, TagFragment>? {
+                           userid: String, tag: String): HashMap<String, TagFragment>? {
         val apolloClient = getApolloClient(preferences)
         val response = apolloClient.mutate(CheckInTagMutation(userid, tag)).execute()
         if (response.hasErrors()) {
@@ -172,7 +163,7 @@ object API {
 
     @Throws(ApolloException::class)
     suspend fun checkOutTag(preferences: SharedPreferences,
-                    userid: String, tag: String): HashMap<String, TagFragment>? {
+                            userid: String, tag: String): HashMap<String, TagFragment>? {
         val apolloClient = getApolloClient(preferences)
         val response = apolloClient.mutate(CheckOutTagMutation(userid, tag)).execute()
         if (response.hasErrors()) {
@@ -188,35 +179,4 @@ object API {
         }
         return null
     }
-//
-//    interface Supplier<T> {
-//        @Throws(ApolloException::class)
-//        fun get(): T
-//    }
-//
-//    interface Consumer<T> {
-//        fun run(data: T)
-//    }
-
-//    class AsyncGraphQlTask<O>(private val context: Context, private val callback: Consumer<List<O>>) : AsyncTask<Supplier<O>, Void, List<O>>() {
-//
-//        override fun doInBackground(vararg params: Supplier<O>): List<O> {
-//            val outputs = ArrayList<O?>()
-//            for (supplier in params) {
-//                try {
-//                    outputs.add(supplier.get())
-//                } catch (err: Exception) {
-//                    err.printStackTrace()
-//                    Toast.makeText(context, err.message, Toast.LENGTH_LONG).show()
-//                    outputs.add(null)
-//                }
-//
-//            }
-//            return outputs
-//        }
-//
-//        override fun onPostExecute(data: List<O>) {
-//            this.callback.run(data)
-//        }
-//    }
 }
