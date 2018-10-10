@@ -151,6 +151,7 @@ class TapFragment : Fragment() {
           } else {
             if (id == null) {
               Log.i(TAG, "this tag's data is null: " + id)
+              displayMessageAndReset(false, getString(R.string.badge_data_null), 5000)
               activity?.runOnUiThread {
                 showAlert("Invalid user on badge", R.string.badge_data_null)
               }
@@ -175,6 +176,7 @@ class TapFragment : Fragment() {
     }
 
   }
+
 
   fun drawCheckInFinish(checkInData: CheckInData, tagName: String) {
     val waitingForBadge = wait_for_badge_tap
@@ -220,9 +222,7 @@ class TapFragment : Fragment() {
                             || (newTagState == null && check_in_out_select.isChecked)
 
       activity?.runOnUiThread {
-
         userName.text = userInfo.name
-
         if (userInfo.application != null) {
           userBranch.text = userInfo.application.type
         }
@@ -231,28 +231,30 @@ class TapFragment : Fragment() {
         userDietaryRestrictions.text = userDietaryRestrictionsVal
 
         waitingForBadge.visibility = View.GONE
-
-        if (validOperation) {
-          displayMessageAndReset(true, "", 1000)
-        } else {
-          if (prevTagState != null && prevTagState) { // indicates checkin/out state
-           displayMessageAndReset(false, getString(R.string.user_already_checked_in), 5000)
-          } else if (newTagState == null && !check_in_out_select.isChecked) {
-            displayMessageAndReset(false, getString(R.string.cannot_checkout_not_checked_in), 5000)
-          } else {
-            displayMessageAndReset(false, getString(R.string.user_already_checked_out), 5000)
-          }
-        }
-
       }
+
+      if (validOperation) {
+        displayMessageAndReset(true, "", 1000)
+      } else {
+        if (prevTagState != null && prevTagState) { // indicates checkin/out state
+         displayMessageAndReset(false, getString(R.string.user_already_checked_in), 5000)
+        } else if (newTagState == null && !check_in_out_select.isChecked) {
+          displayMessageAndReset(false, getString(R.string.cannot_checkout_not_checked_in), 5000)
+        } else {
+          displayMessageAndReset(false, getString(R.string.user_already_checked_out), 5000)
+        }
+      }
+
+
     } else { // checkInData is null, ie invalid user
         displayMessageAndReset(false, getString(R.string.invalid_badge_id),5000)
       }
     }
 
   fun displayMessageAndReset(validTag: Boolean, message: String, duration: Long ) {
-    val waitingForBadge = wait_for_badge_tap
-    val badgeTapped = badge_tapped
+    activity?.runOnUiThread {
+      val waitingForBadge = wait_for_badge_tap
+      val badgeTapped = badge_tapped
 
       waitingForBadge.visibility = View.GONE
 
@@ -274,8 +276,7 @@ class TapFragment : Fragment() {
         invalid_tap_msg.visibility = View.GONE
         waitingForTag = true
       }, duration)
-
-
+    }
   }
 
   fun showAlert(title: String, message: Int) {
