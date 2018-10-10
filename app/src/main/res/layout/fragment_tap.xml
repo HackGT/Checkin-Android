@@ -61,14 +61,66 @@
                 android:paddingTop="20dp"
                 android:paddingLeft="6dp"/>
 
+            <TextView
+                android:id="@+id/track_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:drawableLeft="@drawable/user"
+                android:drawablePadding="8dp"
+                android:hint="Name"
+                android:paddingLeft="8dp"
+                android:paddingTop="8dp"
+                android:textColor="@color/secondaryTextColor"
+                android:textSize="20dp" />
+
+            <TextView
+                android:id="@+id/track_tshirt_size"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:drawableLeft="@drawable/size"
+                android:drawablePadding="8dp"
+                android:hint="Shirt size"
+                android:paddingLeft="8dp"
+                android:paddingTop="10dp"
+                android:textColor="@color/secondaryTextColor"
+                android:textSize="20dp" />
+
+            <TextView
+                android:id="@+id/track_type"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:drawableLeft="@drawable/branch"
+                android:drawablePadding="8dp"
+                android:hint="Application Branch"
+                android:paddingLeft="8dp"
+                android:paddingTop="10dp"
+                android:textColor="@color/secondaryTextColor"
+                android:textSize="20dp" />
+
+            <TextView
+                android:id="@+id/track_dietary_restrictions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:drawableLeft="@drawable/food"
+                android:drawablePadding="8dp"
+                android:hint="Dietary restrictions"
+                android:paddingLeft="8dp"
+                android:paddingTop="10dp"
+                android:textColor="@color/secondaryTextColor"
+                android:textSize="20dp" />
+
             <ProgressBar
                 android:id="@+id/wait_for_badge_tap"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
                 android:layout_gravity="end"
-                android:paddingTop="20dp"
-                android:paddingBottom="60dp"/>
+                android:gravity="center_horizontal"
+                android:paddingTop="20dp" />
+
             <ImageView
                 android:id="@+id/badge_tapped"
                 android:layout_width="match_parent"
@@ -103,54 +155,6 @@
                 android:textColor="@color/secondaryTextColor"
                 android:textSize="20dp" />
 
-            <TextView
-                android:id="@+id/track_name"
-                android:paddingTop="8dp"
-                android:paddingLeft="8dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:hint="Name"
-                android:textColor="@color/secondaryTextColor"
-                android:textSize="20dp"
-                android:drawableLeft="@drawable/user"
-                android:drawablePadding="8dp" />
-            <TextView
-                android:id="@+id/track_type"
-                android:paddingTop="10dp"
-                android:paddingLeft="8dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:hint="Application Branch"
-                android:textColor="@color/secondaryTextColor"
-                android:textSize="20dp"
-                android:drawableLeft="@drawable/branch"
-                android:drawablePadding="8dp" />
-            <TextView
-                android:id="@+id/track_tshirt_size"
-                android:paddingTop="10dp"
-                android:paddingLeft="8dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:hint="Shirt size"
-                android:textColor="@color/secondaryTextColor"
-                android:textSize="20dp"
-                android:drawableLeft="@drawable/size"
-                android:drawablePadding="8dp" />
-            <TextView
-                android:id="@+id/track_dietary_restrictions"
-                android:paddingTop="10dp"
-                android:paddingLeft="8dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:hint="Dietary restrictions"
-                android:textColor="@color/secondaryTextColor"
-                android:textSize="20dp"
-                android:drawableLeft="@drawable/food"
-                android:drawablePadding="8dp" />
         </LinearLayout>
     </android.support.v7.widget.CardView>
 </LinearLayout>
