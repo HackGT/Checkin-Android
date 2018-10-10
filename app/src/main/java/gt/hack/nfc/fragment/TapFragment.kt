@@ -133,7 +133,7 @@ class TapFragment : Fragment() {
 //            }
 //          }
 //          Log.i(TAG, "past job2")
-            val userInfo = runBlocking { API.getUserById(preferences, uuid) }
+            val userInfo = runBlocking { API.getUserById(preferences, uuid)!!.user().fragments().userFragment() }
             val currentTags = runBlocking { API.getTagsForUser(preferences, uuid) }
             val newTags = when (doCheckIn) {
               true -> runBlocking { API.checkInTag(preferences, uuid, tagName) }

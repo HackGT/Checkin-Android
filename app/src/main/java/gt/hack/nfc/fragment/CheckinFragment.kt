@@ -34,6 +34,7 @@ import com.google.android.gms.vision.barcode.BarcodeDetector
 import java.io.IOException
 
 import gt.hack.nfc.R
+import gt.hack.nfc.UserGetQuery
 import gt.hack.nfc.util.API
 import gt.hack.nfc.util.CameraSourcePreview
 import kotlinx.coroutines.experimental.runBlocking
@@ -243,7 +244,7 @@ class CheckinFragment : Fragment() {
         }
     }
 
-    internal inner class GetUser(private val fragment: CheckinFragment) : AsyncTask<String, String, UserFragment>() {
+    internal inner class GetUser(private val fragment: CheckinFragment) : AsyncTask<String, String, UserGetQuery.User>() {
 
         private var dialog: ProgressDialog? = null
 
@@ -254,7 +255,7 @@ class CheckinFragment : Fragment() {
             this.dialog!!.show()
         }
 
-        override fun doInBackground(vararg strings: String): UserFragment? {
+        override fun doInBackground(vararg strings: String): UserGetQuery.User? {
             this.publishProgress("Show dialog")
             try {
                 return runBlocking { API.getUserById(
@@ -267,19 +268,31 @@ class CheckinFragment : Fragment() {
             return null
         }
 
-        override fun onPostExecute(user: UserFragment?) {
-            super.onPostExecute(user)
+        override fun onPostExecute(userData: UserGetQuery.User?) {
+            super.onPostExecute(userData)
             this.dialog!!.dismiss()
-            if (user != null && user.accepted && user.confirmed) {
-                val fragment2 = CheckinFlowFragment.newInstance(user)
-                val fragmentManager = fragmentManager
-                val transaction = fragmentManager!!.beginTransaction()
-                transaction.setCustomAnimations(R.anim.enter,
-                        R.anim.exit, R.anim.pop_enter, R.anim.pop_exit)
-                transaction.addToBackStack(null)
-                transaction.replace(R.id.content_frame, fragment2)
-                foundTag = false
-                transaction.commit()
+            if (userData != null &&
+                    userData.user().fragments().userFragment().accepted &&
+                    userData.user().fragments().userFragment().confirmed) {
+                val user = userData!!.user().fragments().userFragment()
+                val tags = API.parseTags(userData.tags());
+                if (tags!!.contains("hackgt") && tags["hackgt"]!!.checked_in()) {
+                    Toast.makeText(context, "User already has badge issued! Please find a check-in admin (Evan/Ehsan/Kexin).",
+                            Toast.LENGTH_LONG).show()
+                    val toneGen1 = ToneGenerator(AudioManager.STREAM_MUSIC, 100)
+                    toneGen1.startTone(ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK, 500)
+                    foundTag = false
+                } else {
+                    val fragment2 = CheckinFlowFragment.newInstance(user)
+                    val fragmentManager = fragmentManager
+                    val transaction = fragmentManager!!.beginTransaction()
+                    transaction.setCustomAnimations(R.anim.enter,
+                            R.anim.exit, R.anim.pop_enter, R.anim.pop_exit)
+                    transaction.addToBackStack(null)
+                    transaction.replace(R.id.content_frame, fragment2)
+                    foundTag = false
+                    transaction.commit()
+                }
             } else {
                 Toast.makeText(context, "User not found! Please proceed to help desk.",
                         Toast.LENGTH_LONG).show()

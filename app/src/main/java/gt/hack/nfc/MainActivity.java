@@ -94,7 +94,8 @@ public class MainActivity extends AppCompatActivity {
                 .getDefaultSharedPreferences(getApplicationContext());
         final IProfile profile = new ProfileDrawerItem()
                 .withName(preferences.getString("username", "HackGT User"))
-                .withEmail(preferences.getString("url", "Unknown instance URL"))
+                .withEmail(preferences.getString("url", Util.DEFAULT_SERVER))
+                .withIcon(R.drawable.empty)
                 .withIdentifier(100);
         headerResult = new AccountHeaderBuilder()
                 .withActivity(this)

@@ -112,7 +112,7 @@ object API {
     }
 
     @Throws(ApolloException::class)
-    suspend fun getUserById(preferences: SharedPreferences, id: String): UserFragment? {
+    suspend fun getUserById(preferences: SharedPreferences, id: String): UserGetQuery.User? {
         val apolloClient = getApolloClient(preferences)
         val response = apolloClient.query(UserGetQuery(id)).execute()
         if (response.hasErrors()) {
@@ -120,7 +120,7 @@ object API {
             return null
         }
         return if (response.data()!!.user() != null) {
-            response.data()!!.user()!!.user().fragments().userFragment()
+            response.data()!!.user()!!
         } else null
     }
 
@@ -132,14 +132,18 @@ object API {
             Log.e("apollo", response.errors().toString())
             return null
         }
-        val tags = HashMap<String, TagFragment>()
         if (response.data()!!.user() != null) {
-            for (t in response.data()!!.user()!!.tags()) {
-                tags[t.fragments().tagFragment().tag().name()] = t.fragments().tagFragment()
-            }
-            return tags
+            return parseTags(response.data()!!.user()!!.tags())
         }
         return null
+    }
+
+    fun parseTags(tagsIn: List<UserGetQuery.Tag>): HashMap<String, TagFragment>? {
+        val tags = HashMap<String, TagFragment>()
+        for (t in tagsIn) {
+            tags[t.fragments().tagFragment().tag().name()] = t.fragments().tagFragment()
+        }
+        return tags
     }
 
     @Throws(ApolloException::class)
