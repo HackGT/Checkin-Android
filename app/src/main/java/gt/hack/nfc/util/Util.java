@@ -16,7 +16,6 @@ import java.util.List;
 import gt.hack.nfc.fragment.UserFragment;
 
 public class Util {
-    public static final String version = "2.0.0";
     public static final String DEFAULT_SERVER = "https://checkin.hack.gt";
     // Whether to make the tag read-only by default in production
     public static boolean nfcLockEnabled = true;
