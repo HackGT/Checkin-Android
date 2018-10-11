@@ -274,7 +274,7 @@ class CheckinFragment : Fragment() {
             if (userData != null &&
                     userData.user().fragments().userFragment().accepted &&
                     userData.user().fragments().userFragment().confirmed) {
-                val user = userData!!.user().fragments().userFragment()
+                val user = userData.user().fragments().userFragment()
                 val tags = API.parseTags(userData.tags());
                 if (tags!!.contains("hackgt") && tags["hackgt"]!!.checked_in()) {
                     Toast.makeText(context, "User already has badge issued! Please find a check-in admin (Evan/Ehsan/Kexin).",

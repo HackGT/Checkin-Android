@@ -85,7 +85,7 @@ class TapFragment : Fragment() {
         }
       }
 
-      check_in_out_select.setOnCheckedChangeListener { buttonView, isChecked ->
+      check_in_out_select.setOnCheckedChangeListener { _, isChecked ->
         check_in_out_select.text = when (isChecked) {
           true -> getString(R.string.switch_check_in)
           false -> getString(R.string.switch_check_out)
@@ -185,7 +185,6 @@ class TapFragment : Fragment() {
     val userBranch = track_type
     val userShirtSize = track_tshirt_size
     val userDietaryRestrictions = track_dietary_restrictions
-    val tagSelect = checkin_tag
 
     val userInfo = checkInData.userInfo
     var userShirtSizeVal: String? = ""
