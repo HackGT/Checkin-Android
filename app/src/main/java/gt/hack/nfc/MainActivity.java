@@ -1,9 +1,11 @@
 package gt.hack.nfc;
 
-import android.app.PendingIntent;
+import
+        android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.os.Bundle;
@@ -49,10 +51,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Drawer result = null;
     private AccountHeader headerResult;
-    private PendingIntent pendingIntent;
-    private IntentFilter[] intentFiltersArray;
-    private NfcAdapter mAdapter;
-    private String[][] techLists;
+
 
     private enum DrawerItem {
         SCAN ("Scan QR code", "Scan", GoogleMaterial.Icon.gmd_camera),
@@ -95,6 +94,8 @@ public class MainActivity extends AppCompatActivity {
                 .getDefaultSharedPreferences(getApplicationContext());
         final IProfile profile = new ProfileDrawerItem()
                 .withName(preferences.getString("username", "HackGT User"))
+                .withEmail(preferences.getString("url", Util.DEFAULT_SERVER))
+                .withIcon(R.drawable.empty)
                 .withIdentifier(100);
         headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
@@ -110,7 +111,8 @@ public class MainActivity extends AppCompatActivity {
             drawerItems.add(DrawerItem.SCAN.getDrawerItem());
 
         }
-        if (username.equals("ehsan") || username.equals("petschekr") || username.equals("andrew") || username.equals("michael") || username.equals("kexin")) {
+        if (username.equals("ehsan") || username.equals("petschekr") || username.equals("andrew") || username.equals("michael") || username.equals("kexin")
+                || username.equals("evan")) {
             drawerItems.add(DrawerItem.SEARCH.getDrawerItem());
         }
         drawerItems.add(DrawerItem.TAP.getDrawerItem());
@@ -129,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
         }).withSelectable(false));
         drawerItems.add(new DividerDrawerItem());
         drawerItems.add(DrawerItem.LOGOUT.getDrawerItem());
-        drawerItems.add(new SecondaryDrawerItem().withName("Version v" + Util.version).withSelectable(false));
+        drawerItems.add(new SecondaryDrawerItem().withName("Version " + getApplicationContext().getString(R.string.app_version)).withSelectable(false));
 
         result = new DrawerBuilder()
                 .withActivity(this)
@@ -188,16 +190,6 @@ public class MainActivity extends AppCompatActivity {
     public void setTitle(CharSequence title) {
         mTitle = title;
         getSupportActionBar().setTitle(mTitle);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
     }
 
     @Override

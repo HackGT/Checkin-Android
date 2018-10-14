@@ -26,6 +26,7 @@ import android.widget.ImageView;
 import java.io.IOException;
 
 import gt.hack.nfc.util.API;
+import gt.hack.nfc.util.Util;
 
 
 /**
@@ -90,7 +91,7 @@ public class LoginActivity extends AppCompatActivity {
 
                         final EditText input = new EditText(getApplicationContext());
                         input.setInputType(InputType.TYPE_TEXT_VARIATION_URI);
-                        input.setText(preferences.getString("url", "https://checkin.hack.gt"));
+                        input.setText(preferences.getString("url", Util.DEFAULT_SERVER));
                         builder.setView(input);
 
                         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -224,7 +225,7 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-                return API.login(username, password,
+                return API.INSTANCE.login(username, password,
                         PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
             } catch (IOException e) {
                 e.printStackTrace();

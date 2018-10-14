@@ -7,11 +7,13 @@ import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.Ndef;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,6 +27,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 
+import gt.hack.nfc.BuildConfig;
 import gt.hack.nfc.R;
 import gt.hack.nfc.util.CheckInAsyncTask;
 import gt.hack.nfc.util.Util;
@@ -40,7 +43,6 @@ public class CheckinFlowFragment extends Fragment {
     private String confirmBranch;
     private boolean alreadyCheckedIn = false;
     private boolean wroteBadge = false;
-    private final String packageName = "gt.hack.nfc";
     private AppCompatButton confirmButton;
 
     public static CheckinFlowFragment newInstance(UserFragment user) {
@@ -157,10 +159,15 @@ public class CheckinFlowFragment extends Fragment {
                                         "https://live.hack.gt/?user=" + id);
                                 NdefMessage ndefMessage = new NdefMessage(
                                         new NdefRecord[] { uriRecord });
-
                                 ndef.writeNdefMessage(ndefMessage);
-                                if (ndef.canMakeReadOnly() && Util.nfcLockEnabled) {
+                                //TODO: PLEASE PLEASE PLEASE make sure badge locking works in a release (non-debug) build
+                                if (ndef.canMakeReadOnly() && Util.nfcLockEnabled && !BuildConfig.DEBUG) {
                                     ndef.makeReadOnly();
+                                } else if (Util.nfcLockEnabled && BuildConfig.DEBUG) {
+                                    Util.makeSnackbar(getActivity().findViewById(R.id.content_frame), R.string.permanent_badge_locking_option_disabled_debug_build, Snackbar.LENGTH_SHORT).show();
+                                }
+                                else if (!Util.nfcLockEnabled) {
+                                    Util.makeSnackbar(getActivity().findViewById(R.id.content_frame), R.string.permanent_badge_locking_option_disabled, Snackbar.LENGTH_SHORT).show();
                                 }
                                 else {
                                     Util.makeSnackbar(getActivity().findViewById(R.id.content_frame), R.string.unlockable_tag, Snackbar.LENGTH_SHORT).show();
