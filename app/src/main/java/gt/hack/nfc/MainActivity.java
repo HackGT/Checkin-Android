@@ -166,6 +166,24 @@ public class MainActivity extends AppCompatActivity {
                         return false;
                     }
                 })
+                 .withOnDrawerListener(
+                         new Drawer.OnDrawerListener() {
+                             @Override
+                             public void onDrawerOpened(View drawerView) {
+                                drawerView.clearFocus();
+                             }
+
+                             @Override
+                             public void onDrawerClosed(View drawerView) {
+
+                             }
+
+                             @Override
+                             public void onDrawerSlide(View drawerView, float slideOffset) {
+
+                             }
+                         }
+                 )
                 .build();
         if (savedInstanceState == null) {
             result.setSelection(DrawerItem.SCAN.getDrawerItem(), true);
