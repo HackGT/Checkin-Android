@@ -116,6 +116,7 @@ class TapFragment : Fragment() {
 
           val id: Uri? = record?.toUri()
           Log.i(TAG, id.toString())
+          launch {
           if (id?.host == "live.hack.gt" && uuidRegex.containsMatchIn(id.getQueryParameter("user").orEmpty())) {
             val uuid = id.getQueryParameter("user").orEmpty()
             Log.i(TAG, "this valid id is " + uuid)
@@ -133,42 +134,43 @@ class TapFragment : Fragment() {
 //            }
 //          }
 //          Log.i(TAG, "past job2")
-            val userInfo = runBlocking { API.getUserById(preferences, uuid)!!.user().fragments().userFragment() }
-            val currentTags = runBlocking { API.getTagsForUser(preferences, uuid) }
-            val newTags = when (doCheckIn) {
-              true -> runBlocking { API.checkInTag(preferences, uuid, tagName) }
-              else -> runBlocking { API.checkOutTag(preferences, uuid, tagName) }
-            }
 
-            val checkInData = CheckInData(userInfo, currentTags, newTags!!)
-
-            Log.i(TAG, "hi")
-            drawCheckInFinish(checkInData, tagName)
-
-            Log.i(TAG, checkInData.userInfo.toString())
-            Log.i(TAG, checkInData.currentTags.toString())
-            Log.i(TAG, checkInData.newTags.toString())
-          } else {
-            if (id == null) {
-              Log.i(TAG, "this tag's data is null: " + id)
-              displayMessageAndReset(false, getString(R.string.badge_data_null), 5000)
-              activity?.runOnUiThread {
-                showAlert("Invalid user on badge", R.string.badge_data_null)
+              val userInfo = async { API.getUserById(preferences, uuid)!!.user().fragments().userFragment() }
+              val currentTags = async { API.getTagsForUser(preferences, uuid) }
+              val newTags = when (doCheckIn) {
+                true -> async { API.checkInTag(preferences, uuid, tagName) }
+                else -> async { API.checkOutTag(preferences, uuid, tagName) }
               }
+
+              val checkInData = CheckInData(userInfo.await(), currentTags.await(), newTags.await()!!)
+
+              Log.i(TAG, "hi")
+              drawCheckInFinish(checkInData, tagName)
+
+              Log.i(TAG, checkInData.userInfo.toString())
+              Log.i(TAG, checkInData.currentTags.toString())
+              Log.i(TAG, checkInData.newTags.toString())
             } else {
-              Log.i(TAG, "this tag's data is formatted incorrectly: " + id)
-              activity?.runOnUiThread {
-                showAlert("Invalid user on badge", R.string.invalid_badge_id)
+              if (id == null) {
+                Log.i(TAG, "this tag's data is null: " + id)
+                displayMessageAndReset(false, getString(R.string.badge_data_null), 5000)
+                activity?.runOnUiThread {
+                  showAlert("Invalid user on badge", R.string.badge_data_null)
+                }
+              } else {
+                Log.i(TAG, "this tag's data is formatted incorrectly: " + id)
+                activity?.runOnUiThread {
+                  showAlert("Invalid user on badge", R.string.invalid_badge_id)
+                }
+
               }
 
+              val toneGen1 = ToneGenerator(AudioManager.STREAM_MUSIC, 100)
+              toneGen1.startTone(ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK, 500)
+
+              waitingForTag = true
             }
-
-            val toneGen1 = ToneGenerator(AudioManager.STREAM_MUSIC, 100)
-            toneGen1.startTone(ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK, 500)
-
-            waitingForTag = true
           }
-
         }
 
       } , READER_FLAGS, null)
@@ -252,6 +254,7 @@ class TapFragment : Fragment() {
 
   fun displayMessageAndReset(validTag: Boolean, message: String, duration: Long ) {
     activity?.runOnUiThread {
+      Log.i(TAG,"tag tap result reached")
       val waitingForBadge = wait_for_badge_tap
       val badgeTapped = badge_tapped
 
