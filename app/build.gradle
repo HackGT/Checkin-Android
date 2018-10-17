@@ -13,7 +13,6 @@ android {
         }
     }
     compileSdkVersion 28
-    buildToolsVersion '28.0.2'
     defaultConfig {
         applicationId "gt.hack.nfc"
         minSdkVersion 19
@@ -33,6 +32,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    buildToolsVersion = '28.0.3'
 }
 
 kotlin {
