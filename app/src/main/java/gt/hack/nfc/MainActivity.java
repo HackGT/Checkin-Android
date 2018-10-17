@@ -111,7 +111,9 @@ public class MainActivity extends AppCompatActivity {
             drawerItems.add(DrawerItem.SCAN.getDrawerItem());
 
         }
-        if (username.equals("ehsan") || username.equals("petschekr") || username.equals("andrew") || username.equals("michael") || username.equals("kexin")
+
+        //TODO: implement server-side access control
+        if (username.equals("ehsan") || username.equals("petschekr") || username.equals("julian") || username.equals("kexin")
                 || username.equals("evan")) {
             drawerItems.add(DrawerItem.SEARCH.getDrawerItem());
         }
