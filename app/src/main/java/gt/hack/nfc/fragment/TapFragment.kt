@@ -144,7 +144,6 @@ class TapFragment : Fragment() {
 
               val checkInData = CheckInData(userInfo.await(), currentTags.await(), newTags.await()!!)
 
-              Log.i(TAG, "hi")
               drawCheckInFinish(checkInData, tagName)
 
               Log.i(TAG, checkInData.userInfo.toString())
@@ -154,21 +153,10 @@ class TapFragment : Fragment() {
               if (id == null) {
                 Log.i(TAG, "this tag's data is null: " + id)
                 displayMessageAndReset(false, getString(R.string.badge_data_null), 5000)
-                activity?.runOnUiThread {
-                  showAlert("Invalid user on badge", R.string.badge_data_null)
-                }
               } else {
                 Log.i(TAG, "this tag's data is formatted incorrectly: " + id)
-                activity?.runOnUiThread {
-                  showAlert("Invalid user on badge", R.string.invalid_badge_id)
-                }
-
+                displayMessageAndReset(false, getString(R.string.invalid_badge_id), 6000)
               }
-
-              val toneGen1 = ToneGenerator(AudioManager.STREAM_MUSIC, 100)
-              toneGen1.startTone(ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK, 500)
-
-              waitingForTag = true
             }
           }
         }
@@ -182,7 +170,6 @@ class TapFragment : Fragment() {
 
   fun drawCheckInFinish(checkInData: CheckInData, tagName: String) {
     val waitingForBadge = wait_for_badge_tap
-    val badgeTapped = badge_tapped
     val userName = track_name
     val userBranch = track_type
     val userShirtSize = track_tshirt_size
@@ -191,8 +178,6 @@ class TapFragment : Fragment() {
     val userInfo = checkInData.userInfo
     var userShirtSizeVal: String? = ""
     var userDietaryRestrictionsVal: String? = ""
-    var delayTime: Long = 1000
-
 
     if (userInfo != null) {
 
@@ -207,9 +192,11 @@ class TapFragment : Fragment() {
       Log.i(TAG, ""+ checkInData.currentTags)
       var prevTagState: Boolean? = null
       var newTagState: Boolean? = null
+      var prevTagTime: String? = null
       var unseenTag = false
       if (checkInData.currentTags!!.get(tagName) != null) {
         prevTagState = checkInData.currentTags.get(tagName)!!.checked_in
+        prevTagTime = checkInData.currentTags.get(tagName)!!.checked_in_date
         newTagState = checkInData.newTags.get(tagName)!!.checked_in
       } else {
         unseenTag = true
@@ -245,8 +232,6 @@ class TapFragment : Fragment() {
           displayMessageAndReset(false, getString(R.string.user_already_checked_out), 5000)
         }
       }
-
-
     } else { // checkInData is null, ie invalid user
         displayMessageAndReset(false, getString(R.string.invalid_badge_id),5000)
       }
@@ -254,7 +239,6 @@ class TapFragment : Fragment() {
 
   fun displayMessageAndReset(validTag: Boolean, message: String, duration: Long ) {
     activity?.runOnUiThread {
-      Log.i(TAG,"tag tap result reached")
       val waitingForBadge = wait_for_badge_tap
       val badgeTapped = badge_tapped
 
