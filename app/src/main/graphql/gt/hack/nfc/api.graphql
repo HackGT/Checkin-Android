@@ -18,8 +18,8 @@ query UserGet($id: ID!) {
             }
        }
 }
-query TagsGet {
-  tags {
+query TagsGet($only_current: Boolean!) {
+  tags(only_current: $only_current) {
     name
   }
 }

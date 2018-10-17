@@ -4,14 +4,6 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'com.apollographql.android'
 
 android {
-    signingConfigs {
-        test {
-            keyAlias 'pwistest'
-            keyPassword 'test'
-            storeFile file('C:/Users/Evan/Desktop/teststore')
-            storePassword 'test'
-        }
-    }
     compileSdkVersion 28
     buildToolsVersion '28.0.2'
     defaultConfig {
