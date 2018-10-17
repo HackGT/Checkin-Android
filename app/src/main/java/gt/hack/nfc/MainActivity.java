@@ -115,10 +115,10 @@ public class MainActivity extends AppCompatActivity {
         //TODO: implement server-side access control
         if (username.equals("ehsan") || username.equals("petschekr") || username.equals("julian") || username.equals("kexin")
                 || username.equals("evan")) {
-            drawerItems.add(DrawerItem.SEARCH.getDrawerItem());
+            drawerItems.add(DrawerItem.SEARCH.getDrawerItem().withIdentifier(101));
         }
-        drawerItems.add(DrawerItem.TAP.getDrawerItem());
-        drawerItems.add(new DividerDrawerItem());
+        drawerItems.add(DrawerItem.TAP.getDrawerItem().withIdentifier(102));
+        drawerItems.add(new DividerDrawerItem().withIdentifier(103));
         drawerItems.add(new SwitchDrawerItem().withChecked(Util.nfcLockEnabled).withName("NFC locking enabled").withOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(IDrawerItem drawerItem, CompoundButton buttonView, boolean isChecked) {
@@ -130,10 +130,10 @@ public class MainActivity extends AppCompatActivity {
                     Util.makeSnackbar(findViewById(R.id.content_frame), R.string.nfc_locking_disabled, Snackbar.LENGTH_SHORT).show();
                 }
             }
-        }).withSelectable(false));
-        drawerItems.add(new DividerDrawerItem());
-        drawerItems.add(DrawerItem.LOGOUT.getDrawerItem());
-        drawerItems.add(new SecondaryDrawerItem().withName("Version " + getApplicationContext().getString(R.string.app_version)).withSelectable(false));
+        }).withSelectable(false).withIdentifier(104));
+        drawerItems.add(new DividerDrawerItem().withIdentifier(105));
+        drawerItems.add(DrawerItem.LOGOUT.getDrawerItem().withIdentifier(106));
+        drawerItems.add(new SecondaryDrawerItem().withName("Version " + getApplicationContext().getString(R.string.app_version)).withSelectable(false).withIdentifier(107));
 
         result = new DrawerBuilder()
                 .withActivity(this)
@@ -172,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
                          new Drawer.OnDrawerListener() {
                              @Override
                              public void onDrawerOpened(View drawerView) {
-                                drawerView.clearFocus();
+
                              }
 
                              @Override
