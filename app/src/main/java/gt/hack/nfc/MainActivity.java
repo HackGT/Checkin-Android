@@ -147,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                        if (drawerItem != null && drawerItem instanceof PrimaryDrawerItem) {
+                        if (drawerItem instanceof PrimaryDrawerItem) {
                             String selectedLabel = ((PrimaryDrawerItem) drawerItem).getName().toString();
                             String newTitle = "";
                             if (selectedLabel.equals(DrawerItem.SCAN.getLabel())) {
