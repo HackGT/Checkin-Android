@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
         result = new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(toolbar)
-                .withHasStableIds(true)
+                //.withHasStableIds(true)
                 .withAccountHeader(headerResult)
                 .addDrawerItems(
                         drawerItems.toArray(new AbstractDrawerItem[drawerItems.size()])
@@ -192,6 +192,7 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             result.setSelection(DrawerItem.SCAN.getDrawerItem(), true);
         }
+        switchToFragment(new CheckinFragment());
     }
 
     private void switchToFragment(Fragment fragment) {
