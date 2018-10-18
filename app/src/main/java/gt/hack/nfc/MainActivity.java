@@ -13,6 +13,7 @@ import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -111,12 +112,14 @@ public class MainActivity extends AppCompatActivity {
             drawerItems.add(DrawerItem.SCAN.getDrawerItem());
 
         }
-        if (username.equals("ehsan") || username.equals("petschekr") || username.equals("andrew") || username.equals("michael") || username.equals("kexin")
+
+        //TODO: implement server-side access control
+        if (username.equals("ehsan") || username.equals("petschekr") || username.equals("julian") || username.equals("kexin")
                 || username.equals("evan")) {
-            drawerItems.add(DrawerItem.SEARCH.getDrawerItem());
+            drawerItems.add(DrawerItem.SEARCH.getDrawerItem().withIdentifier(101));
         }
-        drawerItems.add(DrawerItem.TAP.getDrawerItem());
-        drawerItems.add(new DividerDrawerItem());
+        drawerItems.add(DrawerItem.TAP.getDrawerItem().withIdentifier(102));
+        drawerItems.add(new DividerDrawerItem().withIdentifier(103));
         drawerItems.add(new SwitchDrawerItem().withChecked(Util.nfcLockEnabled).withName("NFC locking enabled").withOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(IDrawerItem drawerItem, CompoundButton buttonView, boolean isChecked) {
@@ -128,15 +131,15 @@ public class MainActivity extends AppCompatActivity {
                     Util.makeSnackbar(findViewById(R.id.content_frame), R.string.nfc_locking_disabled, Snackbar.LENGTH_SHORT).show();
                 }
             }
-        }).withSelectable(false));
-        drawerItems.add(new DividerDrawerItem());
-        drawerItems.add(DrawerItem.LOGOUT.getDrawerItem());
-        drawerItems.add(new SecondaryDrawerItem().withName("Version " + getApplicationContext().getString(R.string.app_version)).withSelectable(false));
+        }).withSelectable(false).withIdentifier(104));
+        drawerItems.add(new DividerDrawerItem().withIdentifier(105));
+        drawerItems.add(DrawerItem.LOGOUT.getDrawerItem().withIdentifier(106));
+        drawerItems.add(new SecondaryDrawerItem().withName("Version " + getApplicationContext().getString(R.string.app_version)).withSelectable(false).withIdentifier(107));
 
         result = new DrawerBuilder()
                 .withActivity(this)
                 .withToolbar(toolbar)
-                .withHasStableIds(true)
+                //.withHasStableIds(true)
                 .withAccountHeader(headerResult)
                 .addDrawerItems(
                         drawerItems.toArray(new AbstractDrawerItem[drawerItems.size()])
@@ -145,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                        if (drawerItem != null && drawerItem instanceof PrimaryDrawerItem) {
+                        if (drawerItem instanceof PrimaryDrawerItem) {
                             String selectedLabel = ((PrimaryDrawerItem) drawerItem).getName().toString();
                             String newTitle = "";
                             if (selectedLabel.equals(DrawerItem.SCAN.getLabel())) {
@@ -166,10 +169,30 @@ public class MainActivity extends AppCompatActivity {
                         return false;
                     }
                 })
+                 .withOnDrawerListener(
+                         new Drawer.OnDrawerListener() {
+                             @Override
+                             public void onDrawerOpened(View drawerView) {
+
+                             }
+
+                             @Override
+                             public void onDrawerClosed(View drawerView) {
+
+                             }
+
+                             @Override
+                             public void onDrawerSlide(View drawerView, float slideOffset) {
+                                 drawerView.bringToFront();
+                                 drawerView.requestLayout();
+                             }
+                         }
+                 )
                 .build();
         if (savedInstanceState == null) {
             result.setSelection(DrawerItem.SCAN.getDrawerItem(), true);
         }
+        switchToFragment(new CheckinFragment());
     }
 
     private void switchToFragment(Fragment fragment) {

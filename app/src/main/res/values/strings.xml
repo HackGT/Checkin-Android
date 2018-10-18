@@ -23,7 +23,7 @@
     <string name="invalid_nfc_tag">Corrupted or blank tag tapped. Please try again.</string>
     <string name="invalid_tag">Please type a valid tag</string>
     <string name="server_or_network_error">Invalid response from server</string>
-    <string name="invalid_badge_id">The badge you just scanned does not contain a valid user ID to check in. This could be due to outdated data, a connection to the wrong checkin2 server, or possibly a forged NFC badge.</string>
+    <string name="invalid_badge_id">This badge contains invalid data. Possible causes include outdated data, a connection to the wrong checkin2 server, or a forged NFC badge.</string>
     <string name="nfc_locking_enabled">Enabled permanent NFC badge locking</string>
     <string name="nfc_locking_disabled">Disabled permanent NFC badge locking</string>
     <string name="checkin_flow">Check In Flow</string>
@@ -35,7 +35,7 @@
     <string name="switch_check_out">Check out user</string>
     <string name="permanent_badge_locking_option_disabled">Not locking tag because the permanent locking option is disabled</string>
     <string name="permanent_badge_locking_option_disabled_debug_build">Didn\'t permanently lock badge because this is a debug build</string>
-    <string name="badge_data_null">This badge appears to be blank</string>
+    <string name="badge_data_null">This badge appears to be blank - try tapping again</string>
 
     <string name="checkin_error">Error checking user in. Please try again.</string>
     <string name="get_tags_failed">Failed to get tags</string>
