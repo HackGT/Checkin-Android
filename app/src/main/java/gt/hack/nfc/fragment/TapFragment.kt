@@ -77,11 +77,13 @@ class TapFragment : Fragment() {
 
       val autocomplete = ArrayAdapter(context, android.R.layout.simple_expandable_list_item_1, allTags as ArrayList<String>)
       // the cast to ArrayList is kinda icky but so long as the API response is OK, it should work
-      tagSelect.threshold = 0
+      tagSelect.threshold = 1
       tagSelect.setAdapter(autocomplete)
       tagSelect.setOnFocusChangeListener { v, hasFocus ->
         if (!hasFocus) {
           Util.hideSoftKeyboard(view, context)
+        } else {
+          tagSelect.showDropDown() // make sure the suggestions show even if no characters have been entered
         }
       }
 
