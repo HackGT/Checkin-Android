@@ -35,7 +35,7 @@
     <string name="switch_check_out">Check out user</string>
     <string name="permanent_badge_locking_option_disabled">Not locking tag because the permanent locking option is disabled</string>
     <string name="permanent_badge_locking_option_disabled_debug_build">Didn\'t permanently lock badge because this is a debug build</string>
-    <string name="badge_data_null">This badge appears to be blank</string>
+    <string name="badge_data_null">This badge appears to be blank - try tapping again</string>
 
     <string name="checkin_error">Error checking user in. Please try again.</string>
     <string name="get_tags_failed">Failed to get tags</string>
