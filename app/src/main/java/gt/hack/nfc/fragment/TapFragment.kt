@@ -22,7 +22,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import com.apollographql.apollo.exception.ApolloNetworkException
 import gt.hack.nfc.R
 import gt.hack.nfc.util.API
 import gt.hack.nfc.util.Util
@@ -59,113 +58,105 @@ class TapFragment : Fragment() {
 
     val preferences = PreferenceManager.getDefaultSharedPreferences(activity)
     var error = false
-    val allTags = runBlocking {
-      try {
-        API.getTags(preferences)
-      } catch (e: ApolloNetworkException) { // Working way to detect errors inside the network
-        // operation call and then make the UI do something in response
-        error = true
+    var allTags = runBlocking { API.getTags(preferences) } // TODO: this seems to delay showing this screen, so check that out
+    val currentCheckinTags = runBlocking { API.getTags(preferences, true) }
+
+    allTags = allTags as ArrayList<String>
+    allTags.sortWith(kotlin.Comparator { t1, t2 ->
+      val t1SortVal = when (currentCheckinTags?.contains(t1)) {
+        true -> -1
+        else -> 0
       }
-    } // TODO: this seems to delay showing this screen, so check that out
-    Log.i(TAG, "Contents of allTags: " + allTags)
-
-    if (error) {
-      tagSelect.setText("No internet, couldn't fetch tags")
-    } else {
-      tagSelect.text = prevTag
-      tagSelect.isEnabled = true
-
-      val autocomplete = ArrayAdapter(context, android.R.layout.simple_expandable_list_item_1, allTags as ArrayList<String>)
-      // the cast to ArrayList is kinda icky but so long as the API response is OK, it should work
-      tagSelect.threshold = 1
-      tagSelect.setAdapter(autocomplete)
-      tagSelect.setOnFocusChangeListener { v, hasFocus ->
-        if (!hasFocus) {
-          Util.hideSoftKeyboard(view, context)
-        } else {
-          tagSelect.showDropDown() // make sure the suggestions show even if no characters have been entered
-        }
+      val t2SortVal = when (currentCheckinTags?.contains(t2)) {
+        true -> -1
+        else -> 0
       }
+      t1SortVal - t2SortVal
+    })
+    Log.i(TAG, "Contents of sorted allTags: " + allTags)
 
-      check_in_out_select.setOnCheckedChangeListener { _, isChecked ->
-        check_in_out_select.text = when (isChecked) {
-          true -> getString(R.string.switch_check_in)
-          false -> getString(R.string.switch_check_out)
-        }
+    tagSelect.text = prevTag
+    tagSelect.isEnabled = true
+
+    val autocomplete = ArrayAdapter(context, android.R.layout.simple_expandable_list_item_1, allTags)
+    // the cast to ArrayList is kinda icky but so long as the API response is OK, it should work
+    tagSelect.threshold = 1
+    tagSelect.setAdapter(autocomplete)
+    tagSelect.setOnFocusChangeListener { v, hasFocus ->
+      if (!hasFocus) {
+        Util.hideSoftKeyboard(view, context)
+      } else {
+        tagSelect.showDropDown() // make sure the suggestions show even if no characters have been entered
       }
-
-      val nfc = NfcAdapter.getDefaultAdapter(activity)
-
-      nfc.enableReaderMode(activity, { tag: Tag ->
-        if (waitingForTag) {
-          waitingForTag = false
-          // get the latest read tag
-          val ndef = Ndef.get(tag)
-          val record: NdefRecord? = try {
-            ndef.connect()
-            val message = ndef.ndefMessage
-            message.records[0]
-          } catch (e: Throwable) {
-            Log.i(TAG, "" + e.printStackTrace())
-            null
-          } finally {
-            try {
-              ndef.close()
-            } catch (e: Throwable) {
-              e.printStackTrace()
-            }
-          }
-
-          val id: Uri? = record?.toUri()
-          Log.i(TAG, id.toString())
-          launch {
-          if (id?.host == "live.hack.gt" && uuidRegex.containsMatchIn(id.getQueryParameter("user").orEmpty())) {
-            val uuid = id.getQueryParameter("user").orEmpty()
-            Log.i(TAG, "this valid id is " + uuid)
-
-            val tagName = tagSelect.text.trim().toString()
-            val doCheckIn = check_in_out_select.isChecked
-            // check in/out the user
-            // TODO: we should run these concurrently to save time
-//          val job2 = launch {
-//            try {
-//              val userInfo = async { API.getUserById(preferences, uuid) }
-//              Log.i(TAG, "async tags" + userInfo.await())
-//            } catch (exception: Exception) {
-//              Log.e(TAG, "Problem in coroutine")
-//            }
-//          }
-//          Log.i(TAG, "past job2")
-
-              val userInfo = async { API.getUserById(preferences, uuid)!!.user().fragments().userFragment() }
-              val currentTags = async { API.getTagsForUser(preferences, uuid) }
-              val newTags = when (doCheckIn) {
-                true -> async { API.checkInTag(preferences, uuid, tagName) }
-                else -> async { API.checkOutTag(preferences, uuid, tagName) }
-              }
-
-              val checkInData = CheckInData(userInfo.await(), currentTags.await(), newTags.await()!!)
-
-              drawCheckInFinish(checkInData, tagName)
-
-              Log.i(TAG, checkInData.userInfo.toString())
-              Log.i(TAG, checkInData.currentTags.toString())
-              Log.i(TAG, checkInData.newTags.toString())
-            } else {
-              if (id == null) {
-                Log.i(TAG, "this tag's data is null: " + id)
-                displayMessageAndReset(false, getString(R.string.badge_data_null), 5000)
-              } else {
-                Log.i(TAG, "this tag's data is formatted incorrectly: " + id)
-                displayMessageAndReset(false, getString(R.string.invalid_badge_id), 6000)
-              }
-            }
-          }
-        }
-
-      } , READER_FLAGS, null)
-
     }
+
+    check_in_out_select.setOnCheckedChangeListener { _, isChecked ->
+      check_in_out_select.text = when (isChecked) {
+        true -> getString(R.string.switch_check_in)
+        false -> getString(R.string.switch_check_out)
+      }
+    }
+
+    val nfc = NfcAdapter.getDefaultAdapter(activity)
+
+    nfc.enableReaderMode(activity, { tag: Tag ->
+      if (waitingForTag) {
+        waitingForTag = false
+        // get the latest read tag
+        val ndef = Ndef.get(tag)
+        val record: NdefRecord? = try {
+          ndef.connect()
+          val message = ndef.ndefMessage
+          message.records[0]
+        } catch (e: Throwable) {
+          Log.i(TAG, "" + e.printStackTrace())
+          null
+        } finally {
+          try {
+            ndef.close()
+          } catch (e: Throwable) {
+            e.printStackTrace()
+          }
+        }
+
+        val id: Uri? = record?.toUri()
+        Log.i(TAG, id.toString())
+        if (id?.host == "live.hack.gt" && uuidRegex.containsMatchIn(id.getQueryParameter("user").orEmpty())) {
+          val uuid = id.getQueryParameter("user").orEmpty()
+          Log.i(TAG, "this valid id is " + uuid)
+
+          val tagName = tagSelect.text.trim().toString()
+          val doCheckIn = check_in_out_select.isChecked
+          // check in/out the user
+
+          val userInfo = runBlocking { API.getUserById(preferences, uuid)!!.user().fragments().userFragment() }
+          val currentTags = runBlocking { API.getTagsForUser(preferences, uuid) }
+          val newTags = when (doCheckIn) {
+            true -> runBlocking { API.checkInTag(preferences, uuid, tagName) }
+            else -> runBlocking { API.checkOutTag(preferences, uuid, tagName) }
+          }
+
+          val checkInData = CheckInData(userInfo, currentTags, newTags!!)
+
+          drawCheckInFinish(checkInData, tagName)
+
+          Log.i(TAG, checkInData.userInfo.toString())
+          Log.i(TAG, checkInData.currentTags.toString())
+          Log.i(TAG, checkInData.newTags.toString())
+        } else {
+          if (id == null) {
+            Log.i(TAG, "this tag's data is null: " + id)
+            displayMessageAndReset(false, getString(R.string.badge_data_null), 5000)
+          } else {
+            Log.i(TAG, "this tag's data is formatted incorrectly: " + id)
+            displayMessageAndReset(false, getString(R.string.invalid_badge_id), 6000)
+          }
+        }
+
+      }
+
+    }, READER_FLAGS, null)
+
 
   }
 
@@ -187,19 +178,18 @@ class TapFragment : Fragment() {
         if (question?.name.equals("tshirt-size")) {
           userShirtSizeVal = question?.value
         } else if (question?.name.equals("dietary-restrictions")) {
-          userDietaryRestrictionsVal = question?.value
+          userDietaryRestrictionsVal = question?.values.toString()
         }
       }
 
-      Log.i(TAG, ""+ checkInData.currentTags)
+      Log.i(TAG, "" + checkInData.currentTags)
       var prevTagState: Boolean? = null
       var newTagState: Boolean? = null
       var prevTagTime: String? = null
       var unseenTag = false
-      if (checkInData.currentTags!!.get(tagName) != null) {
-        prevTagState = checkInData.currentTags.get(tagName)!!.checked_in
-        prevTagTime = checkInData.currentTags.get(tagName)!!.checked_in_date
-        newTagState = checkInData.newTags.get(tagName)!!.checked_in
+      if (checkInData.currentTags!![tagName] != null) {
+        prevTagState = checkInData.currentTags[tagName]!!.checked_in
+        newTagState = checkInData.newTags[tagName]!!.checked_in
       } else {
         unseenTag = true
       }
@@ -209,7 +199,7 @@ class TapFragment : Fragment() {
       Log.i(TAG, "newTagState: " + newTagState)
 
       val validOperation = (prevTagState != newTagState && !unseenTag)
-                            || (newTagState == null && check_in_out_select.isChecked)
+          || (newTagState == null && check_in_out_select.isChecked)
 
       activity?.runOnUiThread {
         userName.text = userInfo.name
@@ -218,7 +208,7 @@ class TapFragment : Fragment() {
         }
 
         userShirtSize.text = userShirtSizeVal
-        userDietaryRestrictions.text = userDietaryRestrictionsVal
+        userDietaryRestrictions.text = userDietaryRestrictionsVal?.substring(1)?.dropLast(1)
 
         waitingForBadge.visibility = View.GONE
       }
@@ -227,7 +217,7 @@ class TapFragment : Fragment() {
         displayMessageAndReset(true, "", 1000)
       } else {
         if (prevTagState != null && prevTagState) { // indicates checkin/out state
-         displayMessageAndReset(false, getString(R.string.user_already_checked_in), 5000)
+          displayMessageAndReset(false, getString(R.string.user_already_checked_in), 5000)
         } else if (newTagState == null && !check_in_out_select.isChecked) {
           displayMessageAndReset(false, getString(R.string.cannot_checkout_not_checked_in), 5000)
         } else {
@@ -235,11 +225,11 @@ class TapFragment : Fragment() {
         }
       }
     } else { // checkInData is null, ie invalid user
-        displayMessageAndReset(false, getString(R.string.invalid_badge_id),5000)
-      }
+      displayMessageAndReset(false, getString(R.string.invalid_badge_id), 5000)
     }
+  }
 
-  fun displayMessageAndReset(validTag: Boolean, message: String, duration: Long ) {
+  fun displayMessageAndReset(validTag: Boolean, message: String, duration: Long) {
     activity?.runOnUiThread {
       val waitingForBadge = wait_for_badge_tap
       val badgeTapped = badge_tapped
