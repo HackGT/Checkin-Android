@@ -101,9 +101,9 @@ object API {
     }
 
     @Throws(ApolloException::class)
-    suspend fun getTags(preferences: SharedPreferences): ArrayList<String>? {
+    suspend fun getTags(preferences: SharedPreferences, only_current: Boolean = false): ArrayList<String>? {
         val apolloClient = getApolloClient(preferences)
-        val response = apolloClient.query(TagsGetQuery(false)).execute()
+        val response = apolloClient.query(TagsGetQuery(only_current)).execute()
         val items = ArrayList<String>()
         for (t in response.data()!!.tags()) {
             items.add(t.name())
