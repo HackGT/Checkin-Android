@@ -171,7 +171,6 @@ class TapFragment : Fragment() {
     val userInfo = checkInData.userInfo
     var userShirtSizeVal: String? = ""
     var userDietaryRestrictionsVal: String? = ""
-
     if (userInfo != null) {
 
       userInfo.questions.forEach { question: UserFragment.Question? ->
@@ -208,7 +207,11 @@ class TapFragment : Fragment() {
         }
 
         userShirtSize.text = userShirtSizeVal
-        userDietaryRestrictions.text = userDietaryRestrictionsVal?.substring(1)?.dropLast(1)
+        try {
+          userDietaryRestrictions.text = userDietaryRestrictionsVal?.substring(1)?.dropLast(1)
+        } catch (e : StringIndexOutOfBoundsException) {
+          userDietaryRestrictions.text = ""
+        }
 
         waitingForBadge.visibility = View.GONE
       }
