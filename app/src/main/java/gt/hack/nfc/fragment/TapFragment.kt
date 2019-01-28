@@ -4,6 +4,7 @@ import java.util.*
 
 import android.app.AlertDialog
 import android.content.DialogInterface.OnClickListener
+import android.content.Intent
 import android.media.AudioManager
 import android.media.ToneGenerator
 import android.net.Uri
@@ -16,6 +17,7 @@ import android.os.Bundle
 import android.os.Handler
 
 import android.preference.PreferenceManager
+import android.provider.Settings
 import android.support.v4.app.Fragment
 import android.util.Log
 import android.view.LayoutInflater
@@ -98,6 +100,17 @@ class TapFragment : Fragment() {
     }
 
     val nfc = NfcAdapter.getDefaultAdapter(activity)
+
+    // Show alert if NFC is disabled
+    if (!nfc.isEnabled) {
+      val dialog = android.support.v7.app.AlertDialog.Builder(activity!!)
+      dialog.setTitle("NFC Disabled!")
+      dialog.setMessage("Badge scanning is unlikely to work w/o NFC. Would you like to enable NFC?")
+      dialog.setPositiveButton("Enable NFC") { _, _ -> startActivity(Intent(Settings.ACTION_NFC_SETTINGS)) }
+      dialog.setNegativeButton("Cancel", null)
+      dialog.show()
+      return
+    }
 
     nfc.enableReaderMode(activity, { tag: Tag ->
       if (waitingForTag) {
