@@ -99,6 +99,12 @@ class TapFragment : Fragment() {
 
     val nfc = NfcAdapter.getDefaultAdapter(activity)
 
+    if (nfc == null) {
+      // if device does not support NFC provide dialog instead of just crashing
+      showAlert("This device does not support NFC.", "Badges cannot be read or written using this device.")
+      return
+    }
+
     nfc.enableReaderMode(activity, { tag: Tag ->
       if (waitingForTag) {
         waitingForTag = false
@@ -260,8 +266,9 @@ class TapFragment : Fragment() {
     }
   }
 
-  fun showAlert(title: String, message: Int) {
+  fun showAlert(title: String, message: CharSequence) {
     val builder: AlertDialog.Builder
+
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
       builder = AlertDialog.Builder(context, android.R.style.Theme_Material_Dialog_Alert)
     } else {
