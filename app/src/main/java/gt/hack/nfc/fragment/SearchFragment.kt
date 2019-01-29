@@ -91,7 +91,7 @@ class SearchFragment : ListFragment(), SearchView.OnQueryTextListener {
             setListShown(true)
             if (searchResults != null) {
                 adapter!!.clear()
-                adapter!!.addAll(searchResults)
+                adapter!!.addAll(HashSet(searchResults))
                 (listAdapter as SearchAdapter).notifyDataSetChanged()
             }
         }
