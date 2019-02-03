@@ -37,7 +37,7 @@ import gt.hack.nfc.R
 import gt.hack.nfc.UserGetQuery
 import gt.hack.nfc.util.API
 import gt.hack.nfc.util.CameraSourcePreview
-import kotlinx.coroutines.experimental.runBlocking
+import kotlinx.coroutines.runBlocking
 
 class CheckinFragment : Fragment() {
 

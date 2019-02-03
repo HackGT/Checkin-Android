@@ -29,7 +29,7 @@ import gt.hack.nfc.util.API
 import gt.hack.nfc.util.Util
 
 import kotlinx.android.synthetic.main.fragment_tap.*
-import kotlinx.coroutines.experimental.*
+import kotlinx.coroutines.runBlocking
 import kotlin.collections.ArrayList
 
 

@@ -12,7 +12,7 @@ import java.util.HashMap
 
 import gt.hack.nfc.R
 import gt.hack.nfc.fragment.TagFragment
-import kotlinx.coroutines.experimental.runBlocking
+import kotlinx.coroutines.runBlocking
 
 
 /**
