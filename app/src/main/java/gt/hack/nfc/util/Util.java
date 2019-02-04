@@ -2,7 +2,9 @@ package gt.hack.nfc.util;
 
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.os.Build;
 import android.support.design.widget.BaseTransientBottomBar;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
@@ -12,8 +14,6 @@ import android.view.inputmethod.InputMethodManager;
 
 import java.lang.reflect.Field;
 import java.util.List;
-
-import gt.hack.nfc.fragment.UserFragment;
 
 public class Util {
     public static final String DEFAULT_SERVER = "https://checkin.hack.gt";
@@ -27,6 +27,22 @@ public class Util {
             }
         }
         return null;
+    }
+
+    public static void showWarning(Context context, int title, int message) {
+        AlertDialog.Builder builder;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            builder = new AlertDialog.Builder(context, android.R.style.Theme_Material_Dialog_Alert);
+        } else {
+            builder = new AlertDialog.Builder(context);
+        }
+
+        builder.setTitle(title)
+                .setMessage(message)
+                .setNeutralButton(android.R.string.ok, null)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
     }
 
     public static Snackbar makeSnackbar(View view, int resId, int duration) {
