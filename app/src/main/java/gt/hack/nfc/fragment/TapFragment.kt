@@ -3,6 +3,7 @@ package gt.hack.nfc.fragment
 import java.util.*
 
 import android.app.AlertDialog
+import android.content.DialogInterface
 import android.content.DialogInterface.OnClickListener
 import android.content.Intent
 import android.media.AudioManager
@@ -32,12 +33,12 @@ import kotlinx.android.synthetic.main.fragment_tap.*
 import kotlinx.coroutines.runBlocking
 import kotlin.collections.ArrayList
 
-
-class TapFragment : Fragment() {
+class TapFragment : Fragment(), View.OnClickListener {
 
   val READER_FLAGS = NfcAdapter.FLAG_READER_NFC_A
   val TAG = "CHECKIN/TAP_FRAGMENT"
   var waitingForTag = true
+  var nfcIsLoaded = false
 
   companion object {
     fun newInstance(): TapFragment {
@@ -49,9 +50,18 @@ class TapFragment : Fragment() {
     return inflater.inflate(R.layout.fragment_tap, container, false)
   }
 
+  override fun onResume() {
+    super.onResume()
+
+    // in case NFC becomes enabled in settings
+    if (view != null) {
+      loadNFC(view!!)
+    }
+  }
+
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    val uuidRegex = Regex("[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}")
     super.onViewCreated(view, savedInstanceState)
+    val uuidRegex = Regex("[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}")
     Log.i("checkin-tap", "inside onviewcreated")
     val tagSelect: AutoCompleteTextView = checkin_tag
     val prevTag = tagSelect.text
@@ -99,86 +109,125 @@ class TapFragment : Fragment() {
       }
     }
 
-    val nfc = NfcAdapter.getDefaultAdapter(activity)
+    loadNFC(view)
+  }
 
-    if (nfc == null) {
-      // if device does not support NFC provide dialog instead of just crashing
-      Util.showWarning(context, R.string.nfc_not_supported_device_title, R.string.nfc_not_supported__device_message)
-      return
-    }
+  fun loadNFC(view: View) {
 
-    // Show alert if NFC is disabled
-    if (!nfc.isEnabled) {
-      val dialog = android.support.v7.app.AlertDialog.Builder(activity!!)
-      dialog.setTitle("NFC Disabled!")
-      dialog.setMessage("Badge scanning is unlikely to work w/o NFC. Would you like to enable NFC?")
-      dialog.setPositiveButton("Enable NFC") { _, _ -> startActivity(Intent(Settings.ACTION_NFC_SETTINGS)) }
-      dialog.setNegativeButton("Cancel", null)
-      dialog.show()
-      return 
-    }
+    val nfcAdapter = NfcAdapter.getDefaultAdapter(context)
 
-    nfc.enableReaderMode(activity, { tag: Tag ->
-      if (waitingForTag) {
-        waitingForTag = false
-        // get the latest read tag
-        val ndef = Ndef.get(tag)
-        val record: NdefRecord? = try {
-          ndef.connect()
-          val message = ndef.ndefMessage
-          message.records[0]
-        } catch (e: Throwable) {
-          Log.i(TAG, "" + e.printStackTrace())
-          null
-        } finally {
-          try {
-            ndef.close()
-          } catch (e: Throwable) {
-            e.printStackTrace()
-          }
-        }
+    val nfcInfo = view.findViewById<TextView>(R.id.nfcInstructions)
+    val nfcProgressBar = view.findViewById<ProgressBar>(R.id.wait_for_badge_tap)
+    val warningIcon = view.findViewById<ImageView>(R.id.nfc_error)
+    val nfcEnableButton = view.findViewById<Button>(R.id.enable_nfc_button)
 
-        val id: Uri? = record?.toUri()
-        Log.i(TAG, id.toString())
-        if (id?.host == "live.hack.gt" && uuidRegex.containsMatchIn(id.getQueryParameter("user").orEmpty())) {
-          val uuid = id.getQueryParameter("user").orEmpty()
-          Log.i(TAG, "this valid id is " + uuid)
+    if (nfcAdapter == null) {
 
-          val tagName = tagSelect.text.trim().toString()
-          val doCheckIn = check_in_out_select.isChecked
-          // check in/out the user
+      nfcInfo.text = getString(R.string.nfc_unsupported_device)
 
-          val userInfo = runBlocking { API.getUserById(preferences, uuid)!!.user().fragments().userFragment() }
-          val currentTags = runBlocking { API.getTagsForUser(preferences, uuid) }
-          val newTags = when (doCheckIn) {
-            true -> runBlocking { API.checkInTag(preferences, uuid, tagName) }
-            else -> runBlocking { API.checkOutTag(preferences, uuid, tagName) }
-          }
+      nfcProgressBar.visibility = View.GONE
+      warningIcon.visibility = View.VISIBLE
+      nfcEnableButton.visibility = View.GONE
 
-          val checkInData = CheckInData(userInfo, currentTags, newTags!!)
+    } else if (!nfcAdapter.isEnabled) {
 
-          drawCheckInFinish(checkInData, tagName)
+      nfcInfo.text = getString(R.string.nfc_disabled)
 
-          Log.i(TAG, checkInData.userInfo.toString())
-          Log.i(TAG, checkInData.currentTags.toString())
-          Log.i(TAG, checkInData.newTags.toString())
-        } else {
-          if (id == null) {
-            Log.i(TAG, "this tag's data is null: " + id)
-            displayMessageAndReset(false, getString(R.string.badge_data_null), 5000)
-          } else {
-            Log.i(TAG, "this tag's data is formatted incorrectly: " + id)
-            displayMessageAndReset(false, getString(R.string.invalid_badge_id), 6000)
-          }
-        }
+      nfcProgressBar.visibility = View.GONE
+      warningIcon.visibility = View.VISIBLE
+      nfcEnableButton.visibility = View.VISIBLE
 
+      nfcEnableButton.setOnClickListener(this)
+
+    } else {
+
+      nfcInfo.text = getString(R.string.nfc_ready)
+
+      nfcProgressBar.visibility = View.VISIBLE
+      warningIcon.visibility = View.GONE
+      nfcEnableButton.visibility = View.GONE
+
+      // prevents being called multiple times if it is already enabled in reader mode
+      if (nfcIsLoaded) {
+        return
       }
 
-    }, READER_FLAGS, null)
+      val uuidRegex = Regex("[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}")
+      val tagSelect: AutoCompleteTextView = checkin_tag
+      val preferences = PreferenceManager.getDefaultSharedPreferences(activity)
 
+      nfcIsLoaded = true
+
+      nfcAdapter.enableReaderMode(activity, { tag: Tag ->
+        if (waitingForTag) {
+          waitingForTag = false
+          // get the latest read tag
+          val ndef = Ndef.get(tag)
+          val record: NdefRecord? = try {
+            ndef.connect()
+            val message = ndef.ndefMessage
+            message.records[0]
+          } catch (e: Throwable) {
+            Log.i(TAG, "" + e.printStackTrace())
+            null
+          } finally {
+            try {
+              ndef.close()
+            } catch (e: Throwable) {
+              e.printStackTrace()
+            }
+          }
+
+          val id: Uri? = record?.toUri()
+          Log.i(TAG, id.toString())
+          if (id?.host == "live.hack.gt" && uuidRegex.containsMatchIn(id.getQueryParameter("user").orEmpty())) {
+            val uuid = id.getQueryParameter("user").orEmpty()
+            Log.i(TAG, "this valid id is " + uuid)
+
+            val tagName = tagSelect.text.trim().toString()
+            val doCheckIn = check_in_out_select.isChecked
+            // check in/out the user
+
+            val userInfo = runBlocking { API.getUserById(preferences, uuid)!!.user().fragments().userFragment() }
+            val currentTags = runBlocking { API.getTagsForUser(preferences, uuid) }
+            val newTags = when (doCheckIn) {
+              true -> runBlocking { API.checkInTag(preferences, uuid, tagName) }
+              else -> runBlocking { API.checkOutTag(preferences, uuid, tagName) }
+            }
+
+            val checkInData = CheckInData(userInfo, currentTags, newTags!!)
+
+            drawCheckInFinish(checkInData, tagName)
+
+            Log.i(TAG, checkInData.userInfo.toString())
+            Log.i(TAG, checkInData.currentTags.toString())
+            Log.i(TAG, checkInData.newTags.toString())
+          } else {
+            if (id == null) {
+              Log.i(TAG, "this tag's data is null: " + id)
+              displayMessageAndReset(false, getString(R.string.badge_data_null), 5000)
+            } else {
+              Log.i(TAG, "this tag's data is formatted incorrectly: " + id)
+              displayMessageAndReset(false, getString(R.string.invalid_badge_id), 6000)
+            }
+          }
+
+        }
+
+      }, READER_FLAGS, null)
+    }
 
   }
 
+  override fun onClick(view: View?) {
+    if (view == null) {
+      return
+    }
+
+    if (view!!.id == R.id.enable_nfc_button) {
+      startActivity(Intent(Settings.ACTION_NFC_SETTINGS))
+    }
+  }
 
   fun drawCheckInFinish(checkInData: CheckInData, tagName: String) {
     val waitingForBadge = wait_for_badge_tap

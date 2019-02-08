@@ -86,7 +86,7 @@ public class CheckinFlowFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        final ProgressBar progressBar = getActivity().findViewById(R.id.waitForBadge);
+        final ProgressBar progressBar = getActivity().findViewById(R.id.wait_for_badge_tap);
 
         TextView nameView = getActivity().findViewById(R.id.hacker_checkin_name);
         nameView.setText(name);

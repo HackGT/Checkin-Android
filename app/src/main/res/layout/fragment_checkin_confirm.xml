@@ -101,22 +101,24 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:paddingTop="16dp">
+                <ProgressBar
+                    android:id="@+id/wait_for_badge_tap"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:gravity="center_horizontal"
+                    android:layout_marginTop="24dp" />
+
+
                 <TextView
                     android:id="@+id/nfcInstructions"
                     android:layout_width="match_parent"
                     android:gravity="center_horizontal"
                     android:layout_height="wrap_content"
-                    android:text="Waiting for badge..."
+                    android:text="@string/nfc_ready"
                     android:layout_gravity="center_vertical"
-                    android:textSize="24sp"
-                    android:paddingRight="16dp"/>
-                <ProgressBar
-                    android:id="@+id/waitForBadge"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_horizontal"
-                    android:layout_gravity="end"
-                    android:paddingTop="16dp"/>
+                    android:textSize="24sp" />
+
                 <ImageView
                     android:id="@+id/badgeWritten"
                     android:layout_width="match_parent"
