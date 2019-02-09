@@ -12,6 +12,7 @@ import android.media.ToneGenerator
 import android.os.AsyncTask
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.provider.Settings
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
@@ -20,7 +21,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import android.widget.*
 
 import com.apollographql.apollo.exception.ApolloException
 import com.google.android.gms.common.ConnectionResult
@@ -37,6 +38,7 @@ import gt.hack.nfc.R
 import gt.hack.nfc.UserGetQuery
 import gt.hack.nfc.util.API
 import gt.hack.nfc.util.CameraSourcePreview
+import gt.hack.nfc.util.NFCHandler
 import kotlinx.coroutines.runBlocking
 
 class CheckinFragment : Fragment() {
@@ -44,6 +46,7 @@ class CheckinFragment : Fragment() {
     private var mCameraSource: CameraSource? = null
     private var mPreview: CameraSourcePreview? = null
     private var foundTag: Boolean = false
+    private var nfcHandler = NFCHandler()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,6 +68,10 @@ class CheckinFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
         return inflater.inflate(R.layout.fragment_checkin, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
     }
 
     /**

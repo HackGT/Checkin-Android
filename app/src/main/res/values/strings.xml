@@ -42,7 +42,7 @@
     <string name="user_already_checked_in">User already checked in for this tag</string>
     <string name="user_already_checked_out">User already checked out for this tag</string>
     <string name="cannot_checkout_not_checked_in">Cannot checkout - user is not checked in</string>
-    <string name="nfc_unsupported_device">NFC Unsupported Device</string>
-    <string name="nfc_disabled">NFC Disabled</string>
+    <string name="nfc_unsupported_device">Device does not support NFC</string>
+    <string name="nfc_disabled">NFC is currently disabled</string>
     <string name="nfc_ready">Waiting for badge...</string>
 </resources>

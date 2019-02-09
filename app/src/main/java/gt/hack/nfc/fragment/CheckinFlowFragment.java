@@ -7,18 +7,17 @@ import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.Ndef;
-import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatButton;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -30,6 +29,7 @@ import java.util.concurrent.ExecutionException;
 import gt.hack.nfc.BuildConfig;
 import gt.hack.nfc.R;
 import gt.hack.nfc.util.CheckInAsyncTask;
+import gt.hack.nfc.util.NFCHandler;
 import gt.hack.nfc.util.Util;
 
 public class CheckinFlowFragment extends Fragment {
@@ -44,6 +44,7 @@ public class CheckinFlowFragment extends Fragment {
     private boolean alreadyCheckedIn = false;
     private boolean wroteBadge = false;
     private AppCompatButton confirmButton;
+    private NFCHandler nfcHandler = new NFCHandler();
 
     public static CheckinFlowFragment newInstance(UserFragment user) {
         CheckinFlowFragment f = new CheckinFlowFragment();
@@ -80,6 +81,7 @@ public class CheckinFlowFragment extends Fragment {
         school = bundle.getString("school");
         branch = bundle.getString("branch");
         confirmBranch = bundle.getString("confirmBranch");
+
         return inflater.inflate(R.layout.fragment_checkin_confirm, container, false);
     }
 
@@ -134,6 +136,7 @@ public class CheckinFlowFragment extends Fragment {
                 }
             }
         });
+
         if (alreadyCheckedIn) {
             confirmButton.setText("User already checked in");
             confirmButton.setEnabled(false);
@@ -141,65 +144,80 @@ public class CheckinFlowFragment extends Fragment {
             progressBar.setVisibility(View.GONE);
             TextView nfcInstructions = getActivity().findViewById(R.id.nfcInstructions);
             nfcInstructions.setVisibility(View.GONE);
+            getActivity().findViewById(R.id.nfc_error).setVisibility(View.GONE);
+            getActivity().findViewById(R.id.enable_nfc_button).setVisibility(View.GONE);
         } else {
-            NfcAdapter nfc = NfcAdapter.getDefaultAdapter(getActivity());
-            if (nfc != null) {
-                nfc.enableReaderMode(getActivity(), new NfcAdapter.ReaderCallback() {
-                    @Override
-                    public void onTagDiscovered(Tag tag) {
-                        Ndef ndef = Ndef.get(tag);
-                        Log.d("NFC", tag.toString());
-                        try {
-                            ndef.connect();
-                            if (ndef.isWritable() && !wroteBadge) {
-
-                                String type = "badge";
-
-                                NdefRecord uriRecord = NdefRecord.createUri(
-                                        "https://live.hack.gt/?user=" + id);
-                                NdefMessage ndefMessage = new NdefMessage(
-                                        new NdefRecord[] { uriRecord });
-                                ndef.writeNdefMessage(ndefMessage);
-                                //TODO: PLEASE PLEASE PLEASE make sure badge locking works in a release (non-debug) build
-                                if (ndef.canMakeReadOnly() && Util.nfcLockEnabled && !BuildConfig.DEBUG) {
-                                    ndef.makeReadOnly();
-                                } else if (Util.nfcLockEnabled && BuildConfig.DEBUG) {
-                                    Util.makeSnackbar(getActivity().findViewById(R.id.content_frame), R.string.permanent_badge_locking_option_disabled_debug_build, Snackbar.LENGTH_SHORT).show();
-                                }
-                                else if (!Util.nfcLockEnabled) {
-                                    Util.makeSnackbar(getActivity().findViewById(R.id.content_frame), R.string.permanent_badge_locking_option_disabled, Snackbar.LENGTH_SHORT).show();
-                                }
-                                else {
-                                    Util.makeSnackbar(getActivity().findViewById(R.id.content_frame), R.string.unlockable_tag, Snackbar.LENGTH_SHORT).show();
-                                }
-
-                                getActivity().runOnUiThread(new Runnable() {
-                                    public void run() {
-                                        progressBar.setVisibility(View.GONE);
-                                        ImageView check = getActivity()
-                                                .findViewById(R.id.badgeWritten);
-                                        check.setVisibility(View.VISIBLE);
-                                        confirmButton.setVisibility(View.VISIBLE);
-                                    }
-                                });
-                                wroteBadge = true;
-                            }
-                            else if (!ndef.isWritable()) {
-                                // Tag already locked or unwritable NFC device like a Buzzcard was tapped
-                                Util.makeSnackbar(getActivity().findViewById(R.id.content_frame), R.string.unwritable_tag, Snackbar.LENGTH_SHORT).show();
-                            }
-                        } catch (IOException | FormatException e) {
-                            e.printStackTrace();
-                        } finally {
-                            try {
-                                ndef.close();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    }
-                }, READER_FLAGS, null);
+            // load nfc loading/errors only if they are not already checked in
+            if (getView() != null) {
+                loadNFC(getView());
             }
         }
+    }
+
+    private void loadNFC(View view) {
+        TextView nfcInfo = view.findViewById(R.id.nfcInstructions);
+        final ProgressBar progressBar = view.findViewById(R.id.wait_for_badge_tap);
+        ImageView warningIcon = view.findViewById(R.id.nfc_error);
+        Button nfcEnableButton = view.findViewById(R.id.enable_nfc_button);
+
+        nfcHandler.setActivity(getActivity());
+        nfcHandler.setContext(getContext());
+        nfcHandler.setCallback(new NfcAdapter.ReaderCallback() {
+            @Override
+            public void onTagDiscovered(Tag tag) {
+                Ndef ndef = Ndef.get(tag);
+                Log.d("NFC", tag.toString());
+                try {
+                    ndef.connect();
+                    if (ndef.isWritable() && !wroteBadge) {
+
+                        String type = "badge";
+
+                        NdefRecord uriRecord = NdefRecord.createUri(
+                                "https://live.hack.gt/?user=" + id);
+                        NdefMessage ndefMessage = new NdefMessage(
+                                new NdefRecord[] { uriRecord });
+                        ndef.writeNdefMessage(ndefMessage);
+                        //TODO: PLEASE PLEASE PLEASE make sure badge locking works in a release (non-debug) build
+                        if (ndef.canMakeReadOnly() && Util.nfcLockEnabled && !BuildConfig.DEBUG) {
+                            ndef.makeReadOnly();
+                        } else if (Util.nfcLockEnabled && BuildConfig.DEBUG) {
+                            Util.makeSnackbar(getActivity().findViewById(R.id.content_frame), R.string.permanent_badge_locking_option_disabled_debug_build, Snackbar.LENGTH_SHORT).show();
+                        }
+                        else if (!Util.nfcLockEnabled) {
+                            Util.makeSnackbar(getActivity().findViewById(R.id.content_frame), R.string.permanent_badge_locking_option_disabled, Snackbar.LENGTH_SHORT).show();
+                        }
+                        else {
+                            Util.makeSnackbar(getActivity().findViewById(R.id.content_frame), R.string.unlockable_tag, Snackbar.LENGTH_SHORT).show();
+                        }
+
+                        getActivity().runOnUiThread(new Runnable() {
+                            public void run() {
+                                progressBar.setVisibility(View.GONE);
+                                ImageView check = getActivity()
+                                        .findViewById(R.id.badgeWritten);
+                                check.setVisibility(View.VISIBLE);
+                                confirmButton.setVisibility(View.VISIBLE);
+                            }
+                        });
+                        wroteBadge = true;
+                    }
+                    else if (!ndef.isWritable()) {
+                        // Tag already locked or unwritable NFC device like a Buzzcard was tapped
+                        Util.makeSnackbar(getActivity().findViewById(R.id.content_frame), R.string.unwritable_tag, Snackbar.LENGTH_SHORT).show();
+                    }
+                } catch (IOException | FormatException e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        ndef.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+
+        nfcHandler.loadNFC(nfcInfo, progressBar, warningIcon, nfcEnableButton);
     }
 }

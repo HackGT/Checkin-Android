@@ -101,6 +101,17 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:paddingTop="16dp">
+
+                <ImageView
+                    android:id="@+id/nfc_error"
+                    android:layout_width="match_parent"
+                    android:layout_height="64dp"
+                    android:gravity="center_horizontal"
+                    android:layout_gravity="end"
+                    android:layout_marginTop="16dp"
+                    android:src="@drawable/warning"
+                    android:visibility="gone" />
+
                 <ProgressBar
                     android:id="@+id/wait_for_badge_tap"
                     android:layout_width="match_parent"
@@ -118,6 +129,29 @@
                     android:text="@string/nfc_ready"
                     android:layout_gravity="center_vertical"
                     android:textSize="24sp" />
+
+                <android.support.v7.widget.AppCompatButton
+                    android:id="@+id/enable_nfc_button"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="24dp"
+                    android:textColor="@color/white"
+                    android:background="@color/primaryColor"
+                    android:padding="12dp"
+                    android:visibility="gone"
+                    android:text="Enable NFC" />
+
+                <ImageView
+                    android:id="@+id/badge_tapped"
+                    android:layout_width="match_parent"
+                    android:layout_height="64dp"
+                    android:tint="@color/success"
+                    android:visibility="gone"
+                    android:gravity="center_horizontal"
+                    android:layout_gravity="end"
+                    android:paddingTop="16dp"
+                    android:src="@drawable/check" />
 
                 <ImageView
                     android:id="@+id/badgeWritten"
