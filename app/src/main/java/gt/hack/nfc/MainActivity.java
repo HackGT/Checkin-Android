@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
 
         //TODO: implement server-side access control
         if (username.equals("ehsan") || username.equals("petschekr") || username.equals("julian") || username.equals("kexin")
-                || username.equals("evan")) {
+                || username.equals("evan") || username.equals("nickg")) {
             drawerItems.add(DrawerItem.SEARCH.getDrawerItem().withIdentifier(101));
         }
         drawerItems.add(DrawerItem.TAP.getDrawerItem().withIdentifier(102));
