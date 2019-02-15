@@ -23,7 +23,9 @@ import gt.hack.nfc.fragment.UserFragment
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import kotlin.coroutines.experimental.suspendCoroutine
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 object API {
     @Throws(IOException::class)
