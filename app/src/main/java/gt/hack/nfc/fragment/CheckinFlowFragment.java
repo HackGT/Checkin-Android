@@ -115,25 +115,27 @@ public class CheckinFlowFragment extends Fragment {
         confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                try {
-                    HashMap<String, TagFragment> tags = new CheckInAsyncTask(
-                            PreferenceManager.getDefaultSharedPreferences(getActivity()),
-                            CheckinFlowFragment.this).execute(id, "hackgt").get();
-                    if (tags != null && tags.get("hackgt").checked_in) {
-                        getFragmentManager().popBackStack();
-                    } else {
-                        Util.makeSnackbar(getActivity().findViewById(R.id.content_frame),
-                                R.string.checkin_error, Snackbar.LENGTH_SHORT).show();
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    Util.makeSnackbar(getActivity().findViewById(R.id.content_frame),
-                            R.string.checkin_error, Snackbar.LENGTH_SHORT).show();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                    Util.makeSnackbar(getActivity().findViewById(R.id.content_frame),
-                            R.string.checkin_error, Snackbar.LENGTH_SHORT).show();
-                }
+                // TODO: fix me
+//                try {
+//                    // TODO:  FIX ME
+////                    HashMap<String, TagFragment> tags = new CheckInAsyncTask(
+////                            PreferenceManager.getDefaultSharedPreferences(getActivity()),
+////                            CheckinFlowFragment.this).execute(id, "hackgt").get();
+////                    if (tags != null && tags.get("hackgt").checked_in) {
+////                        getFragmentManager().popBackStack();
+////                    } else {
+////                        Util.makeSnackbar(getActivity().findViewById(R.id.content_frame),
+////                                R.string.checkin_error, Snackbar.LENGTH_SHORT).show();
+////                    }
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                    Util.makeSnackbar(getActivity().findViewById(R.id.content_frame),
+//                            R.string.checkin_error, Snackbar.LENGTH_SHORT).show();
+//                } catch (ExecutionException e) {
+//                    e.printStackTrace();
+//                    Util.makeSnackbar(getActivity().findViewById(R.id.content_frame),
+//                            R.string.checkin_error, Snackbar.LENGTH_SHORT).show();
+//                }
             }
         });
 

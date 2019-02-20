@@ -21,6 +21,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import gt.hack.nfc.CheckInTagMutation
 import gt.hack.nfc.R
 import gt.hack.nfc.util.API
 import gt.hack.nfc.util.NFCHandler
@@ -28,6 +29,7 @@ import gt.hack.nfc.util.Util
 
 import kotlinx.android.synthetic.main.fragment_tap.*
 import kotlinx.coroutines.runBlocking
+import org.junit.Test
 import kotlin.collections.ArrayList
 
 class TapFragment : Fragment() {
@@ -135,22 +137,22 @@ class TapFragment : Fragment() {
 
                     val tagName = tagSelect.text.trim().toString()
                     val doCheckIn = check_in_out_select.isChecked
-                    // check in/out the user
 
-                    val userInfo = runBlocking { API.getUserById(preferences, uuid)!!.user().fragments().userFragment() }
-                    val currentTags = runBlocking { API.getTagsForUser(preferences, uuid) }
-                    val newTags = when (doCheckIn) {
-                        true -> runBlocking { API.checkInTag(preferences, uuid, tagName) }
-                        else -> runBlocking { API.checkOutTag(preferences, uuid, tagName) }
+                    val checkinResult = runBlocking { API.checkInTag(preferences, uuid, tagName, doCheckIn) };
+
+                    if (checkinResult != null) {
+                        var checkinDetails : TagFragment? = null;
+                        val checkinTagInfo = checkinResult.tags().findLast { it.fragments().tagFragment().tag.name.equals(tagName) }
+                        if (checkinTagInfo != null) {
+                            checkinDetails = checkinTagInfo.fragments().tagFragment();
+                        }
+
+                        val userInfo = checkinResult.user().fragments().userFragment()
+
+                        val checkInData = CheckInData(userInfo, checkinDetails);
+
+                        drawCheckInFinish(checkInData);
                     }
-
-                    val checkInData = CheckInData(userInfo, currentTags, newTags!!)
-
-                    drawCheckInFinish(checkInData, tagName)
-
-                    Log.i(TAG, checkInData.userInfo.toString())
-                    Log.i(TAG, checkInData.currentTags.toString())
-                    Log.i(TAG, checkInData.newTags.toString())
                 } else {
                     if (id == null) {
                         Log.i(TAG, "this tag's data is null: " + id)
@@ -172,7 +174,7 @@ class TapFragment : Fragment() {
         nfcHandler.loadNFC(nfcInstructions, wait_for_badge_tap, nfc_error, enable_nfc_button)
     }
 
-    fun drawCheckInFinish(checkInData: CheckInData, tagName: String) {
+    fun drawCheckInFinish(checkInData: CheckInData) {
         val waitingForBadge = wait_for_badge_tap
         val userName = track_name
         val userBranch = track_type
@@ -182,7 +184,7 @@ class TapFragment : Fragment() {
         val userInfo = checkInData.userInfo
         var userShirtSizeVal: String? = ""
         var userDietaryRestrictionsVal: String? = ""
-        if (userInfo != null) {
+        if (userInfo != null && checkInData.checkInResult != null) {
 
             userInfo.questions.forEach { question: UserFragment.Question? ->
                 if (question?.name.equals("tshirt-size")) {
@@ -192,24 +194,6 @@ class TapFragment : Fragment() {
                 }
             }
 
-            Log.i(TAG, "" + checkInData.currentTags)
-            var prevTagState: Boolean? = null
-            var newTagState: Boolean? = null
-            var prevTagTime: String? = null
-            var unseenTag = false
-            if (checkInData.currentTags!![tagName] != null) {
-                prevTagState = checkInData.currentTags[tagName]!!.checked_in
-                newTagState = checkInData.newTags[tagName]!!.checked_in
-            } else {
-                unseenTag = true
-            }
-
-
-            Log.i(TAG, "prevTagState: " + prevTagState)
-            Log.i(TAG, "newTagState: " + newTagState)
-
-            val validOperation = (prevTagState != newTagState && !unseenTag)
-                    || (newTagState == null && check_in_out_select.isChecked)
 
             activity?.runOnUiThread {
                 userName.text = userInfo.name
@@ -228,16 +212,18 @@ class TapFragment : Fragment() {
                 nfcInstructions.visibility = View.GONE
             }
 
+            val validOperation: Boolean = checkInData.checkInResult.checkin_success
+
             if (validOperation) {
                 displayMessageAndReset(true, "", 1000)
             } else {
-                if (prevTagState != null && prevTagState) { // indicates checkin/out state
+                //if (prevTagState != null && prevTagState) { // indicates checkin/out state
                     displayMessageAndReset(false, getString(R.string.user_already_checked_in), 5000)
-                } else if (newTagState == null && !check_in_out_select.isChecked) {
-                    displayMessageAndReset(false, getString(R.string.cannot_checkout_not_checked_in), 5000)
-                } else {
-                    displayMessageAndReset(false, getString(R.string.user_already_checked_out), 5000)
-                }
+//                } else if (newTagState == null && !check_in_out_select.isChecked) {
+//                    displayMessageAndReset(false, getString(R.string.cannot_checkout_not_checked_in), 5000)
+//                } else {
+//                    displayMessageAndReset(false, getString(R.string.user_already_checked_out), 5000)
+//                }
             }
         } else { // checkInData is null, ie invalid user
             displayMessageAndReset(false, getString(R.string.invalid_badge_id), 5000)
@@ -277,5 +263,5 @@ class TapFragment : Fragment() {
     }
 
 
-    data class CheckInData(val userInfo: UserFragment?, val currentTags: HashMap<String, TagFragment>?, val newTags: HashMap<String, TagFragment>)
+    data class CheckInData(val userInfo: UserFragment?, val checkInResult: TagFragment?)
 }

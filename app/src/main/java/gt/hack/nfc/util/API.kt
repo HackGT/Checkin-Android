@@ -147,41 +147,21 @@ object API {
         return tags
     }
 
-    // TODO: these should return *ALL THE DATA*  and not just the list of tags
     @Throws(ApolloException::class)
     suspend fun checkInTag(preferences: SharedPreferences,
-                           userid: String, tag: String): HashMap<String, TagFragment>? {
+                           userid: String, tag: String, checkin: Boolean): CheckInTagMutation.Check_in? {
         val apolloClient = getApolloClient(preferences)
-        val response = apolloClient.mutate(CheckInTagMutation(userid, tag, true)).execute()
+        val response = apolloClient.mutate(CheckInTagMutation(userid, tag, checkin)).execute()
         if (response.hasErrors()) {
             Log.e("apollo", response.errors().toString())
             return null
         }
         val tags = HashMap<String, TagFragment>()
-        if (response.data()!!.check_in() != null) {
+        if (response.data()?.check_in() != null) {
             for (t in response.data()!!.check_in()!!.tags()) {
                 tags[t.fragments().tagFragment().tag().name()] = t.fragments().tagFragment()
             }
-            return tags
-        }
-        return null
-    }
-
-    @Throws(ApolloException::class)
-    suspend fun checkOutTag(preferences: SharedPreferences,
-                            userid: String, tag: String): HashMap<String, TagFragment>? {
-        val apolloClient = getApolloClient(preferences)
-        val response = apolloClient.mutate(CheckInTagMutation(userid, tag, false)).execute()
-        if (response.hasErrors()) {
-            Log.e("apollo", response.errors().toString())
-            return null
-        }
-        val tags = HashMap<String, TagFragment>()
-        if (response.data()!!.check_in() != null) {
-            for (t in response.data()!!.check_in()!!.tags()) {
-                tags[t.fragments().tagFragment().tag().name()] = t.fragments().tagFragment()
-            }
-            return tags
+            return response.data()?.check_in()
         }
         return null
     }
