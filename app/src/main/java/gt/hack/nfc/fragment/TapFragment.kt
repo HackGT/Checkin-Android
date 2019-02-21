@@ -1,36 +1,28 @@
 package gt.hack.nfc.fragment
 
-import java.util.*
-
-import android.content.Intent
 import android.media.AudioManager
 import android.media.ToneGenerator
 import android.net.Uri
 import android.nfc.NdefRecord
-import android.nfc.tech.Ndef
 import android.nfc.NfcAdapter
 import android.nfc.Tag
+import android.nfc.tech.Ndef
 import android.os.Bundle
 import android.os.Handler
-
 import android.preference.PreferenceManager
-import android.provider.Settings
 import android.support.v4.app.Fragment
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
-import gt.hack.nfc.CheckInTagMutation
+import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
 import gt.hack.nfc.R
 import gt.hack.nfc.util.API
 import gt.hack.nfc.util.NFCHandler
 import gt.hack.nfc.util.Util
-
 import kotlinx.android.synthetic.main.fragment_tap.*
 import kotlinx.coroutines.runBlocking
-import org.junit.Test
-import kotlin.collections.ArrayList
 
 class TapFragment : Fragment() {
 
@@ -156,10 +148,10 @@ class TapFragment : Fragment() {
                 } else {
                     if (id == null) {
                         Log.i(TAG, "this tag's data is null: " + id)
-                        displayMessageAndReset(false, getString(R.string.badge_data_null), 5000)
+                        displayMessageAndReset(false, getString(R.string.badge_data_null), 2500)
                     } else {
                         Log.i(TAG, "this tag's data is formatted incorrectly: " + id)
-                        displayMessageAndReset(false, getString(R.string.invalid_badge_id), 6000)
+                        displayMessageAndReset(false, getString(R.string.invalid_badge_id), 4000)
                     }
                 }
 
@@ -215,18 +207,21 @@ class TapFragment : Fragment() {
             val validOperation: Boolean = checkInData.checkInResult.checkin_success
 
             if (validOperation) {
-                displayMessageAndReset(true, "", 1000)
+                displayMessageAndReset(true, "", 750)
+            } else if (checkInData.checkInResult.checked_in) { // indicates checkin/out state
+                displayMessageAndReset(false, getString(R.string.user_already_checked_in), 3000)
+                Log.i(TAG, checkInData.checkInResult.last_successful_checkin()?.checked_in_date);
+                Log.i(TAG, checkInData.checkInResult.last_successful_checkin()?.checked_in_by);
+            } else if (!checkInData.checkInResult.checked_in) {
+                //displayMessageAndReset(false, getString(R.string.cannot_checkout_not_checked_in), 5000)
+                displayMessageAndReset(false, getString(R.string.user_already_checked_out), 3000)
             } else {
-                //if (prevTagState != null && prevTagState) { // indicates checkin/out state
-                    displayMessageAndReset(false, getString(R.string.user_already_checked_in), 5000)
-//                } else if (newTagState == null && !check_in_out_select.isChecked) {
-//                    displayMessageAndReset(false, getString(R.string.cannot_checkout_not_checked_in), 5000)
-//                } else {
-//                    displayMessageAndReset(false, getString(R.string.user_already_checked_out), 5000)
-//                }
+                displayMessageAndReset(false, "Edge case encountered ... somehow", 3000)
             }
+
+
         } else { // checkInData is null, ie invalid user
-            displayMessageAndReset(false, getString(R.string.invalid_badge_id), 5000)
+            displayMessageAndReset(false, getString(R.string.invalid_badge_id), 4000)
         }
     }
 
