@@ -148,7 +148,7 @@ class TapFragment : Fragment() {
             drawCheckInFinish(checkInData)
           } else {
             Log.i(TAG, "checkin API returned null")
-            displayMessageAndReset(false, "User ID or tag name not found", 2500)
+            displayMessageAndReset(false, getString(R.string.uuid_or_tag_not_found), 2500)
           }
         } else {
           if (id == null) {
@@ -218,13 +218,10 @@ class TapFragment : Fragment() {
         Log.i(TAG, checkInData.checkInResult.last_successful_checkin()?.checked_in_date)
         //Log.i(TAG, DateUtils.getRelativeTimeSpanString((Date(checkInData.checkInResult.last_successful_checkin()?.checked_in_date)).toString())
         Log.i(TAG, checkInData.checkInResult.last_successful_checkin()?.checked_in_by)
-      } else if (!checkInData.checkInResult.checked_in) {
+      } else { // !checkInData.checkInResult.checked_in
         //displayMessageAndReset(false, getString(R.string.cannot_checkout_not_checked_in), 5000)
         displayMessageAndReset(false, getString(R.string.user_already_checked_out), 3000)
-      } else {
-        displayMessageAndReset(false, "Edge case encountered ... somehow", 3000)
       }
-
 
     } else { // checkInData is null, ie invalid user
       displayMessageAndReset(false, getString(R.string.invalid_badge_id), 4000)

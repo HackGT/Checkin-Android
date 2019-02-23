@@ -93,7 +93,7 @@ class CheckinFlowFragment : Fragment() {
             }
 
             if (checkinResult != null) {
-              var checkinDetails: TagFragment? = null;
+              var checkinDetails: TagFragment? = null
               val checkinTagInfo = checkinResult.tags().findLast { it.fragments().tagFragment().tag.name.equals(tagName) }
               if (checkinTagInfo != null) {
                 checkinDetails = checkinTagInfo.fragments().tagFragment()
@@ -103,36 +103,36 @@ class CheckinFlowFragment : Fragment() {
               if (checkinDetails != null) {
                 if (userInfo.accepted && userInfo.confirmed) {
                   if (checkinDetails.checkin_success) {
-                    getFragmentManager()!!.popBackStack()
+                    fragmentManager!!.popBackStack()
                     Util.makeSnackbar(activity!!.findViewById(R.id.content_frame),
-                        R.string.checkin_success, Snackbar.LENGTH_SHORT).show();
+                        R.string.checkin_success, Snackbar.LENGTH_SHORT).show()
                   } else {
                     Util.makeSnackbar(activity!!.findViewById(R.id.content_frame),
-                        R.string.checkin_error, Snackbar.LENGTH_SHORT).show();
+                        R.string.user_already_checked_in, Snackbar.LENGTH_SHORT).show()
                   }
                 } else {
                   Log.i(TAG, "user (uuid: " + checkinUuid + ") not acccepted and confirmed")
                   Util.makeSnackbar(activity!!.findViewById(R.id.content_frame),
                       R.string.user_not_accepted_and_confirmed, Snackbar.LENGTH_SHORT)
-                      .show();
+                      .show()
                 }
 
               } else {
-                Log.i(TAG, "checkin API returned null");
+                Log.i(TAG, "checkin API returned null")
                 Util.makeSnackbar(activity!!.findViewById(R.id.content_frame),
-                    R.string.checkin_error, Snackbar.LENGTH_SHORT).show();
+                    R.string.checkin_error, Snackbar.LENGTH_SHORT).show()
               }
             }
           }
         } catch (e: InterruptedException) {
-          e.printStackTrace();
-          Util.makeSnackbar(activity!!.findViewById(R.id.content_frame),
-              R.string.checkin_error, Snackbar.LENGTH_SHORT).show();
-        } catch (e: ExecutionException) {
-          e.printStackTrace();
-          Util.makeSnackbar(activity!!.findViewById(R.id.content_frame),
-              R.string.checkin_error, Snackbar.LENGTH_SHORT).show();
-        }
+          e.printStackTrace()
+        Util.makeSnackbar(activity!!.findViewById(R.id.content_frame),
+              R.string.checkin_error, Snackbar.LENGTH_SHORT).show()
+      } catch (e: ExecutionException) {
+          e.printStackTrace()
+        Util.makeSnackbar(activity!!.findViewById(R.id.content_frame),
+              R.string.checkin_error, Snackbar.LENGTH_SHORT).show()
+      }
       }
 
     if (alreadyCheckedIn) {
@@ -173,26 +173,33 @@ class CheckinFlowFragment : Fragment() {
               "https://live.hack.gt/?user=" + uuid)
           val ndefMessage = NdefMessage(
               arrayOf(uriRecord))
-          ndef.writeNdefMessage(ndefMessage)
 
-          if (ndef.canMakeReadOnly() && Util.nfcLockEnabled && !BuildConfig.DEBUG) {
-            ndef.makeReadOnly()
-          } else if (Util.nfcLockEnabled && BuildConfig.DEBUG) {
-            Util.makeSnackbar(activity!!.findViewById(R.id.content_frame), R.string.permanent_badge_locking_option_disabled_debug_build, Snackbar.LENGTH_SHORT).show()
-          } else if (!Util.nfcLockEnabled) {
-            Util.makeSnackbar(activity!!.findViewById(R.id.content_frame), R.string.permanent_badge_locking_option_disabled, Snackbar.LENGTH_SHORT).show()
-          } else {
-            Util.makeSnackbar(activity!!.findViewById(R.id.content_frame), R.string.unlockable_tag, Snackbar.LENGTH_SHORT).show()
+          try {
+            ndef.writeNdefMessage(ndefMessage)
+
+            if (ndef.canMakeReadOnly() && Util.nfcLockEnabled && !BuildConfig.DEBUG) {
+              ndef.makeReadOnly()
+            } else if (Util.nfcLockEnabled && BuildConfig.DEBUG) {
+              Util.makeSnackbar(activity!!.findViewById(R.id.content_frame), R.string.permanent_badge_locking_option_disabled_debug_build, Snackbar.LENGTH_SHORT).show()
+            } else if (!Util.nfcLockEnabled) {
+              Util.makeSnackbar(activity!!.findViewById(R.id.content_frame), R.string.permanent_badge_locking_option_disabled, Snackbar.LENGTH_SHORT).show()
+            } else {
+              Util.makeSnackbar(activity!!.findViewById(R.id.content_frame), R.string.unlockable_tag, Snackbar.LENGTH_SHORT).show()
+            }
+
+            activity!!.runOnUiThread {
+              progressBar.visibility = View.GONE
+              val check = activity!!
+                  .findViewById<ImageView>(R.id.badgeWritten)
+              check.visibility = View.VISIBLE
+              confirmButton!!.visibility = View.VISIBLE
+            }
+            wroteBadge = true
+          } catch (e: IOException) {
+            Util.makeSnackbar(activity!!.findViewById(R.id.content_frame), R.string.badge_write_error, Snackbar.LENGTH_LONG).show()
           }
 
-          activity!!.runOnUiThread {
-            progressBar.visibility = View.GONE
-            val check = activity!!
-                .findViewById<ImageView>(R.id.badgeWritten)
-            check.visibility = View.VISIBLE
-            confirmButton!!.visibility = View.VISIBLE
-          }
-          wroteBadge = true
+
         } else if (!ndef.isWritable) {
           // Tag already locked or unwritable NFC device like a Buzzcard was tapped
           Util.makeSnackbar(activity!!.findViewById(R.id.content_frame), R.string.unwritable_tag, Snackbar.LENGTH_SHORT).show()
