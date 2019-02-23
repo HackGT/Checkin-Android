@@ -36,7 +36,9 @@
     <string name="permanent_badge_locking_option_disabled">Not locking tag because the permanent locking option is disabled</string>
     <string name="permanent_badge_locking_option_disabled_debug_build">Didn\'t permanently lock badge because this is a debug build</string>
     <string name="badge_data_null">This badge appears to be blank - try tapping again</string>
-
+    <string name="checkin_success">User checked in successfully!</string>
+    <string name="uuid_not_found">User not found</string>
+    <string name="user_not_accepted_and_confirmed">User is not accepted and confirmed in registration</string>
     <string name="checkin_error">Error checking user in. Please try again.</string>
     <string name="get_tags_failed">Failed to get tags</string>
     <string name="user_already_checked_in">User already checked in for this tag</string>
@@ -44,5 +46,5 @@
     <string name="cannot_checkout_not_checked_in">Cannot checkout - user is not checked in</string>
     <string name="nfc_unsupported_device">Device does not support NFC</string>
     <string name="nfc_disabled">NFC is currently disabled</string>
-    <string name="nfc_ready">Waiting for badge...</string>
+    <string name="nfc_ready">Waiting for badge…</string>
 </resources>
