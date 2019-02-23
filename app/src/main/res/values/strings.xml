@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">HackGT 5</string>
+    <string name="app_name">Check In</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
@@ -35,6 +35,7 @@
     <string name="switch_check_out">Check out user</string>
     <string name="permanent_badge_locking_option_disabled">Not locking tag because the permanent locking option is disabled</string>
     <string name="permanent_badge_locking_option_disabled_debug_build">Didn\'t permanently lock badge because this is a debug build</string>
+    <string name="badge_write_error">An error occurred while writing to the badge - try tapping again</string>
     <string name="badge_data_null">This badge appears to be blank - try tapping again</string>
     <string name="checkin_success">User checked in successfully!</string>
     <string name="uuid_not_found">User not found</string>
@@ -44,6 +45,7 @@
     <string name="user_already_checked_in">User already checked in for this tag</string>
     <string name="user_already_checked_out">User already checked out for this tag</string>
     <string name="cannot_checkout_not_checked_in">Cannot checkout - user is not checked in</string>
+    <string name="uuid_or_tag_not_found">User ID or tag name not found</string>
     <string name="nfc_unsupported_device">Device does not support NFC</string>
     <string name="nfc_disabled">NFC is currently disabled</string>
     <string name="nfc_ready">Waiting for badge…</string>
