@@ -9,8 +9,8 @@ android {
         applicationId "gt.hack.nfc"
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 7
-        versionName "2.2.0"
+        versionCode 8
+        versionName "2.3.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
