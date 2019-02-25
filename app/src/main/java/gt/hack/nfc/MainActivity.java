@@ -1,11 +1,8 @@
 package gt.hack.nfc;
 
-import
-        android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.os.Bundle;
@@ -13,10 +10,8 @@ import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
 
@@ -39,8 +34,10 @@ import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import java.util.ArrayList;
 
 import gt.hack.nfc.fragment.CheckinFragment;
+import gt.hack.nfc.fragment.ConnectivityFragment;
 import gt.hack.nfc.fragment.SearchFragment;
 import gt.hack.nfc.fragment.TapFragment;
+import gt.hack.nfc.util.NetworkStateReceiver;
 import gt.hack.nfc.util.Util;
 
 
@@ -53,7 +50,8 @@ public class MainActivity extends AppCompatActivity {
 
     private Drawer result = null;
     private AccountHeader headerResult;
-
+    private NetworkStateReceiver networkStateReceiver;
+    private ConnectivityFragment connectivityFragment;
 
     private enum DrawerItem {
         SCAN ("Scan QR code", "Scan", GoogleMaterial.Icon.gmd_camera),
@@ -89,11 +87,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-
-        if (!Util.isNetworkConnected(this)) {
-            Log.d("t", "NO INTERNET");
-            return;
-        }
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -198,7 +191,19 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             result.setSelection(DrawerItem.SCAN.getDrawerItem(), true);
         }
-        switchToFragment(new CheckinFragment());
+
+        connectivityFragment = new ConnectivityFragment();
+        networkStateReceiver = new NetworkStateReceiver();
+        networkStateReceiver.addListener(connectivityFragment);
+        this.registerReceiver(networkStateReceiver, new IntentFilter(android.net.ConnectivityManager.CONNECTIVITY_ACTION));
+
+        if (Util.isNetworkConnected(this)) {
+            switchToFragment(new CheckinFragment());
+        } else {
+            // if there is no internet, show connectivity fragment
+            // this fragment will also handle network changes
+            switchToFragment(connectivityFragment);
+        }
     }
 
     private void switchToFragment(Fragment fragment) {
@@ -227,5 +232,12 @@ public class MainActivity extends AppCompatActivity {
         Tag t = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
         android.util.Log.v("NFC", "Discovered tag");
         android.util.Log.v("NFC", "{"+t+"}");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        networkStateReceiver.removeListener(connectivityFragment);
+        this.unregisterReceiver(networkStateReceiver);
     }
 }
