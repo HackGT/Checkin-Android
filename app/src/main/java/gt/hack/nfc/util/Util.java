@@ -4,6 +4,8 @@ package gt.hack.nfc.util;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.support.design.widget.BaseTransientBottomBar;
 import android.support.design.widget.Snackbar;
@@ -29,6 +31,13 @@ public class Util {
             }
         }
         return null;
+    }
+
+    public static boolean isNetworkConnected(Activity activity) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+
+        return  networkInfo != null && networkInfo.isConnected();
     }
 
     public static void showWarning(Context context, int title, int message) {
