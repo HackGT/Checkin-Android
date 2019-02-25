@@ -35,7 +35,7 @@ class CheckinFlowFragment : Fragment() {
   private var school: String? = null
   private var branch: String? = null
   private var confirmBranch: String? = null
-  private val alreadyCheckedIn = false
+  private var alreadyCheckedIn = false
   private var wroteBadge = false
   private var confirmButton: AppCompatButton? = null
   private val nfcHandler = NFCHandler()
@@ -107,6 +107,7 @@ class CheckinFlowFragment : Fragment() {
                     Util.makeSnackbar(activity!!.findViewById(R.id.content_frame),
                         R.string.checkin_success, Snackbar.LENGTH_SHORT).show()
                   } else {
+                    alreadyCheckedIn = true
                     Util.makeSnackbar(activity!!.findViewById(R.id.content_frame),
                         R.string.user_already_checked_in, Snackbar.LENGTH_SHORT).show()
                   }
@@ -133,23 +134,13 @@ class CheckinFlowFragment : Fragment() {
         Util.makeSnackbar(activity!!.findViewById(R.id.content_frame),
               R.string.checkin_error, Snackbar.LENGTH_SHORT).show()
       }
-      }
-
-    if (alreadyCheckedIn) {
-      confirmButton!!.text = "User already checked in"
-      confirmButton!!.isEnabled = false
-      confirmButton!!.visibility = View.VISIBLE
-      progressBar.visibility = View.GONE
-      val nfcInstructions = activity!!.findViewById<TextView>(R.id.nfcInstructions)
-      nfcInstructions.visibility = View.GONE
-      activity!!.findViewById<View>(R.id.nfc_error).visibility = View.GONE
-      activity!!.findViewById<View>(R.id.enable_nfc_button).visibility = View.GONE
-    } else {
-      // load nfc loading/errors only if they are not already checked in
-      if (view != null) {
-        loadNFC(view!!)
-      }
     }
+
+    // load nfc loading/errors
+    if (view != null) {
+      loadNFC(view!!)
+    }
+
   }
 
   private fun loadNFC(view: View) {
