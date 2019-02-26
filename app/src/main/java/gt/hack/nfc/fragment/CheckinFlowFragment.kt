@@ -222,7 +222,10 @@ class CheckinFlowFragment : Fragment() {
       args.putString("id", user.id)
       args.putString("name", user.name)
       args.putString("email", user.email)
-      val school = Util.getValueOfQuestion(user.questions, "school")
+      var school = Util.getValueOfQuestion(user.questions, "school")
+      if (school.isNullOrBlank()) {
+        school = Util.getValueOfQuestion(user.questions, "university")
+      }
       args.putString("school", school)
 
       if (user.application != null) {

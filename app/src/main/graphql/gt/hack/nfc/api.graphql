@@ -60,7 +60,7 @@ fragment UserFragment on User {
   }
   name
   email
-  questions(names: ["school", "tshirt-size","dietary-restrictions", "optional-items"]) {
+  questions(names: ["school", "university", "tshirt-size","dietary-restrictions", "optional-items"]) {
       name
       value
       values
