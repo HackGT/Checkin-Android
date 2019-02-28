@@ -11,7 +11,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.preference.PreferenceManager
 import android.support.v4.app.Fragment
-
+import android.text.format.DateUtils
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -24,6 +24,10 @@ import gt.hack.nfc.util.NFCHandler
 import gt.hack.nfc.util.Util
 import kotlinx.android.synthetic.main.fragment_tap.*
 import kotlinx.coroutines.runBlocking
+import org.threeten.bp.*
+import org.threeten.bp.format.DateTimeFormatter
+import java.text.ParseException
+import java.util.*
 
 class TapFragment : Fragment() {
 
@@ -213,14 +217,19 @@ class TapFragment : Fragment() {
 
       if (validOperation) {
         displayMessageAndReset(true, "", 750)
-      } else if (checkInData.checkInResult.checked_in) { // indicates checkin/out state
-        displayMessageAndReset(false, getString(R.string.user_already_checked_in), 3000)
-        Log.i(TAG, checkInData.checkInResult.last_successful_checkin()?.checked_in_date)
-        //Log.i(TAG, DateUtils.getRelativeTimeSpanString((Date(checkInData.checkInResult.last_successful_checkin()?.checked_in_date)).toString())
-        Log.i(TAG, checkInData.checkInResult.last_successful_checkin()?.checked_in_by)
-      } else { // !checkInData.checkInResult.checked_in
-        //displayMessageAndReset(false, getString(R.string.cannot_checkout_not_checked_in), 5000)
-        displayMessageAndReset(false, getString(R.string.user_already_checked_out), 3000)
+      } else { // invalid check in/out
+        val lastCheckInTimeString = getTimeSinceCheckinEvent(checkInData.checkInResult)
+        val checkInUser = checkInData.checkInResult.last_successful_checkin()?.checked_in_by
+        val checkInType = checkInData.checkInResult.checked_in
+
+        // TODO: look at last successful checkin to detect check outs when not checked in (in some cases)
+
+        val checkInString = when (checkInType) {
+          true -> getString(R.string.user_already_checked_in)
+          false -> getString(R.string.user_already_checked_out)
+        }
+
+        displayMessageAndReset(false, checkInString, 3000, checkin = checkInType, lastSuccessTime = lastCheckInTimeString, lastSuccessUser = checkInUser)
       }
 
     } else { // checkInData is null, ie invalid user
@@ -228,7 +237,29 @@ class TapFragment : Fragment() {
     }
   }
 
-  fun displayMessageAndReset(validTag: Boolean, message: String, duration: Long) {
+  private fun getTimeSinceCheckinEvent(checkInResult: TagFragment): CharSequence? {
+    val checkinDate = checkInResult.last_successful_checkin?.checked_in_date
+    if (checkinDate == null) {
+      return null
+    }
+    val localTimeZone = ZoneId.systemDefault()
+    val utc = ZoneOffset.UTC
+    val iso = DateTimeFormatter.ISO_DATE_TIME
+    try {
+      val parsedDate = LocalDateTime.parse(checkinDate, iso)
+
+      val dateInUtc = ZonedDateTime.of(parsedDate, utc).toInstant()
+      val dateInLocalTime = OffsetDateTime.ofInstant(dateInUtc, localTimeZone)
+
+      return DateUtils.getRelativeTimeSpanString(dateInLocalTime.toInstant().toEpochMilli(), Instant.now(Clock.systemDefaultZone()).toEpochMilli(), DateUtils.SECOND_IN_MILLIS)
+    } catch (e: ParseException) {
+      Log.e(TAG, "Unable to parse last successful check-in date returned by server: " + checkinDate)
+      e.printStackTrace()
+      return null
+    }
+  }
+
+  private fun displayMessageAndReset(validTag: Boolean, message: String, duration: Long, checkin: Boolean? = null, lastSuccessTime: CharSequence? = "", lastSuccessUser: String? = "") {
     activity?.runOnUiThread {
       val waitingForBadge = wait_for_badge_tap
       val badgeTapped = badge_tapped
@@ -245,6 +276,16 @@ class TapFragment : Fragment() {
         invalid_tap_msg.text = message
         invalid_tap.visibility = View.VISIBLE
         invalid_tap_msg.visibility = View.VISIBLE
+        if (checkin != null) {
+          if (lastSuccessTime != null) {
+            last_successful_checkin_date.text = lastSuccessTime
+            last_successful_checkin_date.show()
+          }
+          if (lastSuccessUser != null) {
+            last_successful_checkin_user.text = lastSuccessUser
+            last_successful_checkin_user.show()
+          }
+        }
       }
 
       Handler().postDelayed({
@@ -255,9 +296,20 @@ class TapFragment : Fragment() {
         invalid_tap.visibility = View.GONE
         invalid_tap_msg.visibility = View.GONE
 
+        last_successful_checkin_date.hide()
+        last_successful_checkin_user.hide()
+
         waitingForTag = true
       }, duration)
     }
+  }
+
+  private fun View.show() {
+    this.visibility = View.VISIBLE
+  }
+
+  private fun View.hide() {
+    this.visibility = View.INVISIBLE
   }
 
 

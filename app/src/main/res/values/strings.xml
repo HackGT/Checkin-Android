@@ -49,4 +49,12 @@
     <string name="nfc_unsupported_device">Device does not support NFC</string>
     <string name="nfc_disabled">NFC is currently disabled</string>
     <string name="nfc_ready">Waiting for badge…</string>
+    <string name="application_branch">Application branch</string>
+    <string name="dietary_restrictions">Dietary restrictions</string>
+    <string name="shirt_size">Shirt size</string>
+    <string name="tap_badge_to_track_event">Tap badge to track event</string>
+    <string name="name">Name</string>
+    <string name="enable_nfc">Enable NFC</string>
+    <string name="previous_time">Previous time</string>
+    <string name="previous_user">Previous user</string>
 </resources>
