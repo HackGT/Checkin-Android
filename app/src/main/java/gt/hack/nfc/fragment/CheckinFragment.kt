@@ -1,9 +1,7 @@
 package gt.hack.nfc.fragment
 
 import android.Manifest
-import android.app.Dialog
 import android.app.ProgressDialog
-import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
@@ -12,17 +10,13 @@ import android.media.ToneGenerator
 import android.os.AsyncTask
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.provider.Settings
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentTransaction
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
-
+import android.widget.Toast
 import com.apollographql.apollo.exception.ApolloException
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
@@ -31,15 +25,13 @@ import com.google.android.gms.vision.MultiProcessor
 import com.google.android.gms.vision.Tracker
 import com.google.android.gms.vision.barcode.Barcode
 import com.google.android.gms.vision.barcode.BarcodeDetector
-
-import java.io.IOException
-
 import gt.hack.nfc.R
 import gt.hack.nfc.UserGetQuery
 import gt.hack.nfc.util.API
 import gt.hack.nfc.util.CameraSourcePreview
 import gt.hack.nfc.util.NFCHandler
 import kotlinx.coroutines.runBlocking
+import java.io.IOException
 
 class CheckinFragment : Fragment() {
 
@@ -68,10 +60,6 @@ class CheckinFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
         return inflater.inflate(R.layout.fragment_checkin, container, false)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
     }
 
     /**
@@ -282,9 +270,9 @@ class CheckinFragment : Fragment() {
                     userData.user().fragments().userFragment().accepted &&
                     userData.user().fragments().userFragment().confirmed) {
                 val user = userData.user().fragments().userFragment()
-                val tags = API.parseTags(userData.tags());
+                val tags = API.parseTags(userData.tags())
                 if (tags!!.contains("hackgt") && tags["hackgt"]!!.checked_in()) {
-                    Toast.makeText(context, "User already has badge issued! Please find a check-in admin (Evan/Ehsan/Kexin).",
+                    Toast.makeText(context, "User already has badge issued! Please find a check-in admin (Evan/Ehsan/Ryan).",
                             Toast.LENGTH_LONG).show()
                     val toneGen1 = ToneGenerator(AudioManager.STREAM_MUSIC, 100)
                     toneGen1.startTone(ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK, 500)

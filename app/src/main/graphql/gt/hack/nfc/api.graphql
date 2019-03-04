@@ -23,8 +23,9 @@ query TagsGet($only_current: Boolean!) {
     name
   }
 }
-mutation CheckInTag($id: ID!, $tag: String!) {
-   check_in(user: $id, tag: $tag) {
+
+mutation CheckInTag($id: ID!, $tag: String!, $checkin: Boolean!) {
+   check_in(user: $id, tag: $tag, checkin: $checkin) {
         user {
             ...UserFragment
         }
@@ -33,22 +34,17 @@ mutation CheckInTag($id: ID!, $tag: String!) {
         }
    }
 }
-mutation CheckOutTag($id: ID!, $tag: String!) {
-   check_out(user: $id, tag: $tag) {
-        user {
-            ...UserFragment
-        }
-        tags {
-            ...TagFragment
-        }
-   }
-}
+
 fragment TagFragment on TagState {
     tag {
         name
     }
     checked_in
-    checked_in_date
+    checkin_success
+    last_successful_checkin {
+        checked_in_date
+        checked_in_by
+    }
 }
 fragment UserFragment on User {
   id
@@ -64,7 +60,7 @@ fragment UserFragment on User {
   }
   name
   email
-  questions(names: ["school", "tshirt-size","dietary-restrictions", "optional-items"]) {
+  questions(names: ["school", "university", "tshirt-size","dietary-restrictions", "optional-items"]) {
       name
       value
       values

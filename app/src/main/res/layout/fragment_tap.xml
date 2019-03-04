@@ -15,9 +15,9 @@
     <android.support.v7.widget.CardView
         android:id="@+id/card_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:layout_gravity="center"
-        android:layout_weight="0.22"
+        android:layout_weight="1"
         app:cardCornerRadius="4dp"
         app:cardElevation="1dp">
 
@@ -33,7 +33,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:padding="8dp"
-                android:text="Tap badge to track event"
+                android:text="@string/tap_badge_to_track_event"
                 android:textSize="24sp"
                 android:textAlignment="center"/>
 
@@ -66,9 +66,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:drawableLeft="@drawable/user"
+                android:drawableStart="@drawable/user"
                 android:drawablePadding="8dp"
-                android:hint="Name"
+                android:hint="@string/name"
                 android:paddingLeft="8dp"
                 android:paddingTop="8dp"
                 android:textColor="@color/secondaryTextColor"
@@ -79,10 +79,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:drawableLeft="@drawable/size"
+                android:drawableStart="@drawable/size"
                 android:drawablePadding="8dp"
-                android:hint="Shirt size"
-                android:paddingLeft="8dp"
+                android:hint="@string/shirt_size"
+                android:paddingStart="8dp"
                 android:paddingTop="10dp"
                 android:textColor="@color/secondaryTextColor"
                 android:textSize="20dp" />
@@ -92,10 +92,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:drawableLeft="@drawable/branch"
+                android:drawableStart="@drawable/branch"
                 android:drawablePadding="8dp"
-                android:hint="Application Branch"
-                android:paddingLeft="8dp"
+                android:hint="@string/application_branch"
+                android:paddingStart="8dp"
                 android:paddingTop="10dp"
                 android:textColor="@color/secondaryTextColor"
                 android:textSize="20dp" />
@@ -105,10 +105,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:drawableLeft="@drawable/food"
+                android:drawableStart="@drawable/food"
                 android:drawablePadding="8dp"
-                android:hint="Dietary restrictions"
-                android:paddingLeft="8dp"
+                android:hint="@string/dietary_restrictions"
+                android:paddingStart="8dp"
                 android:paddingTop="10dp"
                 android:textColor="@color/secondaryTextColor"
                 android:textSize="20dp" />
@@ -152,7 +152,7 @@
                 android:background="@color/primaryColor"
                 android:padding="12dp"
                 android:visibility="gone"
-                android:text="Enable NFC" />
+                android:text="@string/enable_nfc" />
 
             <ImageView
                 android:id="@+id/badge_tapped"
@@ -181,10 +181,38 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:drawablePadding="8dp"
-                android:paddingLeft="8dp"
+                android:paddingStart="8dp"
                 android:paddingTop="8dp"
                 android:visibility="gone"
                 android:textAlignment="center"
+                android:textColor="@color/secondaryTextColor"
+                android:textSize="20dp" />
+
+            <TextView
+                android:id="@+id/last_successful_checkin_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:drawableStart="@drawable/clock"
+                android:visibility="gone"
+                android:drawablePadding="8dp"
+                android:hint="@string/previous_time"
+                android:paddingStart="8dp"
+                android:paddingTop="10dp"
+                android:textColor="@color/secondaryTextColor"
+                android:textSize="20dp" />
+
+            <TextView
+                android:id="@+id/last_successful_checkin_user"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:drawableStart="@drawable/user"
+                android:drawablePadding="8dp"
+                android:visibility="gone"
+                android:hint="@string/previous_user"
+                android:paddingStart="8dp"
+                android:paddingTop="10dp"
                 android:textColor="@color/secondaryTextColor"
                 android:textSize="20dp" />
 

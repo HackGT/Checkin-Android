@@ -1,11 +1,7 @@
 package gt.hack.nfc;
 
-import
-        android.app.PendingIntent;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.os.Bundle;
@@ -13,7 +9,6 @@ import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -114,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //TODO: implement server-side access control
-        if (username.equals("ehsan") || username.equals("petschekr") || username.equals("julian") || username.equals("kexin")
+        if (username.equals("ehsan") || username.equals("petschekr") || username.equals("julian")
                 || username.equals("evan") || username.equals("nickg")) {
             drawerItems.add(DrawerItem.SEARCH.getDrawerItem().withIdentifier(101));
         }
