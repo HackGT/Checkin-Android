@@ -83,6 +83,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+
+        switch (Util.networkState) {
+            case CONNECTED:
+                switchToFragment(new CheckinFragment());
+                Util.networkState = NetworkStateReceiver.NetworkState.NO_CHANGE;
+            case DISCONNECTED:
+                switchToFragment(new ConnectivityFragment());
+                Util.networkState = NetworkStateReceiver.NetworkState.NO_CHANGE;
+                default:
+                    return;
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 

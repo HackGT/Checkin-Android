@@ -23,6 +23,7 @@ public class Util {
     public static final String DEFAULT_SERVER = "https://checkin.hack.gt";
     // Whether to make the tag read-only by default in production
     public static boolean nfcLockEnabled = true;
+    public static NetworkStateReceiver.NetworkState networkState = NetworkStateReceiver.NetworkState.NO_CHANGE;
 
     public static String getValueOfQuestion(List<UserFragment.Question> questions, String name) {
         for (UserFragment.Question q : questions) {

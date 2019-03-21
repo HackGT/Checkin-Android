@@ -6,7 +6,10 @@ import android.content.Intent
 import android.content.BroadcastReceiver
 import android.content.Context
 
-
+/**
+ * Keep track of when network becomes available/unavailable
+ * // https://stackoverflow.com/questions/6169059/android-event-for-internet-connectivity-state-change
+ */
 class NetworkStateReceiver : BroadcastReceiver() {
 
     protected var listeners: MutableSet<NetworkStateReceiverListener> = HashSet()
@@ -60,4 +63,11 @@ class NetworkStateReceiver : BroadcastReceiver() {
         fun networkAvailable()
         fun networkUnavailable()
     }
+
+    public enum class NetworkState {
+        NO_CHANGE,
+        CONNECTED,
+        DISCONNECTED
+    }
+
 }
