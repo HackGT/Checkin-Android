@@ -17,15 +17,14 @@ package gt.hack.nfc.util;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.res.Configuration;
-import android.support.annotation.RequiresPermission;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.ViewGroup;
 
-import com.google.android.gms.common.images.Size;
+import androidx.annotation.RequiresPermission;
+
 import com.google.android.gms.vision.CameraSource;
 
 import java.io.IOException;
