@@ -2,6 +2,7 @@ package gt.hack.nfc;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.os.Bundle;
@@ -91,15 +92,17 @@ public class MainActivity extends AppCompatActivity {
                 .getDefaultSharedPreferences(getApplicationContext());
         final IProfile profile = new ProfileDrawerItem()
                 .withName(preferences.getString("username", "HackGT User"))
-                .withEmail(preferences.getString("url", Util.DEFAULT_SERVER))
+                .withEmail(preferences.getString("url", Util.INSTANCE.getDEFAULT_SERVER()))
                 .withIcon(R.drawable.empty)
                 .withIdentifier(100);
+
         headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
                 .withTranslucentStatusBar(true)
                 .addProfiles(profile)
                 .withSavedInstance(savedInstanceState)
                 .withHeaderBackground(R.drawable.header)
+                .withTextColor(Color.WHITE)
                 .withSelectionListEnabledForSingleProfile(false)
                 .build();
         String username = preferences.getString("username", null);
@@ -116,15 +119,15 @@ public class MainActivity extends AppCompatActivity {
         }
         drawerItems.add(DrawerItem.TAP.getDrawerItem().withIdentifier(102));
         drawerItems.add(new DividerDrawerItem().withIdentifier(103));
-        drawerItems.add(new SwitchDrawerItem().withChecked(Util.nfcLockEnabled).withName("NFC locking enabled").withOnCheckedChangeListener(new OnCheckedChangeListener() {
+        drawerItems.add(new SwitchDrawerItem().withChecked(Util.INSTANCE.getNfcLockEnabled()).withName("NFC locking enabled").withOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(IDrawerItem drawerItem, CompoundButton buttonView, boolean isChecked) {
-                Util.nfcLockEnabled = isChecked;
+                Util.INSTANCE.setNfcLockEnabled(isChecked);
                 if (isChecked) {
-                    Util.makeSnackbar(findViewById(R.id.content_frame), R.string.nfc_locking_enabled, Snackbar.LENGTH_SHORT).show();
+                    Util.INSTANCE.makeSnackbar(findViewById(R.id.content_frame), R.string.nfc_locking_enabled, Snackbar.LENGTH_SHORT).show();
                 }
                 else {
-                    Util.makeSnackbar(findViewById(R.id.content_frame), R.string.nfc_locking_disabled, Snackbar.LENGTH_SHORT).show();
+                    Util.INSTANCE.makeSnackbar(findViewById(R.id.content_frame), R.string.nfc_locking_disabled, Snackbar.LENGTH_SHORT).show();
                 }
             }
         }).withSelectable(false).withIdentifier(104));
