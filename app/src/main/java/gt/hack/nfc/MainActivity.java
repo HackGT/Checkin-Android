@@ -202,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         // May want to keep around some information in the future
         // For now, clear everything
-        preferences.edit().clear().commit();
+        preferences.edit().clear().apply();
         Intent i = new Intent(MainActivity.this, LoginActivity.class);
         startActivity(i);
         finish();
