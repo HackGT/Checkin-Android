@@ -6,24 +6,19 @@ import android.content.Context
 import android.os.AsyncTask
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentTransaction
-import android.support.v4.app.ListFragment
-import android.support.v7.widget.SearchView
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.View
 import android.widget.ListView
-
+import androidx.appcompat.widget.SearchView
+import androidx.fragment.app.ListFragment
 import com.apollographql.apollo.exception.ApolloException
-
-import java.util.ArrayList
-
-
 import gt.hack.nfc.R
 import gt.hack.nfc.util.API
 import gt.hack.nfc.util.SearchAdapter
 import kotlinx.coroutines.runBlocking
+import java.util.ArrayList
+import kotlin.collections.HashSet
 
 class SearchFragment : ListFragment(), SearchView.OnQueryTextListener {
     private var adapter: SearchAdapter? = null
@@ -36,12 +31,12 @@ class SearchFragment : ListFragment(), SearchView.OnQueryTextListener {
         listAdapter = adapter
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
-        inflater!!.inflate(R.menu.search_menu, menu)
+  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+    inflater.inflate(R.menu.search_menu, menu)
 
         // Associate searchable configuration with the SearchView
         val searchManager = activity!!.getSystemService(Context.SEARCH_SERVICE) as SearchManager
-        val searchView = menu!!.findItem(R.id.search).actionView as SearchView
+    val searchView = menu.findItem(R.id.search).actionView as SearchView
         searchView.setSearchableInfo(
                 searchManager.getSearchableInfo(activity!!.componentName))
         searchView.setOnQueryTextListener(this)
@@ -59,7 +54,7 @@ class SearchFragment : ListFragment(), SearchView.OnQueryTextListener {
         return false
     }
 
-    override fun onListItemClick(l: ListView?, v: View?, position: Int, id: Long) {
+  override fun onListItemClick(l: ListView, v: View, position: Int, id: Long) {
         super.onListItemClick(l, v, position, id)
         val fragmentManager = fragmentManager
         val transaction = fragmentManager!!.beginTransaction()

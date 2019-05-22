@@ -3,23 +3,16 @@ package gt.hack.nfc.util
 import android.app.ProgressDialog
 import android.content.SharedPreferences
 import android.os.AsyncTask
-import android.support.v4.app.Fragment
-
 import com.apollographql.apollo.exception.ApolloException
-
-import java.util.ArrayList
-import java.util.HashMap
-
-import gt.hack.nfc.R
-import gt.hack.nfc.fragment.TagFragment
 import kotlinx.coroutines.runBlocking
+import java.util.*
 
 
 /**
  * AsyncTask for checking a user into a tag
  */
 
-class TagAsyncTask(private val preferences: SharedPreferences, private val fragment: Fragment) : AsyncTask<String, String, ArrayList<String>>() {
+class TagAsyncTask(private val preferences: SharedPreferences, private val fragment: androidx.fragment.app.Fragment) : AsyncTask<String, String, ArrayList<String>>() {
     private var dialog: ProgressDialog? = null
     override fun onProgressUpdate(vararg values: String) {
         super.onProgressUpdate(*values)

@@ -11,7 +11,7 @@ android {
         targetSdkVersion 28
         versionCode 10
         versionName "2.4.0"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
     buildTypes {
@@ -25,33 +25,36 @@ android {
         }
     }
     buildToolsVersion = '28.0.3'
+    compileOptions {
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
+    }
 }
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.google.code.gson:gson:2.8.5'
-    implementation('com.mikepenz:materialdrawer:6.0.9@aar') {
-        transitive = true
-    }
-    implementation 'com.android.support:appcompat-v7:28.0.0'
-    implementation 'com.android.support:cardview-v7:28.0.0'
-    implementation 'com.android.support:design:28.0.0'
+
+    implementation "com.mikepenz:materialdrawer:6.1.2"
+    //required support lib modules for com.mikepenz:materialdrawer
+    implementation "androidx.appcompat:appcompat:1.0.2"
+    implementation "androidx.recyclerview:recyclerview:1.0.0"
+    implementation "androidx.annotation:annotation:1.0.2"
+    implementation "com.google.android.material:material:1.1.0-alpha06"
+    implementation "androidx.constraintlayout:constraintlayout:${versions.constraintLayout}"
+
+    implementation "androidx.cardview:cardview:1.0.0"
     implementation 'com.google.android.gms:play-services-vision:17.0.2'
     implementation 'com.squareup.okhttp3:okhttp:3.14.2'
     implementation 'com.mikepenz:google-material-typeface:3.0.1.1.original@aar'
-    implementation 'com.android.support:support-v4:28.0.0'
+    implementation "androidx.legacy:legacy-support-v4:1.0.0"
     implementation 'junit:junit:4.12'
-    implementation 'com.apollographql.apollo:apollo-runtime:1.0.0-alpha2'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "com.apollographql.apollo:apollo-runtime:${versions.apollo}"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${versions.kotlin}"
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.2.1'
     implementation 'com.jakewharton.threetenabp:threetenabp:1.2.0'
 }
 
-configurations.all {
-    resolutionStrategy {
-        force 'com.android.support:support-v4:28.0.0'
-    }
-}
 repositories {
     mavenCentral()
 }

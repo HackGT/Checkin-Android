@@ -8,9 +8,6 @@ import android.nfc.NfcAdapter
 import android.nfc.tech.Ndef
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.support.design.widget.Snackbar
-import android.support.v4.app.Fragment
-import android.support.v7.widget.AppCompatButton
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -19,6 +16,8 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.appcompat.widget.AppCompatButton
+import com.google.android.material.snackbar.Snackbar
 import gt.hack.nfc.BuildConfig
 import gt.hack.nfc.R
 import gt.hack.nfc.util.API
@@ -28,7 +27,7 @@ import kotlinx.coroutines.runBlocking
 import java.io.IOException
 import java.util.concurrent.ExecutionException
 
-class CheckinFlowFragment : Fragment() {
+class CheckinFlowFragment : androidx.fragment.app.Fragment() {
   private var uuid: String? = null
   private var name: String? = null
   private var email: String? = null

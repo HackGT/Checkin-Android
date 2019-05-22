@@ -10,13 +10,12 @@ import android.media.ToneGenerator
 import android.os.AsyncTask
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.support.v4.app.ActivityCompat
-import android.support.v4.app.Fragment
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import com.apollographql.apollo.exception.ApolloException
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
@@ -33,7 +32,7 @@ import gt.hack.nfc.util.NFCHandler
 import kotlinx.coroutines.runBlocking
 import java.io.IOException
 
-class CheckinFragment : Fragment() {
+class CheckinFragment : androidx.fragment.app.Fragment() {
 
     private var mCameraSource: CameraSource? = null
     private var mPreview: CameraSourcePreview? = null
