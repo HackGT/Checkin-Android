@@ -40,11 +40,13 @@ public class LoginActivity extends AppCompatActivity {
     private UserLoginTask mAuthTask = null;
 
     // UI references.
-    private AutoCompleteTextView mUsernameView;
+    private TextInputEditText mUsernameView;
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
     private int logoPresses;
+    private AutoCompleteTextView signinUrlExposedDropdown;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,6 +77,16 @@ public class LoginActivity extends AppCompatActivity {
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
 
+        String[] SIGNIN_URLS = new String[]{"https://checkin.hack.gt",
+                "https://checkin.dev.hack.gt"};
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+                R.layout.dropdown_menu_popup_item,
+                SIGNIN_URLS);
+
+        signinUrlExposedDropdown = findViewById(R.id.signin_url);
+        signinUrlExposedDropdown.setAdapter(adapter);
+
         // Logic for customizing host url
         final ImageView imageView = findViewById(R.id.logo);
         imageView.setClickable(true);
@@ -91,7 +103,7 @@ public class LoginActivity extends AppCompatActivity {
 
                         final EditText input = new EditText(getApplicationContext());
                         input.setInputType(InputType.TYPE_TEXT_VARIATION_URI);
-                        input.setText(preferences.getString("url", Util.DEFAULT_SERVER));
+                        input.setText(preferences.getString("url", Util.INSTANCE.getDEFAULT_SERVER()));
                         builder.setView(input);
 
                         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
