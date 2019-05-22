@@ -110,7 +110,7 @@ public class LoginActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 String userInput = input.getText().toString();
-                                preferences.edit().putString("url", userInput).commit();
+                                preferences.edit().putString("url", userInput).apply();
                                 dialog.dismiss();
                             }
                         });
@@ -253,7 +253,7 @@ public class LoginActivity extends AppCompatActivity {
             if (success) {
                 SharedPreferences preferences = PreferenceManager
                         .getDefaultSharedPreferences(getApplicationContext());
-                preferences.edit().putString("username", username).commit();
+                preferences.edit().putString("username", username).apply();
                 Intent i = new Intent(LoginActivity.this, MainActivity.class);
                 startActivity(i);
                 finish();

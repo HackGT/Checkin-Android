@@ -1,18 +1,11 @@
 package gt.hack.nfc.util
 
+
 import android.content.SharedPreferences
 import android.util.Log
-
-
 import com.apollographql.apollo.ApolloCall
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.exception.ApolloException
-
-import java.io.IOException
-import java.util.ArrayList
-import java.util.HashMap
-
-
 import gt.hack.nfc.CheckInTagMutation
 import gt.hack.nfc.TagsGetQuery
 import gt.hack.nfc.UserGetQuery
@@ -22,6 +15,8 @@ import gt.hack.nfc.fragment.UserFragment
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import java.io.IOException
+import java.util.*
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -50,7 +45,7 @@ object API {
                         authCookie = authCookie.substring(0, authCookie.indexOf(";"))
                     }
                 }
-                preferences.edit().putString("cookie", authCookie).putBoolean("loggedIn", true).commit()
+              preferences.edit().putString("cookie", authCookie).putBoolean("loggedIn", true).apply()
                 return true
             }
         }
