@@ -3,6 +3,7 @@ package gt.hack.nfc.util
 
 import android.app.Activity
 import android.content.Context
+import android.text.Editable
 import android.util.Log
 import android.view.View
 import android.view.accessibility.AccessibilityManager
@@ -10,6 +11,10 @@ import android.view.inputmethod.InputMethodManager
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import gt.hack.nfc.fragment.UserFragment
+
+// Extension function from https://stackoverflow.com/a/51799663/5434744
+// Global extension function from https://stackoverflow.com/a/44347573/5434744
+fun String?.toEditable(): Editable = Editable.Factory.getInstance().newEditable(this)
 
 object Util {
   val DEFAULT_SERVER = "https://checkin.hack.gt"

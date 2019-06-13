@@ -52,7 +52,7 @@
                 android:layout_marginBottom="8dp">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/username"
+                    android:id="@+id/username_input"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/username"
@@ -66,11 +66,10 @@
                 android:layout_height="wrap_content"
                 style="@style/LoginTextInputLayoutStyle"
                 android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                app:endIconMode="password_toggle">
+                android:layout_marginBottom="8dp">
 
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/password"
+                    android:id="@+id/password_input"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/password"
@@ -79,15 +78,15 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                style="@style/ExposedDropdownLayoutStyle"
+                style="@style/LoginTextInputLayoutStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
-                app:helperText="The URL of the HackGT Check In server you'd like to sign in to">
+                app:helperText="URL of the HackGT Check In server">
 
-                <AutoCompleteTextView
-                    android:id="@+id/signin_url"
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/instance_url_input"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Instance URL"
