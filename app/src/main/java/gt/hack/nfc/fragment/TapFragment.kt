@@ -204,7 +204,7 @@ class TapFragment : androidx.fragment.app.Fragment() {
         userShirtSize.text = userShirtSizeVal
         try {
           userDietaryRestrictions.text = userDietaryRestrictionsVal?.substring(1)?.dropLast(1)
-        } catch (e: StringIndexOutOfBoundsException) {
+        } catch (e: Throwable) {
           userDietaryRestrictions.text = ""
         }
 
