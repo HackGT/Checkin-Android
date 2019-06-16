@@ -10,7 +10,7 @@
     android:paddingRight="8dp"
     android:paddingTop="6dp">
 
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
         android:id="@+id/card_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -38,7 +38,7 @@
             <TextView
                 android:id="@+id/hacker_checkin_name"
                 android:paddingTop="14dp"
-                android:paddingLeft="8dp"
+                android:paddingStart="8dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
@@ -50,50 +50,50 @@
             <TextView
                 android:id="@+id/hacker_checkin_email"
                 android:paddingTop="14dp"
-                android:paddingLeft="8dp"
+                android:drawableStart="@drawable/email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:hint="Email"
                 android:textColor="@color/secondaryTextColor"
-                android:textSize="20dp"
-                android:drawableLeft="@drawable/email"
+                android:paddingStart="8dp"
+                android:textSize="20sp"
                 android:drawablePadding="8dp" />
             <TextView
                 android:id="@+id/hacker_checkin_type"
                 android:paddingTop="14dp"
-                android:paddingLeft="8dp"
+                android:drawableStart="@drawable/branch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:hint="Application Branch"
                 android:textColor="@color/secondaryTextColor"
-                android:textSize="20dp"
-                android:drawableLeft="@drawable/branch"
+                android:paddingStart="8dp"
+                android:textSize="20sp"
                 android:drawablePadding="8dp" />
             <TextView
                 android:id="@+id/hacker_confirm_type"
                 android:paddingTop="14dp"
-                android:paddingLeft="8dp"
+                android:drawableStart="@drawable/branch"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:hint="Confirmation Branch"
                 android:textColor="@color/secondaryTextColor"
-                android:textSize="20dp"
-                android:drawableLeft="@drawable/branch"
+                android:paddingStart="8dp"
+                android:textSize="20sp"
                 android:drawablePadding="8dp" />
             <TextView
                 android:id="@+id/hacker_checkin_school"
                 android:paddingTop="14dp"
-                android:paddingLeft="8dp"
+                android:drawableStart="@drawable/school"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:hint="School"
                 android:textColor="@color/secondaryTextColor"
-                android:textSize="20dp"
-                android:drawableLeft="@drawable/school"
+                android:paddingStart="8dp"
+                android:textSize="20sp"
                 android:drawablePadding="8dp" />
 
             <LinearLayout
@@ -109,8 +109,9 @@
                     android:gravity="center_horizontal"
                     android:layout_gravity="end"
                     android:layout_marginTop="16dp"
-                    android:src="@drawable/warning"
-                    android:visibility="gone" />
+                    android:contentDescription="NFC error"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/warning" />
 
                 <ProgressBar
                     android:id="@+id/wait_for_badge_tap"
@@ -130,7 +131,7 @@
                     android:layout_gravity="center_vertical"
                     android:textSize="24sp" />
 
-                <android.support.v7.widget.AppCompatButton
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/enable_nfc_button"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
@@ -140,18 +141,7 @@
                     android:background="@color/primaryColor"
                     android:padding="12dp"
                     android:visibility="gone"
-                    android:text="Enable NFC" />
-
-                <ImageView
-                    android:id="@+id/badge_tapped"
-                    android:layout_width="match_parent"
-                    android:layout_height="64dp"
-                    android:tint="@color/success"
-                    android:visibility="gone"
-                    android:gravity="center_horizontal"
-                    android:layout_gravity="end"
-                    android:paddingTop="16dp"
-                    android:src="@drawable/check" />
+                    android:text="@string/enable_nfc" />
 
                 <ImageView
                     android:id="@+id/badgeWritten"
@@ -162,8 +152,10 @@
                     android:gravity="center_horizontal"
                     android:layout_gravity="end"
                     android:paddingTop="16dp"
-                    android:src="@drawable/check"/>
-                <android.support.v7.widget.AppCompatButton
+                    android:contentDescription="@string/badge_successfully_written"
+                    app:srcCompat="@drawable/check" />
+
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/confirmCheckin"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
@@ -174,7 +166,9 @@
                     android:padding="12dp"
                     android:visibility="gone"
                     android:text="Confirm Check In"/>
+
             </LinearLayout>
+
         </LinearLayout>
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
 </LinearLayout>

@@ -10,7 +10,6 @@ import android.nfc.tech.Ndef
 import android.os.Bundle
 import android.os.Handler
 import android.preference.PreferenceManager
-import android.support.v4.app.Fragment
 import android.text.format.DateUtils
 import android.util.Log
 import android.view.LayoutInflater
@@ -29,7 +28,7 @@ import org.threeten.bp.format.DateTimeFormatter
 import java.text.ParseException
 import java.util.*
 
-class TapFragment : Fragment() {
+class TapFragment : androidx.fragment.app.Fragment() {
 
   val TAG = "CHECKIN/TAP_FRAGMENT"
   var waitingForTag = true
@@ -205,7 +204,7 @@ class TapFragment : Fragment() {
         userShirtSize.text = userShirtSizeVal
         try {
           userDietaryRestrictions.text = userDietaryRestrictionsVal?.substring(1)?.dropLast(1)
-        } catch (e: StringIndexOutOfBoundsException) {
+        } catch (e: Throwable) {
           userDietaryRestrictions.text = ""
         }
 

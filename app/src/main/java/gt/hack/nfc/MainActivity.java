@@ -2,18 +2,20 @@ package gt.hack.nfc;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.CompoundButton;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+
+import com.google.android.material.snackbar.Snackbar;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.typeface.IIcon;
 import com.mikepenz.materialdrawer.AccountHeader;
@@ -90,15 +92,17 @@ public class MainActivity extends AppCompatActivity {
                 .getDefaultSharedPreferences(getApplicationContext());
         final IProfile profile = new ProfileDrawerItem()
                 .withName(preferences.getString("username", "HackGT User"))
-                .withEmail(preferences.getString("url", Util.DEFAULT_SERVER))
+                .withEmail(preferences.getString("url", Util.INSTANCE.getDEFAULT_SERVER()))
                 .withIcon(R.drawable.empty)
                 .withIdentifier(100);
+
         headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
                 .withTranslucentStatusBar(true)
                 .addProfiles(profile)
                 .withSavedInstance(savedInstanceState)
                 .withHeaderBackground(R.drawable.header)
+                .withTextColor(Color.WHITE)
                 .withSelectionListEnabledForSingleProfile(false)
                 .build();
         String username = preferences.getString("username", null);
@@ -115,15 +119,15 @@ public class MainActivity extends AppCompatActivity {
         }
         drawerItems.add(DrawerItem.TAP.getDrawerItem().withIdentifier(102));
         drawerItems.add(new DividerDrawerItem().withIdentifier(103));
-        drawerItems.add(new SwitchDrawerItem().withChecked(Util.nfcLockEnabled).withName("NFC locking enabled").withOnCheckedChangeListener(new OnCheckedChangeListener() {
+        drawerItems.add(new SwitchDrawerItem().withChecked(Util.INSTANCE.getNfcLockEnabled()).withName("NFC locking enabled").withOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(IDrawerItem drawerItem, CompoundButton buttonView, boolean isChecked) {
-                Util.nfcLockEnabled = isChecked;
+                Util.INSTANCE.setNfcLockEnabled(isChecked);
                 if (isChecked) {
-                    Util.makeSnackbar(findViewById(R.id.content_frame), R.string.nfc_locking_enabled, Snackbar.LENGTH_SHORT).show();
+                    Util.INSTANCE.makeSnackbar(findViewById(R.id.content_frame), R.string.nfc_locking_enabled, Snackbar.LENGTH_SHORT).show();
                 }
                 else {
-                    Util.makeSnackbar(findViewById(R.id.content_frame), R.string.nfc_locking_disabled, Snackbar.LENGTH_SHORT).show();
+                    Util.INSTANCE.makeSnackbar(findViewById(R.id.content_frame), R.string.nfc_locking_disabled, Snackbar.LENGTH_SHORT).show();
                 }
             }
         }).withSelectable(false).withIdentifier(104));
@@ -198,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         // May want to keep around some information in the future
         // For now, clear everything
-        preferences.edit().clear().commit();
+        preferences.edit().clear().apply();
         Intent i = new Intent(MainActivity.this, LoginActivity.class);
         startActivity(i);
         finish();

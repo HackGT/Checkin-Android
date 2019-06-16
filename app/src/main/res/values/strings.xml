@@ -57,4 +57,8 @@
     <string name="enable_nfc">Enable NFC</string>
     <string name="previous_time">Previous time</string>
     <string name="previous_user">Previous user</string>
+    <string name="badge_successfully_written">Badge successfully written</string>
+    <string name="hackgt_logo">HackGT logo</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
 </resources>
