@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
                 .getDefaultSharedPreferences(getApplicationContext());
         final IProfile profile = new ProfileDrawerItem()
                 .withName(preferences.getString("username", "HackGT User"))
-                .withEmail(preferences.getString("url", Util.INSTANCE.getDEFAULT_SERVER()))
+                .withEmail(preferences.getString("url", Util.DEFAULT_SERVER))
                 .withIcon(R.drawable.empty)
                 .withIdentifier(100);
 
@@ -200,9 +200,8 @@ public class MainActivity extends AppCompatActivity {
     }
     private void logOut() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        // May want to keep around some information in the future
-        // For now, clear everything
-        preferences.edit().clear().apply();
+        String instanceUrl = preferences.getString("url", Util.DEFAULT_SERVER);
+        preferences.edit().clear().putString("url", instanceUrl).apply();
         Intent i = new Intent(MainActivity.this, LoginActivity.class);
         startActivity(i);
         finish();

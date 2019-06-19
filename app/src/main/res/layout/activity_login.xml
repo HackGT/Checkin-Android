@@ -89,8 +89,8 @@
                     android:id="@+id/instance_url_input"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Instance URL"
-                    android:text="https://checkin.hack.gt"
+                    android:hint="@string/instance_url"
+                    android:text="@string/default_instance_url"
                     android:textCursorDrawable="@drawable/color_cursor" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -101,15 +101,15 @@
                 android:layout_marginTop="24dp"
                 android:layout_marginBottom="24dp"
                 android:padding="12dp"
-                android:text="Login"/>
+                android:text="@string/login" />
 
             <TextView android:id="@+id/link_signup"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
-                android:text="Login with your account provided by HackGT Staff"
+                android:text="@string/login_with_your_account_provided_by_hackgt_staff"
                 android:gravity="center"
-                android:textSize="16dip"/>
+                android:textSize="16sp" />
 
         </LinearLayout>
     </ScrollView>

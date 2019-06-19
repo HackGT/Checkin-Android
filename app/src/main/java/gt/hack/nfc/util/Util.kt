@@ -17,6 +17,7 @@ import gt.hack.nfc.fragment.UserFragment
 fun String?.toEditable(): Editable = Editable.Factory.getInstance().newEditable(this)
 
 object Util {
+  @JvmField // https://stackoverflow.com/a/53831478/5434744, this lets Java classes use this value
   val DEFAULT_SERVER = "https://checkin.hack.gt"
   // Whether to make the tag read-only by default in production
   var nfcLockEnabled = true
