@@ -80,7 +80,7 @@ class TapFragment : androidx.fragment.app.Fragment() {
     tagSelect.text = prevTag
     tagSelect.isEnabled = true
 
-    val autocomplete = ArrayAdapter(context, android.R.layout.simple_expandable_list_item_1, allTags)
+    val autocomplete = ArrayAdapter(context!!, android.R.layout.simple_expandable_list_item_1, allTags)
     // the cast to ArrayList is kinda icky but so long as the API response is OK, it should work
     tagSelect.threshold = 1
     tagSelect.setAdapter(autocomplete)

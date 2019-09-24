@@ -23,6 +23,7 @@ import gt.hack.nfc.R
 import gt.hack.nfc.util.API
 import gt.hack.nfc.util.NFCHandler
 import gt.hack.nfc.util.Util
+import kotlinx.android.synthetic.main.fragment_checkin_confirm.*
 import kotlinx.coroutines.runBlocking
 import java.io.IOException
 import java.util.concurrent.ExecutionException
@@ -57,6 +58,11 @@ class CheckinFlowFragment : androidx.fragment.app.Fragment() {
   override fun onResume() {
     super.onResume()
     val progressBar = activity!!.findViewById<ProgressBar>(R.id.wait_for_badge_tap)
+    lock_tag_checkbox.setOnCheckedChangeListener { _, checked ->
+      {
+
+      }
+    }
 
     val nameView = activity!!.findViewById<TextView>(R.id.hacker_checkin_name)
     nameView.text = name
@@ -160,7 +166,7 @@ class CheckinFlowFragment : androidx.fragment.app.Fragment() {
           val type = "badge"
 
           val uriRecord = NdefRecord.createUri(
-              "https://live.hack.gt/?user=" + uuid)
+              "https://info.hack.gt/?user=" + uuid)
           val ndefMessage = NdefMessage(
               arrayOf(uriRecord))
 
@@ -239,5 +245,13 @@ class CheckinFlowFragment : androidx.fragment.app.Fragment() {
 
       return f
     }
+  }
+
+  private fun View.show() {
+    this.visibility = View.VISIBLE
+  }
+
+  private fun View.hide() {
+    this.visibility = View.INVISIBLE
   }
 }

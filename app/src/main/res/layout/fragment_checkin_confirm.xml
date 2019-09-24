@@ -25,93 +25,20 @@
             android:orientation="vertical"
             android:padding="8dp">
 
-            <TextView
-                android:id="@+id/text_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="75"
-                android:ellipsize="end"
-                android:padding="8dp"
-                android:text="Confirm User"
-                android:textSize="34sp" />
-
-            <TextView
-                android:id="@+id/hacker_checkin_name"
-                android:paddingTop="14dp"
-                android:paddingStart="8dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:hint="Name"
-                android:textColor="@color/secondaryTextColor"
-                android:textSize="20dp"
-                android:drawableLeft="@drawable/user"
-                android:drawablePadding="8dp" />
-            <TextView
-                android:id="@+id/hacker_checkin_email"
-                android:paddingTop="14dp"
-                android:drawableStart="@drawable/email"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:hint="Email"
-                android:textColor="@color/secondaryTextColor"
-                android:paddingStart="8dp"
-                android:textSize="20sp"
-                android:drawablePadding="8dp" />
-            <TextView
-                android:id="@+id/hacker_checkin_type"
-                android:paddingTop="14dp"
-                android:drawableStart="@drawable/branch"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:hint="Application Branch"
-                android:textColor="@color/secondaryTextColor"
-                android:paddingStart="8dp"
-                android:textSize="20sp"
-                android:drawablePadding="8dp" />
-            <TextView
-                android:id="@+id/hacker_confirm_type"
-                android:paddingTop="14dp"
-                android:drawableStart="@drawable/branch"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:hint="Confirmation Branch"
-                android:textColor="@color/secondaryTextColor"
-                android:paddingStart="8dp"
-                android:textSize="20sp"
-                android:drawablePadding="8dp" />
-            <TextView
-                android:id="@+id/hacker_checkin_school"
-                android:paddingTop="14dp"
-                android:drawableStart="@drawable/school"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:hint="School"
-                android:textColor="@color/secondaryTextColor"
-                android:paddingStart="8dp"
-                android:textSize="20sp"
-                android:drawablePadding="8dp" />
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:paddingTop="16dp">
 
-                <ImageView
-                    android:id="@+id/nfc_error"
-                    android:layout_width="match_parent"
-                    android:layout_height="64dp"
-                    android:gravity="center_horizontal"
-                    android:layout_gravity="end"
-                    android:layout_marginTop="16dp"
-                    android:contentDescription="NFC error"
-                    android:visibility="gone"
-                    app:srcCompat="@drawable/warning" />
+                <CheckBox
+                    android:id="@+id/lock_tag_checkbox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="14dp"
+                    android:text="@string/keep_badge_unlocked"
+                    android:textAlignment="center" />
 
                 <ProgressBar
                     android:id="@+id/wait_for_badge_tap"
@@ -155,6 +82,68 @@
                     android:contentDescription="@string/badge_successfully_written"
                     app:srcCompat="@drawable/check" />
 
+                <ImageView
+                    android:id="@+id/nfc_error"
+                    android:layout_width="match_parent"
+                    android:layout_height="64dp"
+                    android:gravity="center_horizontal"
+                    android:layout_gravity="end"
+                    android:layout_marginTop="16dp"
+                    android:contentDescription="@string/nfc_error"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/warning" />
+
+                <ImageView
+                    android:id="@+id/unlocked_tag_warning_icon"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:contentDescription="@string/warning_symbol"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/ic_warning_red_24dp" />
+
+                <ImageView
+                    android:id="@+id/lock_tag_notice_icon"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:contentDescription="@string/warning_symbol"
+                    app:srcCompat="@drawable/ic_lock_green_24dp" />
+
+                <ImageView
+                    android:id="@+id/unlocked_tag_dev_version_icon"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:contentDescription="@string/warning_symbol"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/ic_developer_mode_black_24dp" />
+
+                <TextView
+                    android:id="@+id/lock_tag_notice_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/badge_contents_will_be_locked"
+                    android:textAlignment="center"
+                    android:textColor="#087f23" />
+
+                <TextView
+                    android:id="@+id/unlocked_tag_warning_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/unlocked_badge_warning"
+                    android:textAlignment="center"
+                    android:textColor="#B00020"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/unlocked_tag_dev_version__text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/badge_unlocked_dev_build"
+                    android:textAlignment="center"
+                    android:visibility="gone" />
+
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/confirmCheckin"
                     android:layout_width="fill_parent"
@@ -165,9 +154,89 @@
                     android:background="@color/primaryColor"
                     android:padding="12dp"
                     android:visibility="gone"
-                    android:text="Confirm Check In"/>
+                    android:text="@string/confirm_check_in" />
 
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/hacker_checkin_name"
+                android:paddingTop="14dp"
+                android:paddingStart="8dp"
+                android:drawableStart="@drawable/user"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:hint="@string/name"
+                android:textColor="@color/secondaryTextColor"
+                android:paddingEnd="8dp"
+                android:textSize="20sp"
+                android:drawablePadding="8dp" />
+
+            <TextView
+                android:id="@+id/hacker_checkin_email"
+                android:paddingTop="14dp"
+                android:drawableStart="@drawable/email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:hint="@string/email"
+                android:textColor="@color/secondaryTextColor"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:textSize="20sp"
+                android:drawablePadding="8dp" />
+
+            <TextView
+                android:id="@+id/hacker_checkin_type"
+                android:paddingTop="14dp"
+                android:drawableStart="@drawable/branch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:hint="@string/application_branch"
+                android:textColor="@color/secondaryTextColor"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:textSize="20sp"
+                android:drawablePadding="8dp" />
+
+            <TextView
+                android:id="@+id/hacker_confirm_type"
+                android:paddingTop="14dp"
+                android:drawableStart="@drawable/branch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:hint="@string/confirmation_branch"
+                android:textColor="@color/secondaryTextColor"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:textSize="20sp"
+                android:drawablePadding="8dp" />
+
+            <TextView
+                android:id="@+id/hacker_checkin_school"
+                android:paddingTop="14dp"
+                android:drawableStart="@drawable/school"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:hint="@string/school"
+                android:textColor="@color/secondaryTextColor"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:textSize="20sp"
+                android:drawablePadding="8dp" />
+
+            <TextView
+                android:id="@+id/text_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="75"
+                android:ellipsize="end"
+                android:padding="8dp"
+                android:text="@string/confirm_user"
+                android:textSize="34sp" />
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>
