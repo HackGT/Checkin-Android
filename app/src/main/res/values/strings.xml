@@ -71,7 +71,7 @@
     <string name="school">School</string>
     <string name="nfc_error">NFC error</string>
     <string name="confirm_check_in">Confirm Check In</string>
-    <string name="unlocked_badge_warning">Watch out! Unless you know what you\'re doing, do not leave this setting enabled. The contents of this badge will not be locked and may be corrupted or modified by anyone in the future</string>
+    <string name="unlocked_badge_warning">Badge contents can be changed by anyone</string>
     <string name="warning_symbol">Warning symbol</string>
     <string name="keep_badge_unlocked">Keep tag unlocked</string>
     <string name="badge_unlocked_dev_build">Badge will not be permanently locked because this is a development build</string>

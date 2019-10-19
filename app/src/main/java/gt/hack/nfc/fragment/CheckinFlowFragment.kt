@@ -1,13 +1,11 @@
 package gt.hack.nfc.fragment
 
-
 import android.nfc.FormatException
 import android.nfc.NdefMessage
 import android.nfc.NdefRecord
 import android.nfc.NfcAdapter
 import android.nfc.tech.Ndef
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -16,7 +14,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.appcompat.widget.AppCompatButton
+import androidx.preference.PreferenceManager
 import com.google.android.material.snackbar.Snackbar
 import gt.hack.nfc.BuildConfig
 import gt.hack.nfc.R
@@ -37,7 +35,6 @@ class CheckinFlowFragment : androidx.fragment.app.Fragment() {
   private var confirmBranch: String? = null
   private var alreadyCheckedIn = false
   private var wroteBadge = false
-  private var confirmButton: AppCompatButton? = null
   private val nfcHandler = NFCHandler()
   private val TAG = "checkin2/CHECKIN_FLOW"
 
@@ -57,36 +54,44 @@ class CheckinFlowFragment : androidx.fragment.app.Fragment() {
 
   override fun onResume() {
     super.onResume()
-    val progressBar = activity!!.findViewById<ProgressBar>(R.id.wait_for_badge_tap)
-    lock_tag_checkbox.setOnCheckedChangeListener { _, checked ->
-      {
-
+    if (BuildConfig.DEBUG) {
+      unlocked_tag_dev_version_icon.show()
+      unlocked_tag_dev_version_text.show()
+      lock_tag_notice_icon.hide()
+      lock_tag_notice_text.hide()
+      no_tag_lock_checkbox.hide()
+    } else {
+      no_tag_lock_checkbox.setOnCheckedChangeListener { _, checked ->
+        if (checked) {
+          lock_tag_notice_icon.hide()
+          lock_tag_notice_text.hide()
+          unlocked_tag_warning_icon.show()
+          unlocked_tag_warning_text.show()
+        } else {
+          lock_tag_notice_icon.show()
+          lock_tag_notice_text.show()
+          unlocked_tag_warning_icon.hide()
+          unlocked_tag_warning_text.hide()
+        }
       }
     }
 
-    val nameView = activity!!.findViewById<TextView>(R.id.hacker_checkin_name)
-    nameView.text = name
+    hacker_checkin_name.text = name
+    hacker_checkin_email.text = email
 
-    val emailView = activity!!.findViewById<TextView>(R.id.hacker_checkin_email)
-    emailView.text = email
-
-    val schoolView = view!!.findViewById<TextView>(R.id.hacker_checkin_school)
     if (school != null) {
-      schoolView.text = school
+      hacker_checkin_school.text = school
     }
 
-    val branchView = view!!.findViewById<TextView>(R.id.hacker_checkin_type)
     if (branch != null) {
-      branchView.text = branch
+      hacker_checkin_type.text = branch
     }
 
-    val confirmBranchView = view!!.findViewById<TextView>(R.id.hacker_confirm_type)
     if (confirmBranch != null) {
-      confirmBranchView.text = confirmBranch
+      hacker_confirm_type.text = confirmBranch
     }
 
-    confirmButton = activity!!.findViewById(R.id.confirmCheckin)
-    confirmButton!!.setOnClickListener {
+    confirmCheckin.setOnClickListener {
       try {
           val preferences = PreferenceManager.getDefaultSharedPreferences(activity)
           val checkinUuid = uuid
@@ -148,6 +153,15 @@ class CheckinFlowFragment : androidx.fragment.app.Fragment() {
 
   }
 
+  private fun shouldLockTag(keepUnlocked: Boolean, isDebug: Boolean): Boolean {
+    if (isDebug || keepUnlocked) {
+      return false
+    }
+
+    return true
+
+  }
+
   private fun loadNFC(view: View) {
     val nfcInfo = view.findViewById<TextView>(R.id.nfcInstructions)
     val progressBar = view.findViewById<ProgressBar>(R.id.wait_for_badge_tap)
@@ -171,24 +185,28 @@ class CheckinFlowFragment : androidx.fragment.app.Fragment() {
               arrayOf(uriRecord))
 
           try {
+            val lockTag = shouldLockTag(no_tag_lock_checkbox.isChecked, BuildConfig.DEBUG)
             ndef.writeNdefMessage(ndefMessage)
+            Log.i(TAG, "Should tag be locked? ${lockTag}")
 
-            if (ndef.canMakeReadOnly() && Util.nfcLockEnabled && !BuildConfig.DEBUG) {
-              ndef.makeReadOnly()
-            } else if (Util.nfcLockEnabled && BuildConfig.DEBUG) {
-              Util.makeSnackbar(activity!!.findViewById(R.id.content_frame), R.string.permanent_badge_locking_option_disabled_debug_build, Snackbar.LENGTH_SHORT).show()
-            } else if (!Util.nfcLockEnabled) {
-              Util.makeSnackbar(activity!!.findViewById(R.id.content_frame), R.string.permanent_badge_locking_option_disabled, Snackbar.LENGTH_SHORT).show()
-            } else {
+            if (ndef.canMakeReadOnly()) {
+              if (lockTag) {
+                ndef.makeReadOnly()
+              } else if (BuildConfig.DEBUG) {
+                Util.makeSnackbar(activity!!.findViewById(R.id.content_frame), R.string.permanent_badge_locking_option_disabled_debug_build, Snackbar.LENGTH_SHORT).show()
+              } else {
+                Util.makeSnackbar(activity!!.findViewById(R.id.content_frame), R.string.permanent_badge_locking_option_disabled, Snackbar.LENGTH_SHORT).show()
+              }
+            } else if (!ndef.canMakeReadOnly() && lockTag) {
               Util.makeSnackbar(activity!!.findViewById(R.id.content_frame), R.string.unlockable_tag, Snackbar.LENGTH_SHORT).show()
             }
 
             activity!!.runOnUiThread {
-              progressBar.visibility = View.GONE
-              val check = activity!!
-                  .findViewById<ImageView>(R.id.badgeWritten)
-              check.visibility = View.VISIBLE
-              confirmButton!!.visibility = View.VISIBLE
+              wait_for_badge_tap.hide()
+              nfcInstructions.hide()
+              badgeWritten.show()
+              confirmCheckin.show()
+              no_tag_lock_checkbox.hide()
             }
             wroteBadge = true
           } catch (e: IOException) {
@@ -198,7 +216,7 @@ class CheckinFlowFragment : androidx.fragment.app.Fragment() {
 
         } else if (!ndef.isWritable) {
           // Tag already locked or unwritable NFC device like a Buzzcard was tapped
-          Util.makeSnackbar(activity!!.findViewById(R.id.content_frame), R.string.unwritable_tag, Snackbar.LENGTH_SHORT).show()
+          Util.makeSnackbar(activity!!.findViewById(R.id.content_frame), R.string.unwritable_tag, Snackbar.LENGTH_LONG).show()
         }
       } catch (e: IOException) {
         e.printStackTrace()
@@ -252,6 +270,6 @@ class CheckinFlowFragment : androidx.fragment.app.Fragment() {
   }
 
   private fun View.hide() {
-    this.visibility = View.INVISIBLE
+    this.visibility = View.GONE
   }
 }
