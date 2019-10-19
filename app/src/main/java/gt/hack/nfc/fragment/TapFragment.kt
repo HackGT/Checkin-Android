@@ -1,7 +1,6 @@
 package gt.hack.nfc.fragment
 
-import android.media.AudioManager
-import android.media.ToneGenerator
+import android.media.MediaPlayer
 import android.net.Uri
 import android.nfc.NdefRecord
 import android.nfc.NfcAdapter
@@ -17,6 +16,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
+import androidx.annotation.RawRes
 import gt.hack.nfc.R
 import gt.hack.nfc.util.API
 import gt.hack.nfc.util.NFCHandler
@@ -33,6 +33,7 @@ class TapFragment : androidx.fragment.app.Fragment() {
   val TAG = "CHECKIN/TAP_FRAGMENT"
   var waitingForTag = true
   private var nfcHandler = NFCHandler()
+  private var mediaPlayer: MediaPlayer? = null
 
   companion object {
     fun newInstance(): TapFragment {
@@ -51,9 +52,24 @@ class TapFragment : androidx.fragment.app.Fragment() {
     loadNFC()
   }
 
+  fun playSound(@RawRes rawResId: Int) {
+    val assetFileDescriptor = context!!.resources.openRawResourceFd(rawResId) ?: return
+    mediaPlayer?.run {
+      reset()
+      setDataSource(assetFileDescriptor.fileDescriptor,
+          assetFileDescriptor.startOffset, assetFileDescriptor.declaredLength)
+      prepareAsync()
+    }
+  }
+
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     Log.i("checkin-tap", "inside onviewcreated")
+    mediaPlayer = MediaPlayer().apply {
+      setOnPreparedListener { start() }
+      setOnCompletionListener { reset() }
+    }
+
     val tagSelect: AutoCompleteTextView = checkin_tag
     val prevTag = tagSelect.text
     tagSelect.setText("Updating tags list...")
@@ -127,7 +143,7 @@ class TapFragment : androidx.fragment.app.Fragment() {
 
         val id: Uri? = record?.toUri()
         Log.i(TAG, id.toString())
-        if (id?.host == "live.hack.gt" && uuidRegex.containsMatchIn(id.getQueryParameter("user").orEmpty())) {
+        if (id?.host == "info.hack.gt" && uuidRegex.containsMatchIn(id.getQueryParameter("user").orEmpty())) {
           val uuid = id.getQueryParameter("user").orEmpty()
           Log.i(TAG, "this valid id is " + uuid)
 
@@ -190,7 +206,7 @@ class TapFragment : androidx.fragment.app.Fragment() {
         if (question?.name.equals("tshirt-size")) {
           userShirtSizeVal = question?.value
         } else if (question?.name.equals("dietary-restrictions")) {
-          userDietaryRestrictionsVal = question?.values.toString()
+          userDietaryRestrictionsVal = question?.values?.toString()
         }
       }
 
@@ -204,6 +220,9 @@ class TapFragment : androidx.fragment.app.Fragment() {
         userShirtSize.text = userShirtSizeVal
         try {
           userDietaryRestrictions.text = userDietaryRestrictionsVal?.substring(1)?.dropLast(1)
+          if (userDietaryRestrictions.text.equals("null")) {
+            userDietaryRestrictions.text = ""
+          }
         } catch (e: Throwable) {
           userDietaryRestrictions.text = ""
         }
@@ -220,8 +239,6 @@ class TapFragment : androidx.fragment.app.Fragment() {
         val lastCheckInTimeString = getTimeSinceCheckinEvent(checkInData.checkInResult)
         val checkInUser = checkInData.checkInResult.last_successful_checkin()?.checked_in_by
         val checkInType = checkInData.checkInResult.checked_in
-
-        // TODO: look at last successful checkin to detect check outs when not checked in (in some cases)
 
         val checkInString = when (checkInType) {
           true -> getString(R.string.user_already_checked_in)
@@ -263,18 +280,18 @@ class TapFragment : androidx.fragment.app.Fragment() {
       val waitingForBadge = wait_for_badge_tap
       val badgeTapped = badge_tapped
 
-      waitingForBadge.visibility = View.GONE
-      nfcInstructions.visibility = View.GONE
+      waitingForBadge.gone()
+      nfcInstructions.gone()
 
       if (validTag) {
-        badgeTapped.visibility = View.VISIBLE
+        badgeTapped.show()
+        playSound(R.raw.success)
       } else {
-        val toneGen1 = ToneGenerator(AudioManager.STREAM_MUSIC, 100)
-        toneGen1.startTone(ToneGenerator.TONE_CDMA_EMERGENCY_RINGBACK, 500)
+        playSound(R.raw.alert_simple)
 
         invalid_tap_msg.text = message
-        invalid_tap.visibility = View.VISIBLE
-        invalid_tap_msg.visibility = View.VISIBLE
+        invalid_tap.show()
+        invalid_tap_msg.show()
         if (checkin != null) {
           if (lastSuccessTime != null) {
             last_successful_checkin_date.text = lastSuccessTime
@@ -288,12 +305,12 @@ class TapFragment : androidx.fragment.app.Fragment() {
       }
 
       Handler().postDelayed({
-        waitingForBadge.visibility = View.VISIBLE
-        nfcInstructions.visibility = View.VISIBLE
+        waitingForBadge.show()
+        nfcInstructions.show()
 
-        badgeTapped.visibility = View.GONE
-        invalid_tap.visibility = View.GONE
-        invalid_tap_msg.visibility = View.GONE
+        badgeTapped.gone()
+        invalid_tap.gone()
+        invalid_tap_msg.gone()
 
         last_successful_checkin_date.hide()
         last_successful_checkin_user.hide()
@@ -309,6 +326,10 @@ class TapFragment : androidx.fragment.app.Fragment() {
 
   private fun View.hide() {
     this.visibility = View.INVISIBLE
+  }
+
+  private fun View.gone() {
+    this.visibility = View.GONE
   }
 
 

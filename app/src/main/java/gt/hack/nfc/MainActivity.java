@@ -110,14 +110,13 @@ public class MainActivity extends AppCompatActivity {
 
         //TODO: implement server-side access control
         if (username.equals("ehsan") || username.equals("petschekr") || username.equals("james") || username.equals("julian")
-                || username.equals("evan") || username.equals("nickg")) {
+                || username.equals("evan")) {
             drawerItems.add(DrawerItem.SEARCH.getDrawerItem().withIdentifier(101));
         }
         drawerItems.add(DrawerItem.TAP.getDrawerItem().withIdentifier(102));
         drawerItems.add(new DividerDrawerItem().withIdentifier(103));
-        drawerItems.add(new DividerDrawerItem().withIdentifier(104));
-        drawerItems.add(DrawerItem.LOGOUT.getDrawerItem().withIdentifier(105));
-        drawerItems.add(new SecondaryDrawerItem().withName("Version " + getApplicationContext().getString(R.string.app_version)).withSelectable(false).withIdentifier(106));
+        drawerItems.add(DrawerItem.LOGOUT.getDrawerItem().withIdentifier(104));
+        drawerItems.add(new SecondaryDrawerItem().withName("Version " + getApplicationContext().getString(R.string.app_version)).withSelectable(false).withIdentifier(105));
 
         result = new DrawerBuilder()
                 .withActivity(this)
