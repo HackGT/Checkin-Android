@@ -108,11 +108,8 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-        //TODO: implement server-side access control
-        if (username.equals("ehsan") || username.equals("petschekr") || username.equals("james") || username.equals("julian")
-                || username.equals("evan")) {
-            drawerItems.add(DrawerItem.SEARCH.getDrawerItem().withIdentifier(101));
-        }
+
+        drawerItems.add(DrawerItem.SEARCH.getDrawerItem().withIdentifier(101));
         drawerItems.add(DrawerItem.TAP.getDrawerItem().withIdentifier(102));
         drawerItems.add(new DividerDrawerItem().withIdentifier(103));
         drawerItems.add(DrawerItem.LOGOUT.getDrawerItem().withIdentifier(104));
