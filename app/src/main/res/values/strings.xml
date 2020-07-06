@@ -65,4 +65,15 @@
     <string name="default_instance_url">https://checkin.hack.gt</string>
     <string name="login">Login</string>
     <string name="login_with_your_account_provided_by_hackgt_staff">Login with your account provided by HackGT Staff</string>
+    <string name="confirm_user">Confirm User</string>
+    <string name="email">Email</string>
+    <string name="confirmation_branch">Confirmation branch</string>
+    <string name="school">School</string>
+    <string name="nfc_error">NFC error</string>
+    <string name="confirm_check_in">Confirm Check In</string>
+    <string name="unlocked_badge_warning">Badge contents can be changed by anyone</string>
+    <string name="warning_symbol">Warning symbol</string>
+    <string name="keep_badge_unlocked">Keep tag unlocked</string>
+    <string name="badge_unlocked_dev_build">Badge will not be permanently locked because this is a development build</string>
+    <string name="badge_contents_will_be_locked">Badge contents will be locked</string>
 </resources>

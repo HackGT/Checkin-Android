@@ -55,10 +55,10 @@ object API {
     private fun getApolloClient(preferences: SharedPreferences): ApolloClient {
         val client = OkHttpClient.Builder().addInterceptor { chain ->
             val original = chain.request()
-            val builder = original.newBuilder().method(original.method(),
-                original.body())
+          val builder = original.newBuilder().method(original.method,
+              original.body)
             builder.header("Cookie", preferences.getString("cookie", "")!!)
-            println(chain.request().url())
+          println(chain.request().url)
             chain.proceed(builder.build())
         }
             .build()

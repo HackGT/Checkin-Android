@@ -8,27 +8,23 @@ import android.nfc.Tag;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
-import android.widget.CompoundButton;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.typeface.IIcon;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
-import com.mikepenz.materialdrawer.interfaces.OnCheckedChangeListener;
 import com.mikepenz.materialdrawer.model.AbstractDrawerItem;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
-import com.mikepenz.materialdrawer.model.SwitchDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
@@ -112,28 +108,12 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-        //TODO: implement server-side access control
-        if (username.equals("ehsan") || username.equals("petschekr") || username.equals("julian")
-                || username.equals("evan") || username.equals("nickg")) {
-            drawerItems.add(DrawerItem.SEARCH.getDrawerItem().withIdentifier(101));
-        }
+
+        drawerItems.add(DrawerItem.SEARCH.getDrawerItem().withIdentifier(101));
         drawerItems.add(DrawerItem.TAP.getDrawerItem().withIdentifier(102));
         drawerItems.add(new DividerDrawerItem().withIdentifier(103));
-        drawerItems.add(new SwitchDrawerItem().withChecked(Util.INSTANCE.getNfcLockEnabled()).withName("NFC locking enabled").withOnCheckedChangeListener(new OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(IDrawerItem drawerItem, CompoundButton buttonView, boolean isChecked) {
-                Util.INSTANCE.setNfcLockEnabled(isChecked);
-                if (isChecked) {
-                    Util.INSTANCE.makeSnackbar(findViewById(R.id.content_frame), R.string.nfc_locking_enabled, Snackbar.LENGTH_SHORT).show();
-                }
-                else {
-                    Util.INSTANCE.makeSnackbar(findViewById(R.id.content_frame), R.string.nfc_locking_disabled, Snackbar.LENGTH_SHORT).show();
-                }
-            }
-        }).withSelectable(false).withIdentifier(104));
-        drawerItems.add(new DividerDrawerItem().withIdentifier(105));
-        drawerItems.add(DrawerItem.LOGOUT.getDrawerItem().withIdentifier(106));
-        drawerItems.add(new SecondaryDrawerItem().withName("Version " + getApplicationContext().getString(R.string.app_version)).withSelectable(false).withIdentifier(107));
+        drawerItems.add(DrawerItem.LOGOUT.getDrawerItem().withIdentifier(104));
+        drawerItems.add(new SecondaryDrawerItem().withName("Version " + getApplicationContext().getString(R.string.app_version)).withSelectable(false).withIdentifier(105));
 
         result = new DrawerBuilder()
                 .withActivity(this)

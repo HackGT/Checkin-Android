@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:weightSum="1"
-    android:paddingBottom="6dp"
+    android:paddingBottom="0dp"
     android:paddingLeft="8dp"
     android:paddingRight="8dp"
     android:paddingTop="6dp">
@@ -17,6 +17,7 @@
         android:layout_gravity="center"
         android:layout_weight="0.22"
         app:cardCornerRadius="4dp"
+        android:paddingBottom="0dp"
         app:cardElevation="1dp">
 
         <LinearLayout
@@ -32,21 +33,23 @@
                 android:layout_weight="75"
                 android:ellipsize="end"
                 android:padding="8dp"
-                android:text="Confirm User"
+                android:text="@string/confirm_user"
                 android:textSize="34sp" />
 
             <TextView
                 android:id="@+id/hacker_checkin_name"
                 android:paddingTop="14dp"
                 android:paddingStart="8dp"
+                android:drawableStart="@drawable/user"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:hint="Name"
+                android:hint="@string/name"
                 android:textColor="@color/secondaryTextColor"
-                android:textSize="20dp"
-                android:drawableLeft="@drawable/user"
+                android:paddingEnd="8dp"
+                android:textSize="20sp"
                 android:drawablePadding="8dp" />
+
             <TextView
                 android:id="@+id/hacker_checkin_email"
                 android:paddingTop="14dp"
@@ -54,11 +57,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:hint="Email"
+                android:hint="@string/email"
                 android:textColor="@color/secondaryTextColor"
                 android:paddingStart="8dp"
+                android:paddingEnd="8dp"
                 android:textSize="20sp"
                 android:drawablePadding="8dp" />
+
             <TextView
                 android:id="@+id/hacker_checkin_type"
                 android:paddingTop="14dp"
@@ -66,11 +71,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:hint="Application Branch"
+                android:hint="@string/application_branch"
                 android:textColor="@color/secondaryTextColor"
                 android:paddingStart="8dp"
+                android:paddingEnd="8dp"
                 android:textSize="20sp"
                 android:drawablePadding="8dp" />
+
             <TextView
                 android:id="@+id/hacker_confirm_type"
                 android:paddingTop="14dp"
@@ -78,11 +85,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:hint="Confirmation Branch"
+                android:hint="@string/confirmation_branch"
                 android:textColor="@color/secondaryTextColor"
                 android:paddingStart="8dp"
+                android:paddingEnd="8dp"
                 android:textSize="20sp"
                 android:drawablePadding="8dp" />
+
             <TextView
                 android:id="@+id/hacker_checkin_school"
                 android:paddingTop="14dp"
@@ -90,9 +99,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:hint="School"
+                android:hint="@string/school"
                 android:textColor="@color/secondaryTextColor"
                 android:paddingStart="8dp"
+                android:paddingEnd="8dp"
                 android:textSize="20sp"
                 android:drawablePadding="8dp" />
 
@@ -103,32 +113,44 @@
                 android:paddingTop="16dp">
 
                 <ImageView
+                    android:id="@+id/badgeWritten"
+                    android:layout_width="match_parent"
+                    android:layout_height="64dp"
+                    android:layout_gravity="end"
+                    android:contentDescription="@string/badge_successfully_written"
+                    android:gravity="center_horizontal"
+                    android:paddingTop="16dp"
+                    android:tint="@color/success"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/check" />
+
+                <ImageView
                     android:id="@+id/nfc_error"
                     android:layout_width="match_parent"
                     android:layout_height="64dp"
-                    android:gravity="center_horizontal"
                     android:layout_gravity="end"
                     android:layout_marginTop="16dp"
-                    android:contentDescription="NFC error"
+                    android:contentDescription="@string/nfc_error"
+                    android:gravity="center_horizontal"
                     android:visibility="gone"
                     app:srcCompat="@drawable/warning" />
+
 
                 <ProgressBar
                     android:id="@+id/wait_for_badge_tap"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
-                    android:gravity="center_horizontal"
-                    android:layout_marginTop="24dp" />
-
+                    android:layout_marginTop="24dp"
+                    android:gravity="center_horizontal" />
 
                 <TextView
                     android:id="@+id/nfcInstructions"
                     android:layout_width="match_parent"
-                    android:gravity="center_horizontal"
                     android:layout_height="wrap_content"
-                    android:text="@string/nfc_ready"
                     android:layout_gravity="center_vertical"
+                    android:gravity="center_horizontal"
+                    android:text="@string/nfc_ready"
                     android:textSize="24sp" />
 
                 <androidx.appcompat.widget.AppCompatButton
@@ -137,23 +159,65 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:layout_marginBottom="24dp"
-                    android:textColor="@color/white"
                     android:background="@color/primaryColor"
                     android:padding="12dp"
-                    android:visibility="gone"
-                    android:text="@string/enable_nfc" />
+                    android:text="@string/enable_nfc"
+                    android:textColor="@color/white"
+                    android:visibility="gone" />
 
                 <ImageView
-                    android:id="@+id/badgeWritten"
+                    android:id="@+id/unlocked_tag_warning_icon"
                     android:layout_width="match_parent"
-                    android:layout_height="64dp"
-                    android:tint="@color/success"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:contentDescription="@string/warning_symbol"
                     android:visibility="gone"
-                    android:gravity="center_horizontal"
-                    android:layout_gravity="end"
-                    android:paddingTop="16dp"
-                    android:contentDescription="@string/badge_successfully_written"
-                    app:srcCompat="@drawable/check" />
+                    app:srcCompat="@drawable/ic_warning_red_24dp" />
+
+                <ImageView
+                    android:id="@+id/unlocked_tag_dev_version_icon"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:contentDescription="@string/warning_symbol"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/ic_developer_mode_black_24dp" />
+
+                <ImageView
+                    android:id="@+id/lock_tag_notice_icon"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:contentDescription="Green lock"
+                    app:srcCompat="@drawable/ic_lock_green_24dp" />
+
+                <TextView
+                    android:id="@+id/unlocked_tag_warning_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="0dp"
+                    android:paddingBottom="0dp"
+                    android:text="@string/unlocked_badge_warning"
+                    android:textAlignment="center"
+                    android:textColor="#B00020"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/lock_tag_notice_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/badge_contents_will_be_locked"
+                    android:textAlignment="center"
+                    android:textColor="#087f23" />
+
+
+                <TextView
+                    android:id="@+id/unlocked_tag_dev_version_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/badge_unlocked_dev_build"
+                    android:textAlignment="center"
+                    android:visibility="gone" />
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/confirmCheckin"
@@ -161,11 +225,20 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
                     android:layout_marginBottom="24dp"
-                    android:textColor="@color/white"
                     android:background="@color/primaryColor"
                     android:padding="12dp"
-                    android:visibility="gone"
-                    android:text="Confirm Check In"/>
+                    android:text="@string/confirm_check_in"
+                    android:textColor="@color/white"
+                    android:visibility="gone" />
+
+                <CheckBox
+                    android:id="@+id/no_tag_lock_checkbox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:layout_marginTop="14dp"
+                    android:text="@string/keep_badge_unlocked"
+                    android:textColor="#BDBDBD" />
 
             </LinearLayout>
 
